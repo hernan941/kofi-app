@@ -1,0 +1,7 @@
+appId: com.cuantovendi.local
+tags:
+  - sales
+---
+- runFlow: ../_shared/launch-clean.yaml
+- tapOn: 'Registrar venta'
+- assertVisible: 'Primero, agrega lo que vendes'

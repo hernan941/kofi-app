@@ -1,0 +1,9 @@
+appId: com.cuantovendi.local
+tags:
+  - foundations
+---
+- runFlow: ../_shared/launch-clean.yaml
+- assertNotVisible: 'No pudimos abrir tus datos'
+- assertNotVisible: 'Actualiza la app'
+- assertVisible: 'Registrar venta'
+- assertVisible: 'Inicio'

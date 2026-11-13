@@ -1,0 +1,45 @@
+appId: com.cuantovendi.local
+tags:
+  - products
+---
+- runFlow: ../_shared/launch-clean.yaml
+- tapOn: 'Productos'
+- tapOn: 'Agregar producto'
+- tapOn: 'Nombre'
+- inputText: 'Lámina Colibrí'
+- tapOn: '¿A cuánto lo vendes?'
+- inputText: '15000'
+- hideKeyboard
+- tapOn: 'Agregar costo'
+- inputText: '3000'
+- hideKeyboard
+- tapOn: 'Agregar otra opción'
+- assertVisible: 'Estándar'
+- inputText: 'Print A3'
+- hideKeyboard
+- scrollUntilVisible:
+    element: 'Agregar otra versión'
+- tapOn: 'Agregar otra versión'
+- inputText: 'Original'
+- hideKeyboard
+- scrollUntilVisible:
+    element:
+      text: 'A convenir'
+      index: 2
+- tapOn:
+    text: 'A convenir'
+    index: 2
+- assertVisible: 'El precio lo escribes al registrar cada venta.'
+- scrollUntilVisible:
+    element: 'Guardar'
+- tapOn: 'Guardar'
+- assertVisible: 'Producto guardado'
+- assertVisible: 'Lámina Colibrí'
+- assertVisible: '3 versiones'
+- tapOn: 'Lámina Colibrí'
+- assertVisible: 'Versiones'
+- assertVisible: 'Estándar'
+- assertVisible: 'Print A3'
+- assertVisible: 'Original'
+- assertVisible: 'A convenir'
+- assertVisible: 'Te cuesta.*3.000.*'

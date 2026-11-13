@@ -1,0 +1,18 @@
+appId: com.cuantovendi.local
+tags:
+  - foundations
+---
+- runFlow: ../_shared/launch-clean.yaml
+- tapOn: 'Calendario'
+- assertVisible: 'Aquí verás tus ventas día por día.'
+- tapOn: 'Productos'
+- assertVisible: 'Aquí guardarás lo que vendes, con sus precios.'
+- tapOn: 'Consejos'
+- assertVisible: 'Aquí encontrarás ideas breves para vender mejor.'
+- tapOn: 'Ajustes'
+- assertVisible: 'Aquí podrás cuidar tus recordatorios y tus respaldos.'
+- tapOn: 'Inicio'
+- assertVisible: 'Todavía no hay ventas esta semana'
+- openLink: cuantovendi://e2e/diagnostics
+- assertVisible: 'Diagnóstico de fechas'
+- assertVisible: 'Todos los casos coinciden'

@@ -1,0 +1,6 @@
+appId: com.cuantovendi.local
+---
+- tapOn: 'Inicio'
+- tapOn: 'Registrar venta'
+- tapOn: ${PRODUCT_ROW}
+- tapOn: 'Guardar venta'

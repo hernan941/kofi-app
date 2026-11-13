@@ -1,0 +1,17 @@
+appId: com.cuantovendi.local
+tags:
+  - sales
+---
+- runFlow: ../_shared/launch-clean.yaml
+- runFlow:
+    file: ../_shared/create-product.yaml
+    env:
+      PRODUCT_NAME: 'Lámina Colibrí'
+      PRODUCT_PRICE: '15000'
+- tapOn: 'Inicio'
+- tapOn: 'Registrar venta'
+- tapOn: 'Lámina Colibrí.*'
+- tapOn: 'Día anterior'
+- assertVisible: 'Ayer.*'
+- tapOn: 'Guardar venta'
+- assertVisible: 'Ayer.*'

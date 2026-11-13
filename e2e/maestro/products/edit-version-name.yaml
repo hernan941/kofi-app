@@ -1,0 +1,23 @@
+appId: com.cuantovendi.local
+tags:
+  - products
+---
+- runFlow: ../_shared/launch-clean.yaml
+- runFlow:
+    file: ../_shared/create-two-version-product.yaml
+    env:
+      PRODUCT_NAME: 'Lámina Colibrí'
+- tapOn: 'Lámina Colibrí'
+- assertVisible: 'Print A3'
+- tapOn: 'Editar producto'
+- scrollUntilVisible:
+    element: 'Print A3'
+- tapOn: 'Print A3'
+- eraseText: 20
+- inputText: 'Print A2'
+- hideKeyboard
+- tapOn: 'Guardar'
+- assertVisible: 'Cambios guardados'
+- tapOn: 'Lámina Colibrí'
+- assertVisible: 'Print A2'
+- assertNotVisible: 'Print A3'

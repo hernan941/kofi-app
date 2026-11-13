@@ -1,0 +1,8 @@
+appId: com.cuantovendi.local
+tags:
+  - upgrade
+---
+- launchApp
+- assertNotVisible: 'No pudimos abrir tus datos'
+- assertNotVisible: 'Actualiza la app'
+- assertVisible: 'Inicio'

@@ -1,0 +1,13 @@
+appId: com.cuantovendi.local
+---
+- scrollUntilVisible:
+    element: 'Galería'
+- tapOn: 'Galería'
+- waitForAnimationToEnd:
+    timeout: 5000
+- tapOn:
+    point: '18%,22%'
+- tapOn:
+    id: '.*button_add'
+    optional: true
+- waitForAnimationToEnd

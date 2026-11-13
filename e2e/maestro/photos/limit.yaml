@@ -1,0 +1,21 @@
+appId: com.cuantovendi.local
+tags:
+  - photos
+---
+- runFlow: ../_shared/launch-clean.yaml
+- runFlow: ../_shared/seed-gallery-images.yaml
+- tapOn: 'Productos'
+- tapOn: 'Agregar producto'
+- repeat:
+    times: 6
+    commands:
+      - runFlow: ../_shared/add-photo-from-gallery.yaml
+- assertVisible: '6 de 6'
+- assertVisible: 'Ya tienes 6 fotos, el máximo. Para agregar otra, quita una.'
+- assertNotVisible: 'Galería'
+- assertNotVisible: 'Cámara'
+- tapOn: 'Foto 6 de 6'
+- tapOn: 'Quitar foto'
+- tapOn: 'Quitar foto'
+- assertVisible: '5 de 6'
+- assertVisible: 'Galería'

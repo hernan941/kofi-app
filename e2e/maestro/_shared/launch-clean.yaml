@@ -1,0 +1,5 @@
+appId: com.cuantovendi.local
+---
+- launchApp:
+    clearState: true
+- assertVisible: 'Todavía no hay ventas esta semana'

@@ -1,0 +1,9 @@
+appId: com.cuantovendi.local
+tags:
+  - release-only
+---
+- launchApp:
+    clearState: true
+- openLink: cuantovendi://e2e/diagnostics
+- assertVisible: 'Todavía no hay ventas esta semana'
+- assertNotVisible: 'Diagnóstico de fechas'

@@ -1,0 +1,25 @@
+appId: com.cuantovendi.local
+tags:
+  - photos
+---
+- runFlow: ../_shared/launch-clean.yaml
+- runFlow: ../_shared/seed-gallery-images.yaml
+- tapOn: 'Productos'
+- tapOn: 'Agregar producto'
+- tapOn: 'Nombre'
+- inputText: 'Lámina Colibrí'
+- hideKeyboard
+- assertVisible: '0 de 6'
+- runFlow: ../_shared/add-photo-from-gallery.yaml
+- assertVisible: '1 de 6'
+- assertVisible: 'Portada'
+- assertVisible: 'Foto 1 de 1, portada'
+- scrollUntilVisible:
+    element: '¿A cuánto lo vendes?'
+- tapOn: '¿A cuánto lo vendes?'
+- inputText: '15000'
+- hideKeyboard
+- tapOn: 'Guardar'
+- assertVisible: 'Producto guardado'
+- tapOn: 'Lámina Colibrí'
+- assertVisible: 'Foto 1 de 1 de Lámina Colibrí, portada'

@@ -1,0 +1,27 @@
+appId: com.cuantovendi.local
+tags:
+  - products
+---
+- runFlow: ../_shared/launch-clean.yaml
+- runFlow:
+    file: ../_shared/create-product.yaml
+    env:
+      PRODUCT_NAME: 'Lámina Colibrí'
+      PRODUCT_PRICE: '15000'
+- tapOn: 'Lámina Colibrí'
+- tapOn: 'Archivar'
+- assertVisible: '¿Archivar Lámina Colibrí?'
+- tapOn:
+    text: 'Archivar'
+    index: 1
+- assertVisible: 'Todavía no tienes productos|No tienes productos en tu lista'
+- tapOn: 'Ver archivados.*'
+- assertVisible: 'Lámina Colibrí'
+- tapOn: 'Lámina Colibrí'
+- assertVisible: 'Está archivado.*'
+- tapOn: 'Volver a usar'
+- assertVisible: 'Listo, vuelve a estar en tu lista.'
+- tapOn: 'Volver'
+- tapOn: 'Volver'
+- assertVisible: 'Lámina Colibrí'
+- assertNotVisible: 'Ver archivados.*'

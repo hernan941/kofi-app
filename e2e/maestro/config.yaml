@@ -1,0 +1,8 @@
+flows:
+  - 'foundations/*'
+  - 'products/*'
+  - 'photos/*'
+  - 'sales/*'
+excludeTags:
+  - release-only
+  - upgrade

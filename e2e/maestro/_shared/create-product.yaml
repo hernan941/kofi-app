@@ -1,0 +1,12 @@
+appId: com.cuantovendi.local
+---
+- tapOn: 'Productos'
+- tapOn: 'Agregar producto'
+- tapOn: 'Nombre'
+- inputText: ${PRODUCT_NAME}
+- tapOn: '¿A cuánto lo vendes?'
+- inputText: ${PRODUCT_PRICE}
+- hideKeyboard
+- tapOn: 'Guardar'
+- assertVisible: 'Producto guardado'
+- assertVisible: ${PRODUCT_NAME}

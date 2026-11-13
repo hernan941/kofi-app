@@ -1,0 +1,33 @@
+appId: com.cuantovendi.local
+tags:
+  - sales
+---
+- runFlow: ../_shared/launch-clean.yaml
+- runFlow:
+    file: ../_shared/create-product.yaml
+    env:
+      PRODUCT_NAME: 'Lámina Colibrí'
+      PRODUCT_PRICE: '15000'
+- runFlow:
+    file: ../_shared/create-product.yaml
+    env:
+      PRODUCT_NAME: 'Taza Pájaro'
+      PRODUCT_PRICE: '8000'
+- runFlow:
+    file: ../_shared/register-sale.yaml
+    env:
+      PRODUCT_ROW: 'Lámina Colibrí.*'
+- tapOn: 'Listo'
+- tapOn: 'Lámina Colibrí.*'
+- assertVisible: 'Editar venta'
+- tapOn: 'Editar venta'
+- tapOn: 'Agregar otro producto'
+- tapOn: 'Taza Pájaro.*'
+- tapOn: 'Guardar cambios'
+- assertVisible: 'Taza Pájaro.*'
+- scrollUntilVisible:
+    element: 'Borrar venta'
+- tapOn: 'Borrar venta'
+- assertVisible: '¿Borrar esta venta?'
+- tapOn: 'Borrar venta'
+- assertVisible: 'Todavía no hay ventas esta semana'

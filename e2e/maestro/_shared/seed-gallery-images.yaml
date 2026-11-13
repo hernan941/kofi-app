@@ -1,0 +1,6 @@
+appId: com.cuantovendi.local
+---
+- addMedia:
+    - ../assets/gallery-1.jpg
+    - ../assets/gallery-2.jpg
+    - ../assets/gallery-3.jpg

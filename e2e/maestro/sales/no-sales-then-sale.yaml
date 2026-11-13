@@ -1,0 +1,31 @@
+appId: com.cuantovendi.local
+tags:
+  - sales
+---
+- runFlow: ../_shared/launch-clean.yaml
+- runFlow:
+    file: ../_shared/create-product.yaml
+    env:
+      PRODUCT_NAME: 'Lámina Colibrí'
+      PRODUCT_PRICE: '15000'
+- tapOn: 'Inicio'
+- tapOn: 'Registrar venta'
+# Depends on the weekday (ADR-007): on Monday and Tuesday the panel asks which week
+# ("Marcar que no vendí" + ChipGroup "Semana"); the rest of the week it offers a single
+# "Esta semana no vendí" button. The flow handles both and always marks the current week.
+- runFlow:
+    when:
+      visible: 'Marcar que no vendí'
+    commands:
+      - tapOn: 'Esta semana'
+      - tapOn: 'Marcar que no vendí'
+- runFlow:
+    when:
+      visible: 'Esta semana no vendí'
+    commands:
+      - tapOn: 'Esta semana no vendí'
+- assertVisible: 'Desmarcar'
+- tapOn: 'Lámina Colibrí.*'
+- tapOn: 'Guardar venta'
+- assertVisible: '¡Registraste tu primera venta!'
+- assertVisible: 'Como vendiste esta semana, quitamos la marca de "no vendí".'

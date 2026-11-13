@@ -1,0 +1,15 @@
+appId: com.cuantovendi.local
+tags:
+  - products
+---
+- runFlow: ../_shared/launch-clean.yaml
+- runFlow:
+    file: ../_shared/create-product.yaml
+    env:
+      PRODUCT_NAME: 'Lámina Colibrí'
+      PRODUCT_PRICE: '15000'
+- assertNotVisible: '.*[Vv]ersi[oó]n.*'
+- tapOn: 'Lámina Colibrí'
+- assertVisible: 'Precio'
+- assertVisible: '.*15.000.*'
+- assertNotVisible: '.*[Vv]ersi[oó]n.*'
