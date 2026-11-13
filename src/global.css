@@ -1,0 +1,141 @@
+@import 'tailwindcss';
+@import 'uniwind';
+@import 'heroui-native/styles';
+
+@theme {
+  --font-normal: 'Lexend_400Regular';
+  --font-medium: 'Lexend_500Medium';
+  --font-semibold: 'Lexend_600SemiBold';
+  --font-bold: 'Lexend_700Bold';
+
+  --border-width: 2px;
+  --field-border-width: 2px;
+  --radius: 0.5rem;
+  --field-radius: 1rem;
+  --opacity-disabled: 0.6;
+
+  --text-xs: 0.8125rem;
+  --text-xs--line-height: 1.125rem;
+  --text-sm: 0.875rem;
+  --text-sm--line-height: 1.25rem;
+  --text-base: 1rem;
+  --text-base--line-height: 1.5rem;
+  --text-lg: 1.125rem;
+  --text-lg--line-height: 1.625rem;
+  --text-heading: 1.25rem;
+  --text-heading--line-height: 1.75rem;
+  --text-title: 1.75rem;
+  --text-title--line-height: 2.25rem;
+  --text-display: 2.75rem;
+  --text-display--line-height: 3.25rem;
+}
+
+@layer theme {
+  :root {
+    @variant light {
+      --background: #e7eff3;
+      --foreground: #171d21;
+
+      --surface: #d5e3ea;
+      --surface-foreground: #171d21;
+      --surface-secondary: #e7eff3;
+      --surface-secondary-foreground: #171d21;
+      --surface-tertiary: #e7eff3;
+      --surface-tertiary-foreground: #171d21;
+
+      --overlay: #d5e3ea;
+      --overlay-foreground: #171d21;
+      --backdrop: oklch(0% 0 0 / 40%);
+
+      --muted: #4c5459;
+      --default: #d5e3ea;
+      --default-foreground: #171d21;
+
+      --accent: #743a59;
+      --accent-foreground: #e7eff3;
+
+      --field-background: #e7eff3;
+      --field-foreground: #171d21;
+      --field-placeholder: #4c5459;
+      --field-border: #4c5459;
+
+      --success: #743a59;
+      --success-foreground: #e7eff3;
+      --warning: #4c5459;
+      --warning-foreground: #e7eff3;
+      --danger: #9c3b22;
+      --danger-foreground: #e7eff3;
+
+      --segment: #e7eff3;
+      --segment-foreground: #171d21;
+
+      --border: #171d21;
+      --separator: color-mix(in oklab, #d5e3ea 70%, #171d21 30%);
+      --focus: #743a59;
+      --link: #743a59;
+
+      --sticker-shadow-color: #171d21;
+      --sticker-shadow: 3px 3px 0 0 #171d21;
+      --sticker-shadow-pressed: 1px 1px 0 0 #171d21;
+      --surface-shadow: 3px 3px 0 0 #171d21;
+      --overlay-shadow: 3px 3px 0 0 #171d21;
+      --field-shadow: 0 0 0 0 transparent;
+    }
+
+    @variant dark {
+      --background: #131a1e;
+      --foreground: #edf3f6;
+
+      --surface: #1d272d;
+      --surface-foreground: #edf3f6;
+      --surface-secondary: #131a1e;
+      --surface-secondary-foreground: #edf3f6;
+      --surface-tertiary: #131a1e;
+      --surface-tertiary-foreground: #edf3f6;
+
+      --overlay: #1d272d;
+      --overlay-foreground: #edf3f6;
+      --backdrop: oklch(0% 0 0 / 40%);
+
+      --muted: #b3babe;
+      --default: #1d272d;
+      --default-foreground: #edf3f6;
+
+      --accent: #d79bbb;
+      --accent-foreground: #131a1e;
+
+      --field-background: #131a1e;
+      --field-foreground: #edf3f6;
+      --field-placeholder: #b3babe;
+      --field-border: #b3babe;
+
+      --success: #d79bbb;
+      --success-foreground: #131a1e;
+      --warning: #b3babe;
+      --warning-foreground: #131a1e;
+      --danger: #ee9a72;
+      --danger-foreground: #131a1e;
+
+      --segment: #131a1e;
+      --segment-foreground: #edf3f6;
+
+      --border: #b3babe;
+      --separator: color-mix(in oklab, #1d272d 70%, #edf3f6 30%);
+      --focus: #d79bbb;
+      --link: #d79bbb;
+
+      --sticker-shadow-color: #000000;
+      --sticker-shadow: 3px 3px 0 0 #000000;
+      --sticker-shadow-pressed: 1px 1px 0 0 #000000;
+      --surface-shadow: 3px 3px 0 0 #000000;
+      --overlay-shadow: 3px 3px 0 0 #000000;
+      --field-shadow: 0 0 0 0 transparent;
+    }
+  }
+}
+
+@theme inline {
+  --color-sticker-shadow: var(--sticker-shadow-color);
+  --shadow-sticker: var(--sticker-shadow);
+  --shadow-sticker-pressed: var(--sticker-shadow-pressed);
+}

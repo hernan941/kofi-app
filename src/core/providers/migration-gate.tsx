@@ -1,0 +1,141 @@
+import {
+  Lexend_400Regular,
+  Lexend_500Medium,
+  Lexend_600SemiBold,
+  Lexend_700Bold,
+  useFonts,
+} from '@expo-google-fonts/lexend';
+import * as SplashScreen from 'expo-splash-screen';
+import { useEffect, useReducer, type ReactNode } from 'react';
+
+import type { BootFailure, MigrationResult } from '@/core/db/configure-and-migrate';
+import { err } from '@/shared/domain/result';
+import { BootErrorScreen } from '@/shared/ui';
+
+import { bootReducer, isBootSettled } from './boot/boot-machine';
+import { useDependencies } from './dependencies-context';
+
+const LEXEND_FONTS = {
+  Lexend_400Regular,
+  Lexend_500Medium,
+  Lexend_600SemiBold,
+  Lexend_700Bold,
+};
+
+type MigrateDatabase = () => Promise<MigrationResult>;
+
+const migrationRuns = new WeakMap<MigrateDatabase, Promise<MigrationResult>>();
+
+/**
+ * Ejecuta la migración una sola vez por tarea: si el gate se vuelve a montar, reutiliza la
+ * promesa anterior. Un rechazo o un `throw` síncrono se traducen a `migration_failed`.
+ */
+function runMigrationOnce(migrateDatabase: MigrateDatabase): Promise<MigrationResult> {
+  const existing = migrationRuns.get(migrateDatabase);
+  if (existing) {
+    return existing;
+  }
+  const started = Promise.resolve()
+    .then(migrateDatabase)
+    .catch((cause: unknown): MigrationResult => err({ kind: 'migration_failed', cause }));
+  migrationRuns.set(migrateDatabase, started);
+  return started;
+}
+
+type AfterFirstRender = () => Promise<void>;
+
+const afterFirstRenderRuns = new WeakSet<AfterFirstRender>();
+
+/** Props de {@link MigrationGate}. */
+export interface MigrationGateProps {
+  readonly migrateDatabase: MigrateDatabase;
+  /** Tarea de arranque que corre una sola vez por proceso, después del primer render en `ready`. */
+  readonly runAfterFirstRender: AfterFirstRender;
+  readonly children: ReactNode;
+}
+
+/** Causa técnica de un fallo de arranque, si la hay, para el logger. */
+function causeOf(failure: BootFailure): unknown {
+  return failure.kind === 'migration_failed' ? failure.cause : undefined;
+}
+
+/**
+ * Puerta de arranque (ADR-005, ADR-006, ADR-014). Mantiene el splash mientras carga las
+ * fuentes Lexend y migra la base, dos condiciones independientes que resuelve `bootReducer`.
+ * Con todo listo muestra los hijos; si la base falla o es más nueva que el código, muestra
+ * la pantalla de error de `shared/ui`, que no ofrece ninguna acción de escritura, y nunca
+ * monta los hijos. Con los hijos montados agenda `runAfterFirstRender` una sola vez por
+ * proceso (efecto + `setTimeout(…, 0)`): no bloquea el render y un fallo solo se registra.
+ */
+export function MigrationGate({
+  migrateDatabase,
+  runAfterFirstRender,
+  children,
+}: MigrationGateProps) {
+  const { logger } = useDependencies();
+  const [state, dispatch] = useReducer(bootReducer, { phase: 'booting' });
+  const [fontsLoaded, fontsError] = useFonts(LEXEND_FONTS);
+
+  useEffect(() => {
+    dispatch({ type: 'started' });
+  }, []);
+
+  useEffect(() => {
+    if (fontsError) {
+      logger.warn('fonts_failed', { message: fontsError.message });
+      dispatch({ type: 'fonts_failed' });
+    } else if (fontsLoaded) {
+      dispatch({ type: 'fonts_loaded' });
+    }
+  }, [fontsLoaded, fontsError, logger]);
+
+  useEffect(() => {
+    let active = true;
+    void runMigrationOnce(migrateDatabase).then((result) => {
+      if (!active) {
+        return;
+      }
+      if (result.ok) {
+        dispatch({ type: 'database_ready' });
+      } else {
+        logger.error('boot_failed', causeOf(result.error), { kind: result.error.kind });
+        dispatch({ type: 'database_failed', failure: result.error });
+      }
+    });
+    return () => {
+      active = false;
+    };
+  }, [migrateDatabase, logger]);
+
+  const settled = isBootSettled(state);
+  useEffect(() => {
+    if (settled) {
+      SplashScreen.hideAsync().catch((error: unknown) => {
+        logger.warn('splash_hide_failed', { message: String(error) });
+      });
+    }
+  }, [settled, logger]);
+
+  const ready = state.phase === 'ready';
+  useEffect(() => {
+    if (!ready || afterFirstRenderRuns.has(runAfterFirstRender)) {
+      return;
+    }
+    const timer = setTimeout(() => {
+      afterFirstRenderRuns.add(runAfterFirstRender);
+      Promise.resolve()
+        .then(runAfterFirstRender)
+        .catch((error: unknown) => {
+          logger.error('after_first_render_failed', error);
+        });
+    }, 0);
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [ready, runAfterFirstRender, logger]);
+
+  if (state.phase === 'failed') {
+    return <BootErrorScreen reason={state.failure.kind} />;
+  }
+  return state.phase === 'ready' ? children : null;
+}
