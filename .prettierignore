@@ -1,0 +1,13 @@
+docs/
+.claude/
+assets/
+src/uniwind-types.d.ts
+builds/
+android/
+ios/
+node_modules/
+.expo/
+dist/
+expo-env.d.ts
+package-lock.json
+src/core/db/migrations/
