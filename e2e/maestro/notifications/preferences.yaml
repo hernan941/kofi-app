@@ -1,0 +1,25 @@
+appId: com.cuantovendi.local
+tags:
+  - notifications
+---
+# Day and time are saved from the sheet; the switches save at once and hide or show "Día y hora".
+- runFlow: ../_shared/launch-clean.yaml
+- tapOn: 'Ajustes'
+- tapOn: 'Recordatorios.*'
+- assertVisible: 'Recordatorio semanal'
+- assertVisible: 'Resumen del mes'
+- assertVisible: 'Domingos a las 20:00'
+- tapOn: 'Día y hora.*'
+- assertVisible: 'Día y hora del recordatorio'
+- tapOn: 'Martes'
+- tapOn: '30'
+- assertVisible: 'Te avisamos los martes a las 20:30.'
+- tapOn: 'Guardar'
+- assertVisible: 'Martes a las 20:30'
+- tapOn: 'Recordatorio semanal'
+- assertNotVisible: 'Día y hora'
+- tapOn: 'Recordatorio semanal'
+- assertVisible: 'Martes a las 20:30'
+- tapOn: 'Resumen del mes'
+- tapOn: 'Resumen del mes'
+- assertVisible: 'Recordatorios'

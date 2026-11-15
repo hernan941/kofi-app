@@ -1,6 +1,12 @@
+/** Quita las tildes y demás marcas combinadas del texto (forma NFD sin diacríticos). */
+function removeDiacritics(text: string): string {
+  return text.normalize('NFD').replace(/\p{M}/gu, '');
+}
+
 /**
  * Arma un patrón de palabra completa, sin distinguir mayúsculas y con letras Unicode
- * (el `\b` de JavaScript no entiende las tildes).
+ * (el `\b` de JavaScript no entiende las tildes). Se escribe sin tildes porque
+ * {@link findGuiltPattern} las quita del texto antes de comparar.
  */
 function wholePhrase(phrase: string): RegExp {
   return new RegExp(`(?<![\\p{L}])${phrase}(?![\\p{L}])`, 'iu');
@@ -13,10 +19,15 @@ function wholePhrase(phrase: string): RegExp {
 export const GUILT_PATTERNS: readonly RegExp[] = [
   wholePhrase('llevas'),
   wholePhrase('otra\\s+vez'),
-  wholePhrase('deberías'),
+  wholePhrase('deberias'),
   wholePhrase('debes'),
   wholePhrase('tienes\\s+que'),
-  wholePhrase('todavía\\s+no'),
+  wholePhrase('todavia\\s+no'),
+  wholePhrase('aun\\s+no'),
+  wholePhrase('no\\s+has'),
+  wholePhrase('dejaste\\s+de'),
+  wholePhrase('te\\s+faltan?'),
+  wholePhrase('hace\\s+\\S+\\s+(dias|semanas)\\s+que\\s+no'),
   wholePhrase('olvidaste'),
   wholePhrase('fallaste'),
   wholePhrase('perdiste'),
@@ -24,7 +35,11 @@ export const GUILT_PATTERNS: readonly RegExp[] = [
   wholePhrase('mal'),
 ];
 
-/** Primer patrón de culpa que coincide con el texto, o `null` si el texto está limpio. */
+/**
+ * Primer patrón de culpa que coincide con el texto, o `null` si el texto está limpio. Compara
+ * sin tildes, así que "deberias" también cuenta.
+ */
 export function findGuiltPattern(text: string): RegExp | null {
-  return GUILT_PATTERNS.find((pattern) => pattern.test(text)) ?? null;
+  const plain = removeDiacritics(text);
+  return GUILT_PATTERNS.find((pattern) => pattern.test(plain)) ?? null;
 }

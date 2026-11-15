@@ -20,19 +20,30 @@ tags:
 - tapOn: 'Inicio'
 - tapOn: 'Registrar venta'
 - tapOn: 'Lámina Colibrí.*'
+- scrollUntilVisible:
+    element: 'Agregar otro producto'
 - tapOn: 'Agregar otro producto'
 - tapOn: 'Taza Pájaro.*'
+- scrollUntilVisible:
+    element: 'Agregar otro producto'
 - tapOn: 'Agregar otro producto'
 - tapOn: 'Print Bosque.*'
 - tapOn: 'Print A3.*'
-- tapOn: 'Precio de cada uno'
+- scrollUntilVisible:
+    element: '22.000'
+- tapOn: '22.000'
+- eraseText: 10
 - inputText: '20000'
 - hideKeyboard
 - scrollUntilVisible:
     element: 'Más detalles.*'
 - tapOn: 'Más detalles.*'
+- scrollUntilVisible:
+    element: 'Feria'
 - tapOn: 'Feria'
-- tapOn: 'Nota'
+- scrollUntilVisible:
+    element: 'Por ejemplo, feria del parque.*'
+- tapOn: 'Por ejemplo, feria del parque.*'
 - inputText: 'Feria del sábado'
 - hideKeyboard
 - assertVisible: 'Total.*43.000.*'

@@ -1,0 +1,26 @@
+appId: com.cuantovendi.local
+tags:
+  - tips
+---
+# Without any cost loaded, the first sale shows the costs tip (priority no_costs over first_sale).
+# The card has no links: closing it only hides it, and "Listo" stays as the only way out.
+- runFlow: ../_shared/launch-clean.yaml
+- runFlow:
+    file: ../_shared/create-product.yaml
+    env:
+      PRODUCT_NAME: 'Lámina Colibrí'
+      PRODUCT_PRICE: '15000'
+- runFlow:
+    file: ../_shared/register-sale.yaml
+    env:
+      PRODUCT_ROW: 'Lámina Colibrí.*'
+- assertVisible: '¡Registraste tu primera venta!'
+- assertVisible: 'Consejo · Costos'
+- assertVisible: '¿Para qué sirve saber cuánto te cuesta?'
+- tapOn: 'Cerrar consejo'
+- assertNotVisible: 'Consejo · Costos'
+- assertNotVisible: '¿Para qué sirve saber cuánto te cuesta?'
+- assertVisible: '¡Registraste tu primera venta!'
+- tapOn: 'Listo'
+- runFlow: ../_shared/dismiss-notification-intro.yaml
+- assertVisible: 'Registrar venta'

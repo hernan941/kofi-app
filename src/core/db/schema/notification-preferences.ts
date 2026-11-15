@@ -13,6 +13,8 @@ export const notificationPreferences = sqliteTable(
     weeklyMinuteOfDay: integer('weekly_minute_of_day').notNull(),
     monthlyEnabled: integer('monthly_enabled').notNull(),
     updatedAt: integer('updated_at').$type<EpochMs>().notNull(),
+    /** Instante del último recordatorio semanal planificado (D-13); no viaja en el respaldo. */
+    lastWeeklyFireAt: integer('last_weekly_fire_at').$type<EpochMs>(),
   },
   () => [
     check('notification_preferences_id_check', sql`id = 'device'`),

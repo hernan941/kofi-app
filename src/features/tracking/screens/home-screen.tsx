@@ -1,7 +1,9 @@
+import { useEffect } from 'react';
 import { ScrollView, View } from 'react-native';
 
 import { useStreak } from '../hooks/use-streak';
 import { addMonths, monthName, yearMonthOf, type SaleRecordId } from '@/shared/domain';
+import { perfMark } from '@/shared/lib/perf-marks';
 import { useToday } from '@/shared/lib/time/use-today';
 import {
   EmptyState,
@@ -43,6 +45,13 @@ export function HomeScreen({ onRegisterSale, onOpenSale, onOpenMonthlySummary }:
   const streak = useStreak().data;
   const compactStreak =
     streak === undefined ? null : <StreakBadge streak={streak} variant="compact" />;
+
+  const isPainted = home.status === 'ready' && latest.status !== 'pending' && home.summary !== null;
+  useEffect(() => {
+    if (process.env.EXPO_PUBLIC_E2E === '1' && isPainted) {
+      perfMark('home:ready');
+    }
+  }, [isPainted]);
 
   const retry = () => {
     home.refetch();

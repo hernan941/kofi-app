@@ -49,7 +49,7 @@ function nameTopProducts(
     .map((top) => ({
       productId: top.productId,
       name: null,
-      isArchived: true,
+      isArchived: false,
       revenue: top.revenue,
     }));
   return [...known, ...unknown];

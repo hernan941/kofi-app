@@ -4,19 +4,23 @@ appId: com.cuantovendi.local
 - tapOn: 'Agregar producto'
 - tapOn: 'Nombre'
 - inputText: ${PRODUCT_NAME}
-- tapOn: '¿A cuánto lo vendes?'
+- hideKeyboard
+- tapOn:
+    text: '¿A cuánto lo vendes?'
+    index: 1
 - inputText: '15000'
 - hideKeyboard
 - tapOn: 'Agregar otra opción'
 - assertVisible: 'Estándar'
 - inputText: 'Print A3'
+- hideKeyboard
 - scrollUntilVisible:
     element:
       text: '¿A cuánto lo vendes?'
-      index: 1
+      below: 'Print A3'
 - tapOn:
-    text: '¿A cuánto lo vendes?'
-    index: 1
+    text: '15.000'
+    below: 'Print A3'
 - inputText: '22000'
 - hideKeyboard
 - tapOn: 'Guardar'

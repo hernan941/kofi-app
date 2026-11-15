@@ -38,8 +38,8 @@ describe('SaleSavedCelebration', () => {
     const { view } = renderCelebration();
     await view;
 
-    expect(screen.getByRole('header', { name: '¡Venta registrada!' })).toBeOnTheScreen();
-    expect(screen.getByLabelText('45.000 pesos')).toHaveTextContent('$45.000');
+    expect(screen.getByRole('header', { name: /^¡Venta registrada!/ })).toBeOnTheScreen();
+    expect(screen.getByText('$45.000', { includeHiddenElements: true })).toBeOnTheScreen();
     expect(screen.getByText('Hoy, viernes 13 de noviembre · 3 productos')).toBeOnTheScreen();
     expect(screen.getByText('Ya quedó en tu historial.')).toBeOnTheScreen();
   });
@@ -49,7 +49,7 @@ describe('SaleSavedCelebration', () => {
     await view;
 
     expect(
-      screen.getByRole('header', { name: '¡Registraste tu primera venta!' }),
+      screen.getByRole('header', { name: /^¡Registraste tu primera venta!/ }),
     ).toBeOnTheScreen();
     expect(
       screen.getByText('Así empieza tu historial. Cada venta que anotas te ayuda a ver tu ritmo.'),
@@ -110,24 +110,27 @@ describe('SaleSavedCelebration', () => {
     expect(props.onDone).toHaveBeenCalledTimes(1);
   });
 
-  it('announces the sale and moves the focus to the title', async () => {
+  it('moves the focus to the title, which says the total, and does not announce apart', async () => {
     const announce = jest.spyOn(AccessibilityInfo, 'announceForAccessibility');
     const sendEvent = jest.spyOn(AccessibilityInfo, 'sendAccessibilityEvent');
     const { view } = renderCelebration();
     await view;
 
-    expect(announce).toHaveBeenCalledWith('Venta registrada. Total: 45.000 pesos.');
+    expect(
+      screen.getByRole('header', { name: '¡Venta registrada! 45.000 pesos' }),
+    ).toBeOnTheScreen();
     await waitFor(() => {
-      expect(sendEvent).toHaveBeenCalledWith(expect.anything(), 'focus');
+      expect(sendEvent.mock.calls.some(([, event]) => event === 'focus')).toBe(true);
     });
+    expect(announce).not.toHaveBeenCalled();
   });
 
-  it('announces the first sale with its own words', async () => {
-    const announce = jest.spyOn(AccessibilityInfo, 'announceForAccessibility');
-    const { view } = renderCelebration({ outcome: outcome({ isFirstSale: true }) });
+  it('reads the total once: the amount is not a second stop', async () => {
+    const { view } = renderCelebration();
     await view;
 
-    expect(announce).toHaveBeenCalledWith('Registraste tu primera venta. Total: 45.000 pesos.');
+    expect(screen.queryByLabelText('45.000 pesos')).not.toBeOnTheScreen();
+    expect(screen.getByText('$45.000', { includeHiddenElements: true })).toBeOnTheScreen();
   });
 
   describe('renderAfterSave', () => {

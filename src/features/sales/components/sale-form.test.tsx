@@ -1,4 +1,4 @@
-import { fireEvent, screen, userEvent } from '@testing-library/react-native';
+import { fireEvent, screen, userEvent, waitFor } from '@testing-library/react-native';
 import { AccessibilityInfo } from 'react-native';
 
 import { createTestDependencies } from '@/core/testing/create-test-dependencies';
@@ -142,16 +142,20 @@ describe('SaleForm', () => {
       await user.press(screen.getByRole('button', { name: 'Lámina Colibrí, 15.000 pesos' }));
 
       expect(screen.queryByRole('button', { name: 'Taza, 1.000 pesos' })).not.toBeOnTheScreen();
-      expect(screen.getByLabelText('Precio de cada uno')).toHaveDisplayValue('15.000');
+      expect(screen.getByLabelText('Precio de cada uno de Lámina Colibrí')).toHaveDisplayValue(
+        '15.000',
+      );
       expect(screen.getByLabelText('Total: 15.000 pesos')).toBeOnTheScreen();
       expect(announce).toHaveBeenCalledWith('Agregaste Lámina Colibrí.');
-      expect(screen.queryByRole('button', { name: 'Cambiar' })).not.toBeOnTheScreen();
+      expect(screen.queryByRole('button', { name: /^Cambiar/ })).not.toBeOnTheScreen();
     });
 
     it('is already loaded when there is a single product with a single version', async () => {
       await renderForm({}, [lamina]).view;
 
-      expect(screen.getByLabelText('Precio de cada uno')).toHaveDisplayValue('15.000');
+      expect(screen.getByLabelText('Precio de cada uno de Lámina Colibrí')).toHaveDisplayValue(
+        '15.000',
+      );
       expect(screen.getByLabelText('Total: 15.000 pesos')).toBeOnTheScreen();
     });
 
@@ -163,7 +167,7 @@ describe('SaleForm', () => {
       await user.press(screen.getByRole('button', { name: 'Print A3, 18.000 pesos' }));
 
       expect(screen.getByText('Print A3')).toBeOnTheScreen();
-      expect(screen.getByLabelText('Precio de cada uno')).toHaveDisplayValue('18.000');
+      expect(screen.getByLabelText('Precio de cada uno de Print')).toHaveDisplayValue('18.000');
       expect(screen.getByLabelText('Total: 18.000 pesos')).toBeOnTheScreen();
     });
 
@@ -173,10 +177,10 @@ describe('SaleForm', () => {
       await user.press(screen.getByRole('button', { name: /Print, 2 versiones/ }));
       await user.press(screen.getByRole('button', { name: 'Print A3, 18.000 pesos' }));
 
-      await user.press(screen.getByRole('button', { name: 'Cambiar' }));
+      await user.press(screen.getByRole('button', { name: 'Cambiar versión de Print' }));
       await user.press(screen.getByRole('button', { name: 'Print A4, 10.000 pesos' }));
 
-      expect(screen.getByLabelText('Precio de cada uno')).toHaveDisplayValue('10.000');
+      expect(screen.getByLabelText('Precio de cada uno de Print')).toHaveDisplayValue('10.000');
       expect(announce).toHaveBeenCalledWith('Ahora es Print A4.');
     });
 
@@ -185,7 +189,7 @@ describe('SaleForm', () => {
       await view;
 
       await user.press(screen.getByRole('button', { name: 'Retrato, precio a convenir' }));
-      expect(screen.getByLabelText('Precio de cada uno')).toHaveDisplayValue('');
+      expect(screen.getByLabelText('Precio de cada uno de Retrato')).toHaveDisplayValue('');
       expect(screen.getByText('Escribe a cuánto lo vendiste.')).toBeOnTheScreen();
       await user.press(screen.getByRole('button', { name: 'Guardar venta' }));
 
@@ -203,7 +207,7 @@ describe('SaleForm', () => {
       await user.press(screen.getByRole('button', { name: 'Agregar otro producto' }));
       await user.press(screen.getByRole('button', { name: 'Lámina Colibrí, 15.000 pesos' }));
 
-      expect(screen.getAllByLabelText('Precio de cada uno')).toHaveLength(2);
+      expect(screen.getAllByLabelText('Precio de cada uno de Lámina Colibrí')).toHaveLength(2);
       expect(announce).toHaveBeenCalledWith('Agregaste Lámina Colibrí de nuevo.');
       expect(screen.getByLabelText('Total: 30.000 pesos')).toBeOnTheScreen();
     });
@@ -213,7 +217,7 @@ describe('SaleForm', () => {
       await renderForm().view;
       await user.press(screen.getByRole('button', { name: 'Lámina Colibrí, 15.000 pesos' }));
 
-      await user.press(screen.getByRole('button', { name: 'Quitar' }));
+      await user.press(screen.getByRole('button', { name: 'Quitar Lámina Colibrí' }));
 
       expect(announce).toHaveBeenCalledWith('Quitaste Lámina Colibrí.');
       expect(screen.getByRole('button', { name: 'Taza, 1.000 pesos' })).toBeOnTheScreen();
@@ -240,15 +244,59 @@ describe('SaleForm', () => {
     });
   });
 
+  describe('what the screen reader says for each row', () => {
+    it('names the controls of each product, so two rows are never ambiguous', async () => {
+      await renderForm({}, [lamina, taza]).view;
+      await user.press(screen.getByRole('button', { name: 'Lámina Colibrí, 15.000 pesos' }));
+      await user.press(screen.getByRole('button', { name: 'Agregar otro producto' }));
+      await user.press(screen.getByRole('button', { name: /^Taza/ }));
+
+      for (const name of ['Lámina Colibrí', 'Taza']) {
+        expect(screen.getByRole('button', { name: `Quitar ${name}` })).toBeOnTheScreen();
+        expect(screen.getByLabelText(`Precio de cada uno de ${name}`)).toBeOnTheScreen();
+        expect(
+          screen.getByRole('button', { name: `Quitar uno a la cantidad de ${name}` }),
+        ).toBeOnTheScreen();
+        expect(
+          screen.getByRole('button', { name: `Agregar uno a la cantidad de ${name}` }),
+        ).toBeOnTheScreen();
+      }
+    });
+
+    it('reads the total and the subtotal as one stop each, without a second stop for the amount', async () => {
+      await renderForm({}, [lamina]).view;
+      await user.press(
+        screen.getByRole('button', { name: 'Agregar uno a la cantidad de Lámina Colibrí' }),
+      );
+
+      expect(screen.getByLabelText('Total: 30.000 pesos')).toBeOnTheScreen();
+      expect(screen.getByLabelText('Subtotal: 30.000 pesos')).toBeOnTheScreen();
+      expect(screen.queryByLabelText('30.000 pesos')).not.toBeOnTheScreen();
+    });
+
+    it('moves the focus to the add button before announcing the added product', async () => {
+      const focus = jest.spyOn(AccessibilityInfo, 'sendAccessibilityEvent');
+      await renderForm().view;
+
+      await user.press(screen.getByRole('button', { name: 'Lámina Colibrí, 15.000 pesos' }));
+
+      await waitFor(() => {
+        expect(focus.mock.calls.some(([, event]) => event === 'focus')).toBe(true);
+      });
+    });
+  });
+
   describe('quantity and price', () => {
     it('recalculates the total when the quantity or the price change', async () => {
       await renderForm({}, [lamina]).view;
 
-      await user.press(screen.getByRole('button', { name: 'Agregar uno' }));
+      await user.press(
+        screen.getByRole('button', { name: 'Agregar uno a la cantidad de Lámina Colibrí' }),
+      );
       expect(screen.getByLabelText('Total: 30.000 pesos')).toBeOnTheScreen();
       expect(screen.getByLabelText('Subtotal: 30.000 pesos')).toBeOnTheScreen();
 
-      const price = screen.getByLabelText('Precio de cada uno');
+      const price = screen.getByLabelText('Precio de cada uno de Lámina Colibrí');
       await user.clear(price);
       await user.type(price, '1500');
       const quantity = screen.getByRole('adjustable', { name: 'Cantidad de Lámina Colibrí' });
@@ -272,6 +320,24 @@ describe('SaleForm', () => {
         expect(screen.getByRole('button', { name: label })).toBeOnTheScreen();
       }
       expect(screen.getByLabelText('Nota (opcional)')).toBeOnTheScreen();
+    });
+
+    it('says whether the details are collapsed or expanded', async () => {
+      await renderForm({}, [lamina]).view;
+
+      const toggle = screen.getByRole('button', { name: 'Más detalles' });
+      expect(toggle).toBeCollapsed();
+
+      await user.press(toggle);
+
+      expect(screen.getByRole('button', { name: /Más detalles/ })).toBeExpanded();
+    });
+
+    it('reaches the question of the optional channel as text', async () => {
+      await renderForm({}, [lamina]).view;
+      await user.press(screen.getByRole('button', { name: 'Más detalles' }));
+
+      expect(screen.getByText('¿Dónde vendiste? (opcional)')).toBeOnTheScreen();
     });
 
     it('lets a channel be deselected and summarizes what is inside when closed', async () => {
@@ -396,14 +462,14 @@ describe('SaleForm', () => {
       const { props, view } = renderForm(editProps(), [lamina]);
       await view;
 
-      await user.press(screen.getByRole('button', { name: 'Quitar' }));
+      await user.press(screen.getByRole('button', { name: 'Quitar Lámina Colibrí' }));
       expect(
         screen.getByText('Si quitas el último producto, la venta se borra. No se puede deshacer.'),
       ).toBeOnTheScreen();
       await user.press(screen.getByRole('button', { name: 'Cancelar' }));
-      expect(screen.getByLabelText('Precio de cada uno')).toBeOnTheScreen();
+      expect(screen.getByLabelText('Precio de cada uno de Lámina Colibrí')).toBeOnTheScreen();
 
-      await user.press(screen.getByRole('button', { name: 'Quitar' }));
+      await user.press(screen.getByRole('button', { name: 'Quitar Lámina Colibrí' }));
       await user.press(screen.getAllByRole('button', { name: 'Borrar venta' }).at(-1) as never);
 
       expect(props.onSubmit).toHaveBeenCalledWith(expect.objectContaining({ items: [] }));
@@ -424,8 +490,8 @@ describe('SaleForm', () => {
       ).view;
 
       expect(screen.getByText('Archivado')).toBeOnTheScreen();
-      expect(screen.queryByRole('button', { name: 'Cambiar' })).not.toBeOnTheScreen();
-      expect(screen.getByLabelText('Precio de cada uno')).toBeOnTheScreen();
+      expect(screen.queryByRole('button', { name: /^Cambiar/ })).not.toBeOnTheScreen();
+      expect(screen.getByLabelText('Precio de cada uno de Lámina Colibrí')).toBeOnTheScreen();
     });
   });
 });

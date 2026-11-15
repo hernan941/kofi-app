@@ -1,0 +1,8 @@
+appId: com.cuantovendi.local
+tags:
+  - tips
+---
+# An internal link to a tip that is not in the catalog lands on the list, without a notice.
+- runFlow: ../_shared/launch-clean.yaml
+- openLink: cuantovendi://tips/no-existe
+- assertVisible: 'Ideas breves para llevar tu negocio.*'

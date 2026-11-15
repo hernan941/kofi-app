@@ -1,0 +1,25 @@
+appId: com.cuantovendi.local
+tags:
+  - backup
+---
+# Each sheet opens the system share sheet; the notice appears only once that sheet is closed.
+- runFlow: ../_shared/launch-clean.yaml
+- runFlow: ../_shared/open-backup.yaml
+- tapOn: 'Exportar ventas'
+- extendedWaitUntil:
+    notVisible: 'Exportar ventas'
+    timeout: 20000
+- pressKey: back
+- extendedWaitUntil:
+    visible: 'Planilla de ventas lista'
+    timeout: 20000
+- tapOn: 'Exportar productos'
+- extendedWaitUntil:
+    notVisible: 'Exportar productos'
+    timeout: 20000
+- pressKey: back
+- extendedWaitUntil:
+    visible: 'Planilla de productos lista'
+    timeout: 20000
+- assertVisible: 'Exportar ventas'
+- assertVisible: 'Exportar productos'

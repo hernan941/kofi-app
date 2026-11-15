@@ -143,4 +143,22 @@ describe('DatePickerSheet', () => {
 
     expect(props.onClose).toHaveBeenCalledTimes(1);
   });
+
+  it('has flexible cells, with no fixed size, so seven columns fit a narrow screen', async () => {
+    await renderSheet().view;
+
+    const cell = screen.getByRole('button', { name: 'Hoy, viernes 13 de noviembre' });
+    const [weekday] = screen.getAllByTestId('date-picker-weekday', { includeHiddenElements: true });
+
+    expect(cell).toHaveProp('className', expect.not.stringContaining('size-12'));
+    expect(cell).toHaveProp('className', expect.stringContaining('flex-1'));
+    expect(weekday).toHaveProp('className', expect.not.stringContaining('size-12'));
+  });
+
+  it('caps the font scale of the day number at 2 and keeps the full label', async () => {
+    await renderSheet().view;
+
+    expect(screen.getByText('13')).toHaveProp('maxFontSizeMultiplier', 2);
+    expect(screen.getByRole('button', { name: 'Hoy, viernes 13 de noviembre' })).toBeOnTheScreen();
+  });
 });

@@ -1,6 +1,6 @@
 import { RecordingLogger } from '@/shared/lib/testing/recording-logger';
 
-import { deleteCacheFile, isCacheUri, sweepStaleCacheFiles } from './cache-files';
+import { deleteCacheFile, sweepStaleCacheFiles } from './cache-files';
 
 interface MockEntry {
   lastModified: number | null;
@@ -83,24 +83,6 @@ beforeEach(() => {
   mockState.deleteFailures.clear();
 });
 
-describe('isCacheUri', () => {
-  it('accepts files under the cache directory', () => {
-    expect(isCacheUri('file:///data/cache/ImagePicker/a.jpg')).toBe(true);
-  });
-
-  it('rejects the document directory, other schemes and the cache directory itself', () => {
-    expect(isCacheUri('file:///data/doc/photos/a.jpg')).toBe(false);
-    expect(isCacheUri('content://media/a.jpg')).toBe(false);
-    expect(isCacheUri('file:///data/cache/')).toBe(false);
-    expect(isCacheUri('file:///data/cache-other/a.jpg')).toBe(false);
-  });
-
-  it('rejects paths that climb out of the cache directory', () => {
-    expect(isCacheUri('file:///data/cache/../doc/photos/a.jpg')).toBe(false);
-    expect(isCacheUri('file:///data/cache/%2e%2e/doc/a.jpg')).toBe(false);
-  });
-});
-
 describe('deleteCacheFile', () => {
   it('deletes a file under the cache', () => {
     put(`${PICKER_DIR}/a.jpg`);
@@ -120,6 +102,17 @@ describe('deleteCacheFile', () => {
     expect(logger.entriesAt('warn').map((entry) => entry.event)).toEqual([
       'photo_temp_outside_cache',
     ]);
+  });
+
+  it('logs only the scheme of a file outside the cache, never the URI', () => {
+    const logger = new RecordingLogger();
+    put('file:///data/doc/photos/a.jpg');
+
+    deleteCacheFile('file:///data/doc/photos/a.jpg', logger);
+
+    const [entry] = logger.entriesAt('warn');
+    expect(entry?.context).toEqual({ scheme: 'file' });
+    expect(JSON.stringify(entry)).not.toContain('photos');
   });
 
   it('tolerates a missing file', () => {

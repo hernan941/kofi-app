@@ -27,3 +27,5 @@ export type {
 export { buildSaleRecordView } from './domain/sale-record-view';
 export type { SaleItemView, SaleRecordView } from './domain/sale-record-view';
 export { SALE_CHANNEL_LABELS } from './components/channel-labels';
+export { SALE_ERROR_MESSAGES } from './components/error-messages';
+export { describeWeekRange } from './components/week-range-label';

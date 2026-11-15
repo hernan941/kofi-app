@@ -26,16 +26,22 @@ export interface TextFieldProps extends Omit<
   | 'editable'
   | 'value'
   | 'onChangeText'
-  | 'accessibilityLabel'
   | 'accessibilityHint'
   | 'placeholderTextColor'
 > {
   readonly label: string;
+  /** Name read by the screen reader when it must say more than the visible `label`, for example "Precio de cada uno de Lámina Colibrí". */
+  readonly accessibilityLabel?: string;
   readonly value: string;
   readonly onChangeText: (text: string) => void;
   readonly error?: string;
   readonly helper?: string;
   readonly isOptional?: boolean;
+  /**
+   * Asked when an error appears: return `false` when a form summary already announces it.
+   * Defaults to always announcing.
+   */
+  readonly canAnnounceError?: () => boolean;
   readonly isDisabled?: boolean;
   readonly prefix?: string;
   readonly ref?: Ref<InputRef>;
@@ -68,11 +74,13 @@ function borderClasses(isInvalid: boolean, isFocused: boolean): string {
  */
 export function TextField({
   label,
+  accessibilityLabel,
   value,
   onChangeText,
   error,
   helper,
   isOptional = false,
+  canAnnounceError,
   isDisabled = false,
   prefix,
   ref,
@@ -83,7 +91,7 @@ export function TextField({
   const [isFocused, setIsFocused] = useState(false);
   const isInvalid = Boolean(error);
   const fullLabel = isOptional ? `${label} (opcional)` : label;
-  useAnnounceWhen(error);
+  useAnnounceWhen(error, canAnnounceError);
 
   const handleFocus = (event: NativeSyntheticEvent<TargetedEvent>) => {
     setIsFocused(true);
@@ -104,7 +112,7 @@ export function TextField({
     variant: 'primary',
     isInvalid,
     isDisabled,
-    accessibilityLabel: fullLabel,
+    accessibilityLabel: accessibilityLabel ?? fullLabel,
     accessibilityHint: error ?? helper,
     className: `${INPUT_BASE} ${borderClasses(isInvalid, isFocused)}`,
   } as const;

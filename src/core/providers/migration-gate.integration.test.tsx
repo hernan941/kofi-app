@@ -15,13 +15,6 @@ jest.mock('expo-splash-screen', () => ({
   preventAutoHideAsync: jest.fn(),
   hideAsync: jest.fn(() => Promise.resolve()),
 }));
-jest.mock('@expo-google-fonts/lexend', () => ({
-  useFonts: (): [boolean, null] => [true, null],
-  Lexend_400Regular: 'regular',
-  Lexend_500Medium: 'medium',
-  Lexend_600SemiBold: 'semibold',
-  Lexend_700Bold: 'bold',
-}));
 
 const MIGRATIONS_FOLDER = path.join(__dirname, '..', 'db', 'migrations');
 

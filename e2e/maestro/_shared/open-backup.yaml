@@ -1,0 +1,5 @@
+appId: com.cuantovendi.local
+---
+- tapOn: 'Ajustes'
+- tapOn: 'Respaldo y planillas.*'
+- assertVisible: 'Respaldo de tus datos'

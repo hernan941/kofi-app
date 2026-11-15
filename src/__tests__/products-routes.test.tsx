@@ -18,13 +18,6 @@ jest.mock('expo-splash-screen', () => ({
   preventAutoHideAsync: jest.fn(() => Promise.resolve()),
   hideAsync: jest.fn(() => Promise.resolve()),
 }));
-jest.mock('@expo-google-fonts/lexend', () => ({
-  useFonts: (): [boolean, null] => [true, null],
-  Lexend_400Regular: 'regular',
-  Lexend_500Medium: 'medium',
-  Lexend_600SemiBold: 'semibold',
-  Lexend_700Bold: 'bold',
-}));
 
 describe('products routes', () => {
   it('invites to create the first product, creates it and goes back to the list', async () => {

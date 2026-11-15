@@ -1,0 +1,26 @@
+appId: com.cuantovendi.local
+tags:
+  - settings
+---
+# Ajustes shows its four blocks; each row opens its screen and going back returns to Ajustes.
+- runFlow: ../_shared/launch-clean.yaml
+- tapOn: 'Ajustes'
+- assertVisible: 'Recordatorios.*'
+- assertVisible: 'Respaldo y planillas.*'
+- assertVisible: 'Privacidad'
+- assertVisible: 'Tus datos viven en tu teléfono.*'
+- scrollUntilVisible:
+    element: 'Acerca de'
+- assertVisible: 'Licencias de terceros.*'
+- tapOn: 'Recordatorios.*'
+- assertVisible: 'Recordatorio semanal'
+- assertVisible: 'Resumen del mes'
+- tapOn: 'Volver'
+- assertVisible: 'Respaldo y planillas.*'
+- tapOn: 'Respaldo y planillas.*'
+- assertVisible: 'Respaldo de tus datos'
+- tapOn: 'Volver'
+- assertVisible: 'Respaldo y planillas.*'
+- scrollUntilVisible:
+    element: '.*Versión 1.0.0.*'
+- assertVisible: '.*Versión 1.0.0.*'

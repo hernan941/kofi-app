@@ -16,7 +16,9 @@ tags:
 - assertVisible: 'Foto 1 de 1, portada'
 - scrollUntilVisible:
     element: '¿A cuánto lo vendes?'
-- tapOn: '¿A cuánto lo vendes?'
+- tapOn:
+    text: '¿A cuánto lo vendes?'
+    index: 1
 - inputText: '15000'
 - hideKeyboard
 - tapOn: 'Guardar'

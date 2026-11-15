@@ -1,0 +1,15 @@
+appId: com.cuantovendi.local
+name: P2 abrir el registro de venta y guardar
+tags:
+  - perf
+---
+- runFlow: _seed-large.yaml
+- tapOn: 'Registrar venta'
+- assertVisible: 'Producto 002.*'
+- tapOn: 'Producto 002.*'
+- tapOn: 'Guardar venta'
+- assertVisible: '.*Listo.*'
+- runFlow:
+    file: _dump-marks.yaml
+    env:
+      FLOW: p2-register-sale

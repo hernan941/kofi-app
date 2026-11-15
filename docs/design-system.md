@@ -416,7 +416,7 @@ Todos viven en `shared/ui` (ADR-005), se construyen sobre HeroUI Native y tienen
 - Va abajo, sobre la barra de pestañas, al alcance de la vista mientras se usa con una mano.
 - **Éxito:** ícono `CheckCircle` (relleno) en `accent` y un texto positivo ("Venta guardada").
 - **Error:** ícono `WarningCircle` en `danger` y un texto que dice qué hacer ("No se pudo guardar. Inténtalo de nuevo").
-- Dura al menos 4 segundos y se puede cerrar. Se anuncia al lector de pantalla.
+- Dura al menos 4 segundos y se puede cerrar al tacto. Se anuncia al lector de pantalla una sola vez, con `announce()`; el toast mismo queda oculto al lector (ver 7).
 - **No se usa para nada que exija una acción**: eso va en un diálogo o en el propio formulario.
 
 ### 6.7 Estado vacío
@@ -437,7 +437,7 @@ Todos viven en `shared/ui` (ADR-005), se construyen sobre HeroUI Native y tienen
 
 - La pestaña activa usa el ícono en peso `fill` y la etiqueta en `font-semibold`, ambos en `accent`.
 - La inactiva usa el ícono en peso `bold` y la etiqueta en `font-medium`, en `muted`.
-- Las etiquetas son `text-xs`, siempre visibles, con `accessibilityState={{ selected }}`.
+- Las etiquetas son `text-xs`, siempre visibles, con `accessibilityState={{ selected }}`. Con letra grande ocupan hasta dos líneas y crecen hasta 1,3× (ver la tabla de excepciones en 7).
 
 ### 6.10 Implementación en `shared/ui` (F0.13)
 
@@ -450,7 +450,8 @@ Todo se importa desde `@/shared/ui`. Decisiones tomadas al construirlos:
 - **Fecha** (`DateField`): avanza y retrocede de a un día ("Día anterior" / "Día siguiente") y nunca pasa de `maxDate`. La mayoría de las ventas son de hoy o de pocos días atrás, y no hay un selector de calendario nativo entre las dependencias. Si hace falta saltar semanas, se evalúa un calendario en una hoja.
 - **Hoja inferior** (`Sheet`): usa el `Modal` de React Native, porque el `BottomSheet` de HeroUI necesita `@gorhom/bottom-sheet`, que no está en el proyecto. Se desliza, salvo si el sistema pide reducir el movimiento.
 - **Grupo de chips** (`ChipGroup`): se lee como un grupo de opciones (`radiogroup`), con cada chip como `radio` y el estado `checked`. Un `Chip` suelto es un botón con `selected`.
-- **Toast** (`useAppToast`): HeroUI dibuja cada toast dos veces (la visible y una copia transparente para medir el alto). La copia no se oculta del lector de pantalla; hay que verificar en TalkBack que no se lea dos veces.
+- **Toast** (`useAppToast`): HeroUI dibuja cada toast dos veces (la visible y una copia transparente para medir el alto). La auditoría F10.1 confirmó que, así, el aviso se podía leer varias veces. Por eso todo el toast se oculta al lector y el aviso llega solo por `announce()` (ver 7).
+- **Diálogo de confirmación** (`ConfirmDialog`): desde F10.1 se dibuja sobre el `Modal` de React Native, no sobre el `Dialog` de HeroUI, para que en Android retenga el foco (ver 7).
 - **Pantalla de error de arranque** (`BootErrorScreen`): no ofrece ninguna acción que escriba datos. Para `newer_database` pide actualizar la app. La exportación de emergencia aparece solo cuando se conecta `onEmergencyExport` (F8.8).
 
 ---
@@ -463,15 +464,26 @@ Todo se importa desde `@/shared/ui`. Decisiones tomadas al construirlos:
 - **Tamaño de letra del sistema:**
   - `allowFontScaling` siempre activo;
   - no se fijan altos, solo altos mínimos;
-  - el monto principal y las etiquetas de pestañas tienen `maxFontSizeMultiplier={1.5}`, y el resto no tiene límite;
+  - todo texto crece sin límite, **salvo las excepciones de la tabla**. Cada excepción tiene que estar en esta tabla con su motivo, y la información completa tiene que poder leerse en otro lugar sin límite (la etiqueta accesible o una pantalla de detalle);
   - se prueba con el tamaño de accesibilidad más grande en iOS y Android.
+
+  | Dónde | Límite | Por qué |
+  |---|---|---|
+  | Monto principal y total del pie (`Amount`, variantes `display` y `total`) | `maxFontSizeMultiplier={1.5}`, una línea, `adjustsFontSizeToFit` | A 44 pt, un monto más grande no cabe en una línea. La etiqueta "45.000 pesos" no cambia. |
+  | Etiquetas de pestañas (`TabBarLabel`) | `maxFontSizeMultiplier={1.3}`, **hasta dos líneas** (`numberOfLines={2}`) | Con cinco pestañas en 360 de ancho, cada una tiene unos 72. A 1,5× y en una línea, "Calendario" se cortaba. Con dos líneas y 1,3×, la barra crece un poco en alto y nada se corta. **Decisión del orquestador (F10.1, M8), pendiente de confirmar en el teléfono.** |
+  | Número del día en el calendario de la pestaña (`CalendarDayCell`) | `maxFontSizeMultiplier={2}` | A 3×, el número no cabe en 1/7 del ancho. La etiqueta accesible lleva la fecha completa y lo vendido, y el detalle del día crece sin límite (`docs/design/tracking-calendar.md`). |
+  | Número del día en la hoja de fecha (`DatePickerSheet`) | `maxFontSizeMultiplier={2}`, celdas `flex-1` con alto mínimo de 48 (sin tamaño fijo) | El mismo motivo que el calendario: siete columnas en 328 de ancho útil. La etiqueta accesible dice el día completo ("Hoy, sábado 14 de noviembre"). Corrige el hallazgo M5 de `docs/design/accessibility-audit.md`. |
 - **Lector de pantalla:**
   - los montos se leen como "15.000 pesos" (`Amount`);
   - un botón con solo ícono lleva `accessibilityLabel`;
   - las tarjetas que se tocan son un solo elemento;
-  - errores y toasts se anuncian.
+  - errores y toasts se anuncian, **una sola vez cada uno**;
+  - **toast**: todo el toast se oculta al lector de pantalla (`accessibilityElementsHidden` e `importantForAccessibility="no-hide-descendants"`, sin `accessibilityLiveRegion`). El aviso llega solo por `announce()`, con un único anuncio. Así no se lee dos o tres veces (por la región viva y por la copia que HeroUI dibuja para medir el alto), y TalkBack no llega a un botón "Cerrar aviso" invisible. El botón de cerrar sigue disponible al tacto, y el aviso se cierra solo a los 4 segundos. No se parcha HeroUI con `patch-package`. **Decisión del orquestador (F10.1, A1).**
 - **Reducir movimiento:** HeroUI Native desactiva sus animaciones automáticamente cuando el sistema lo pide (`useReducedMotion` de Reanimated en su `GlobalAnimationSettingsProvider`). Las animaciones propias hacen lo mismo con `useReducedMotion`. El efecto de presión del sticker es un cambio instantáneo, no una animación.
-- **Foco:** el campo con foco cambia su borde a `accent`. Con teclado físico o control por botones, el foco visible es un anillo de 2 px `focus` separado 2 px del elemento.
+- **Foco:**
+  - el campo con foco cambia su borde a `accent`. Con teclado físico o control por botones, el foco visible es un anillo de 2 px `focus` separado 2 px del elemento;
+  - **diálogo de confirmación** (`ConfirmDialog`): se dibuja sobre el `Modal` de React Native, igual que `Sheet`, y no sobre el `Dialog` de HeroUI. En Android, el `Dialog` de HeroUI no es una ventana propia: TalkBack no iba a la pregunta y dejaba recorrer la pantalla de atrás. El `Modal` sí retiene el foco. Al abrir, el foco queda en la pregunta (rol `header`); `onRequestClose` cancela con el botón atrás; al cerrar, el foco vuelve al elemento que abrió el diálogo. El aspecto no cambia: tarjeta `overlay`, borde sticker y fondo `backdrop`. **Decisión del orquestador (F10.1, A2).**
+  - **nunca un diálogo sobre una hoja visible**: si una acción de una hoja pide confirmación, primero se cierra la hoja y después se abre el diálogo (hallazgo M11 de `docs/design/accessibility-audit.md`).
 
 ---
 

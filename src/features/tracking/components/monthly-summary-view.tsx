@@ -1,7 +1,7 @@
 import { Text, View } from 'react-native';
 
 import { SALE_CHANNEL_LABELS } from '@/features/sales';
-import { yearMonthOf, type LocalDate } from '@/shared/domain';
+import { formatClpAccessible, yearMonthOf, type LocalDate } from '@/shared/domain';
 import {
   Amount,
   CalendarBlankIcon,
@@ -11,6 +11,7 @@ import {
   ListRow,
   ListSeparator,
   StorefrontIcon,
+  AccessibleGroup,
 } from '@/shared/ui';
 
 import type { MonthlySummary, ProfitSummary } from '../domain';
@@ -87,11 +88,15 @@ export function MonthlySummaryView({
   }
   return (
     <View className="gap-4">
-      <View className="gap-1 px-4">
+      <AccessibleGroup
+        label={`Vendiste: ${formatClpAccessible(summary.total)}, ${recordsText(summary.recordCount)}`}
+        className="px-4"
+        contentClassName="gap-1"
+      >
         <Text className="font-medium text-sm text-muted">Vendiste</Text>
         <Amount value={summary.total} variant="display" />
         <Text className="text-sm text-muted">{recordsText(summary.recordCount)}</Text>
-      </View>
+      </AccessibleGroup>
       <View className="px-4">
         <ProfitLine
           profit={profit}

@@ -8,7 +8,14 @@
     "scheme": "cuantovendi",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "icon": "./assets/expo.icon"
+      "icon": "./assets/expo.icon",
+      "bundleIdentifier": "com.cuantovendi.local",
+      "infoPlist": {
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": false,
+          "NSAllowsLocalNetworking": true
+        }
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -18,6 +25,7 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
+      "allowBackup": false,
       "package": "com.cuantovendi.local",
       "blockedPermissions": [
         "android.permission.RECORD_AUDIO",
@@ -27,7 +35,8 @@
         "android.permission.READ_MEDIA_VIDEO",
         "android.permission.SYSTEM_ALERT_WINDOW",
         "android.permission.VIBRATE",
-        "android.permission.ACCESS_NETWORK_STATE"
+        "android.permission.ACCESS_NETWORK_STATE",
+        "com.google.android.c2dm.permission.RECEIVE"
       ]
     },
     "plugins": [
@@ -48,7 +57,19 @@
           "cameraPermission": "cuantovendi usa la cámara solo cuando eliges tomar una foto de tu producto.",
           "microphonePermission": false
         }
-      ]
+      ],
+      "expo-sharing",
+      "expo-asset",
+      [
+        "expo-notifications",
+        {
+          "enableRemoteNotifications": false,
+          "icon": "./assets/images/notification-icon.png",
+          "color": "#743A59"
+        }
+      ],
+      "./plugins/with-release-without-internet",
+      "./plugins/with-no-device-transfer"
     ],
     "experiments": {
       "typedRoutes": true,

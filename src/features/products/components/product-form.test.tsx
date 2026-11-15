@@ -34,7 +34,7 @@ function setup(props: Partial<ProductFormProps> = {}) {
 }
 
 async function pressRemove(index: number): Promise<void> {
-  const button = screen.getAllByRole('button', { name: 'Quitar versión' }).at(index);
+  const button = screen.getAllByRole('button', { name: /^Quitar versión/ }).at(index);
   if (button === undefined) {
     throw new Error('No remove button at that position.');
   }
@@ -158,8 +158,20 @@ describe('ProductForm with several versions', () => {
     expect(names[0]).toHaveDisplayValue('Estándar');
     expect(names[1]).toHaveDisplayValue('');
     expect(screen.getByText('Versiones')).toBeOnTheScreen();
-    expect(screen.getAllByRole('button', { name: 'Quitar versión' })).toHaveLength(2);
+    expect(screen.getAllByRole('button', { name: /^Quitar versión/ })).toHaveLength(2);
     expect(screen.getByRole('button', { name: 'Agregar otra versión' })).toBeOnTheScreen();
+  });
+
+  it('names the controls of a version with its name once it has one', async () => {
+    await renderWithProviders(setup().element);
+    await user.press(screen.getByRole('button', { name: 'Agregar otra opción' }));
+    const names = screen.getAllByLabelText('Nombre de la versión');
+    await user.type(names[1] as never, 'Print A3');
+
+    expect(screen.getByRole('button', { name: 'Quitar versión Print A3' })).toBeOnTheScreen();
+    expect(screen.getByLabelText('¿A cuánto vendes Print A3?')).toBeOnTheScreen();
+    expect(screen.getByLabelText('Precio de Print A3')).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Quitar versión Estándar' })).toBeOnTheScreen();
   });
 
   it('removes a new version at once and goes back to the single layout', async () => {
@@ -411,7 +423,7 @@ describe('ProductForm photos', () => {
 
     await user.press(screen.getByRole('button', { name: 'Guardar' }));
 
-    expect(await screen.findByRole('button', { name: 'Preparando fotos…' })).toBeOnTheScreen();
+    expect(await screen.findByRole('button', { name: 'Preparando fotos…' })).toBeBusy();
     expect(announce).toHaveBeenCalledWith('Esperando que terminen las fotos');
     expect(onSubmit).not.toHaveBeenCalled();
     finish();

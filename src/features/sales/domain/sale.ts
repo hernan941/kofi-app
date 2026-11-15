@@ -76,3 +76,8 @@ export function recordTotal(record: Pick<SaleRecord, 'items'>): Clp {
 export function hasItems(record: Pick<SaleRecord, 'items'>): boolean {
   return record.items.length > 0;
 }
+
+/** Ids de los productos distintos de los ítems del registro, en orden de aparición. */
+export function productIdsOf(record: Pick<SaleRecord, 'items'> | null | undefined): ProductId[] {
+  return [...new Set(record?.items.map((item) => item.productId) ?? [])];
+}

@@ -56,6 +56,29 @@ describe('form fields with the primary button', () => {
     expect(onSave).not.toHaveBeenCalled();
   });
 
+  it('announces once on submit: the summary, not one message per field', async () => {
+    const spy = jest.spyOn(AccessibilityInfo, 'announceForAccessibility');
+    await renderUi(<ProductForm onSave={jest.fn()} />);
+
+    await user.press(screen.getByRole('button', { name: 'Guardar' }));
+    await screen.findByText('Completa este campo');
+
+    expect(spy).toHaveBeenCalledTimes(1);
+    expect(spy).toHaveBeenCalledWith('Revisa los campos marcados');
+  });
+
+  it('still announces the error of a field that changes after the submit', async () => {
+    const spy = jest.spyOn(AccessibilityInfo, 'announceForAccessibility');
+    await renderUi(<ProductForm onSave={jest.fn()} />);
+    await user.press(screen.getByRole('button', { name: 'Guardar' }));
+    await screen.findByText('Completa este campo');
+    spy.mockClear();
+
+    await user.type(screen.getByLabelText('Precio'), '1,5');
+
+    expect(spy).toHaveBeenCalled();
+  });
+
   it('explains amounts written with a comma', async () => {
     await renderUi(<ProductForm onSave={jest.fn()} />);
 

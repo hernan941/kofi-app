@@ -13,6 +13,8 @@ tags:
 # Depends on the weekday (ADR-007): on Monday and Tuesday the panel asks which week
 # ("Marcar que no vendí" + ChipGroup "Semana"); the rest of the week it offers a single
 # "Esta semana no vendí" button. The flow handles both and always marks the current week.
+- scrollUntilVisible:
+    element: '(Marcar que no vendí|Esta semana no vendí)'
 - runFlow:
     when:
       visible: 'Marcar que no vendí'

@@ -1,6 +1,7 @@
 import { Text, View } from 'react-native';
 
 import {
+  AccessibleGroup,
   Amount,
   AmountSentence,
   Card,
@@ -51,26 +52,24 @@ export function HomeSummaryCard({
   const monthComparison = comparisonText(summary.month, { kind: 'month', previousMonthName });
   return (
     <Card>
-      <View
-        accessible
-        accessibilityLabel={blockLabel('Esta semana', summary.week.total, weekComparison)}
-        className="gap-1"
+      <AccessibleGroup
+        label={blockLabel('Esta semana', summary.week.total, weekComparison)}
+        contentClassName="gap-1"
       >
         <Text className="font-medium text-sm text-muted">Esta semana</Text>
         <Amount value={summary.week.total} variant="display" />
         <View className="pt-1">
           <AmountSentence parts={weekComparison} size="sm" />
         </View>
-      </View>
+      </AccessibleGroup>
       <ListSeparator />
       <View className="gap-1">
-        <View
-          accessible
-          accessibilityLabel={blockLabel(`En ${monthName}`, summary.month.total, monthComparison)}
+        <AccessibleGroup
+          label={blockLabel(`En ${monthName}`, summary.month.total, monthComparison)}
         >
           <ListRow title={`En ${monthName}`} amount={summary.month.total} />
           <AmountSentence parts={monthComparison} size="sm" />
-        </View>
+        </AccessibleGroup>
         {profit === null ? null : (
           <View className="pt-2">
             <ProfitLine profit={profit} periodLabel="Este mes" />

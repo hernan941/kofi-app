@@ -1,0 +1,28 @@
+appId: com.cuantovendi.local
+tags:
+  - tracking
+---
+- runFlow: ../_shared/launch-clean.yaml
+- tapOn: 'Calendario'
+- assertVisible: 'Tu racha empieza cuando registras una semana'
+- assertVisible: '¿Una semana sin ventas?'
+- scrollUntilVisible:
+    element: 'Marcar que no vendí'
+- tapOn:
+    text: 'Marcar que no vendí'
+    index: 0
+- assertVisible: 'Semana marcada como "no vendí"'
+- assertVisible: 'Desmarcar'
+- scrollUntilVisible:
+    element: '1 semana'
+    direction: UP
+- scrollUntilVisible:
+    element: 'Desmarcar'
+- tapOn:
+    text: 'Desmarcar'
+    index: 0
+- scrollUntilVisible:
+    element: 'Tu racha empieza cuando registras una semana'
+    direction: UP
+- assertVisible: 'Tu racha empieza cuando registras una semana'
+- assertNotVisible: 'Semana marcada como "no vendí"'

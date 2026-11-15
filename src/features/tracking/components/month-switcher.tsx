@@ -48,7 +48,6 @@ export function MonthSwitcher({
       />
       <Text
         accessibilityRole="header"
-        accessibilityLiveRegion="polite"
         className="flex-1 text-center font-semibold text-heading text-foreground"
       >
         {formatMonthTitle(month, today)}

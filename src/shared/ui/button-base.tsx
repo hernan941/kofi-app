@@ -1,6 +1,7 @@
 import { Button } from 'heroui-native';
 import type { Icon as PhosphorIcon } from 'phosphor-react-native';
 import type { ComponentRef, Ref } from 'react';
+import type { AccessibilityState } from 'react-native';
 
 import { Icon, type IconColor } from './icon';
 import { stickerShadowClasses, useStickerPress } from './use-sticker-press';
@@ -17,6 +18,10 @@ export interface ButtonBaseProps {
   readonly onPress: () => void;
   readonly icon?: PhosphorIcon;
   readonly accessibilityHint?: string;
+  /** Accessible name when it must be longer than the visible `label`; defaults to `label`. */
+  readonly accessibilityLabel?: string;
+  /** State read by the screen reader, for example `{ expanded }` or `{ busy }`. */
+  readonly accessibilityState?: AccessibilityState;
   /** Native handle of the button, for example to move the accessibility focus to it. */
   readonly ref?: Ref<ButtonHandle>;
 }
@@ -77,6 +82,8 @@ export function ButtonBase({
   onPress,
   icon,
   accessibilityHint,
+  accessibilityLabel,
+  accessibilityState,
   tone,
   isDisabled = false,
   ref,
@@ -93,8 +100,9 @@ export function ButtonBase({
       onPress={onPress}
       onPressIn={press.onPressIn}
       onPressOut={press.onPressOut}
-      accessibilityLabel={label}
+      accessibilityLabel={accessibilityLabel ?? label}
       accessibilityHint={accessibilityHint}
+      accessibilityState={accessibilityState}
       className={`h-auto gap-2 rounded-full ${style.root} ${shadow}`}
     >
       {icon ? <Icon icon={icon} color={style.icon} /> : null}

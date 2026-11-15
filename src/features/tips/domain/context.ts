@@ -1,4 +1,3 @@
-import type { EpochMs } from '@/shared/domain';
 import type { SaleChannel } from '@/features/sales/domain';
 
 import type { TipTrigger } from './tip';
@@ -43,10 +42,12 @@ export function activeTriggers(context: TipContext): ReadonlySet<TipTrigger> {
 
 /** Lo que `hasAnyCostLoaded` necesita saber de un producto (cualquier `Product` lo cumple). */
 export interface CostBearingProduct {
-  readonly archivedAt: EpochMs | number | null;
+  /** Instante de archivado en ms (`EpochMs` es un `number`); `null` si sigue activo. */
+  readonly archivedAt: number | null;
   readonly versions: readonly {
     readonly cost: number | null;
-    readonly archivedAt: EpochMs | number | null;
+    /** Instante de archivado en ms; `null` si la versión sigue activa. */
+    readonly archivedAt: number | null;
   }[];
 }
 

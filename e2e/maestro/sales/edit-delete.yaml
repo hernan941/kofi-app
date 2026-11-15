@@ -18,6 +18,7 @@ tags:
     env:
       PRODUCT_ROW: 'Lámina Colibrí.*'
 - tapOn: 'Listo'
+- runFlow: ../_shared/dismiss-notification-intro.yaml
 - tapOn: 'Lámina Colibrí.*'
 - assertVisible: 'Editar venta'
 - tapOn: 'Editar venta'
@@ -30,4 +31,4 @@ tags:
 - tapOn: 'Borrar venta'
 - assertVisible: '¿Borrar esta venta?'
 - tapOn: 'Borrar venta'
-- assertVisible: 'Todavía no hay ventas esta semana'
+- assertVisible: 'Aquí vas a ver cuánto vendes'

@@ -61,7 +61,9 @@ export function VersionFields({
     wasCostVisible.current = costVisible.field.value;
   }, [costVisible.field.value, prefix, setFocus]);
 
-  const removeHint = name.trim() === '' ? 'Quita esta versión' : `Quita la versión ${name.trim()}`;
+  const versionName = name.trim();
+  const named = (build: (versionName: string) => string) =>
+    versionName === '' ? undefined : build(versionName);
 
   return (
     <View className="gap-4">
@@ -77,6 +79,7 @@ export function VersionFields({
       ) : null}
       <ChipGroup
         label="Precio"
+        accessibilityLabel={named((value) => `Precio de ${value}`)}
         options={PRICE_OPTIONS}
         value={mode.field.value}
         onChange={mode.field.onChange}
@@ -86,6 +89,7 @@ export function VersionFields({
           control={control}
           name={`${prefix}.priceText`}
           label="¿A cuánto lo vendes?"
+          accessibilityLabel={named((value) => `¿A cuánto vendes ${value}?`)}
           placeholder="15.000"
           describeError={describeProductError}
         />
@@ -97,6 +101,7 @@ export function VersionFields({
           control={control}
           name={`${prefix}.costText`}
           label="¿Cuánto te cuesta hacerlo?"
+          accessibilityLabel={named((value) => `¿Cuánto te cuesta hacer ${value}?`)}
           isOptional
           placeholder="3.000"
           helper="Solo lo ves tú. Sirve para saber cuánto te queda de cada venta. Puedes dejarlo vacío."
@@ -118,7 +123,7 @@ export function VersionFields({
         <View className="items-start">
           <DeleteButton
             label="Quitar versión"
-            accessibilityHint={removeHint}
+            accessibilityLabel={named((value) => `Quitar versión ${value}`)}
             onPress={() => {
               onRemove(index);
             }}

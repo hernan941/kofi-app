@@ -23,6 +23,16 @@ describe('createTestDependencies', () => {
     expect(createTestDependencies({ ids }).ids).toBe(ids);
   });
 
+  it('provides the backup doubles so a backup can be exported without a device', async () => {
+    const dependencies = createTestDependencies();
+
+    await expect(dependencies.backupStore.readSnapshot()).resolves.toMatchObject({ products: [] });
+    expect(dependencies.archiveIo.availableDiskSpace()).toBeGreaterThan(0);
+    expect(dependencies.backupFiles.exportTarget('ventas.csv')).toContain('ventas.csv');
+    await expect(dependencies.fileSharer.isAvailable()).resolves.toBe(true);
+    expect(dependencies.appVersion).not.toBe('');
+  });
+
   it('runs transactions inline and rejects with the error of the work', async () => {
     const { transactions } = createTestDependencies();
 

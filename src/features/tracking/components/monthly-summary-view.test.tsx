@@ -43,12 +43,15 @@ describe('MonthlySummaryView', () => {
       <MonthlySummaryView summary={summaryOf()} topProducts={[]} profit={null} today={today} />,
     );
 
-    expect(screen.getByText('Vendiste')).toBeOnTheScreen();
-    expect(screen.getByLabelText('45.000 pesos')).toHaveProp(
+    expect(screen.getByText('Vendiste', { includeHiddenElements: true })).toBeOnTheScreen();
+    expect(screen.getByLabelText('Vendiste: 45.000 pesos, 3 ventas registradas')).toBeOnTheScreen();
+    expect(screen.getByText('$45.000', { includeHiddenElements: true })).toHaveProp(
       'className',
       expect.stringContaining('text-display'),
     );
-    expect(screen.getByText('3 ventas registradas')).toBeOnTheScreen();
+    expect(
+      screen.getByText('3 ventas registradas', { includeHiddenElements: true }),
+    ).toBeOnTheScreen();
   });
 
   it('uses the singular for one record', async () => {
@@ -61,7 +64,9 @@ describe('MonthlySummaryView', () => {
       />,
     );
 
-    expect(screen.getByText('1 venta registrada')).toBeOnTheScreen();
+    expect(
+      screen.getByText('1 venta registrada', { includeHiddenElements: true }),
+    ).toBeOnTheScreen();
   });
 
   it('invites to register when the current month has no sales', async () => {
@@ -113,9 +118,9 @@ describe('MonthlySummaryView', () => {
     expect(screen.getByRole('header', { name: 'Lo que más vendiste' })).toBeOnTheScreen();
     expect(screen.getByText('Según el monto vendido.')).toBeOnTheScreen();
     expect(screen.getByText('Empataron con el mismo monto.')).toBeOnTheScreen();
-    expect(screen.getByText('Lámina')).toBeOnTheScreen();
-    expect(screen.getByText('Taza')).toBeOnTheScreen();
-    expect(screen.getByText('Archivado')).toBeOnTheScreen();
+    expect(screen.getByText('Lámina', { includeHiddenElements: true })).toBeOnTheScreen();
+    expect(screen.getByText('Taza', { includeHiddenElements: true })).toBeOnTheScreen();
+    expect(screen.getByText('Archivado', { includeHiddenElements: true })).toBeOnTheScreen();
   });
 
   it('omits the tie note with a single top product and the card without any', async () => {
@@ -148,7 +153,7 @@ describe('MonthlySummaryView', () => {
     );
 
     expect(screen.getByRole('header', { name: 'Dónde vendiste más' })).toBeOnTheScreen();
-    expect(screen.getByText('Feria')).toBeOnTheScreen();
+    expect(screen.getByText('Feria', { includeHiddenElements: true })).toBeOnTheScreen();
 
     await rerender(
       <MonthlySummaryView summary={summaryOf()} topProducts={[]} profit={null} today={today} />,
@@ -201,7 +206,7 @@ describe('MonthlySummaryView', () => {
       />,
     );
 
-    expect(screen.getByLabelText('0 pesos')).toHaveTextContent('$0');
+    expect(screen.getByText('$0', { includeHiddenElements: true })).toHaveTextContent('$0');
     expect(screen.queryByText('Lo que más vendiste')).not.toBeOnTheScreen();
   });
 });

@@ -32,6 +32,26 @@ const PURE_DOMAIN_PACKAGES = [
   '@/core/**',
 ];
 const PERSISTENCE_PACKAGES = ['drizzle-orm', 'drizzle-orm/**', 'expo-sqlite', '**/data/drizzle-*'];
+const NETWORK_MESSAGE =
+  'La app no envía datos a internet (D-23): la nota de privacidad de Ajustes dejaría de ser cierta.';
+const NETWORK_PATTERNS = [
+  {
+    group: [
+      'expo/fetch',
+      'expo-network',
+      'expo-network/**',
+      'expo-web-browser',
+      'expo-web-browser/**',
+    ],
+    message: NETWORK_MESSAGE,
+  },
+  { group: ['expo-file-system/legacy'], message: NETWORK_MESSAGE },
+  {
+    group: ['expo-file-system'],
+    importNames: ['UploadTask', 'DownloadTask'],
+    message: NETWORK_MESSAGE,
+  },
+];
 const EXPO_PACKAGES = ['expo', 'expo-*', 'expo-*/**'];
 
 /**
@@ -157,6 +177,7 @@ function restrictedImports({
   const patterns = [
     ...deepImports,
     { group: packages },
+    ...NETWORK_PATTERNS,
     ...(allowIcons
       ? []
       : [{ group: ICON_PACKAGES, message: 'Use the Icon component from shared/ui.' }]),

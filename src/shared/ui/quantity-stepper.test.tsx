@@ -1,4 +1,5 @@
 import { fireEvent, screen, userEvent, waitFor } from '@testing-library/react-native';
+import { useState } from 'react';
 
 import { QuantityStepper } from './quantity-stepper';
 import { renderUi } from './testing/render-ui';
@@ -170,6 +171,79 @@ describe('QuantityStepper', () => {
 
       expect(field).toHaveProp('keyboardType', 'number-pad');
       expect(field).toHaveDisplayValue('2');
+    });
+  });
+
+  describe('what the screen reader says', () => {
+    it('reads the value as text, so it is not a percentage', async () => {
+      await renderUi(
+        <QuantityStepper label="Cantidad" value={3} min={1} max={99} onChange={jest.fn()} />,
+      );
+
+      expect(screen.getByRole('adjustable', { name: 'Cantidad' })).toHaveProp(
+        'accessibilityValue',
+        {
+          min: 1,
+          max: 99,
+          now: 3,
+          text: '3',
+        },
+      );
+    });
+
+    it('reads a value text written by the screen, like "8 horas"', async () => {
+      await renderUi(
+        <QuantityStepper
+          label="Hora"
+          value={8}
+          min={0}
+          max={23}
+          valueText="8 horas"
+          onChange={jest.fn()}
+        />,
+      );
+
+      expect(screen.getByRole('adjustable', { name: 'Hora' })).toHaveProp('accessibilityValue', {
+        min: 0,
+        max: 23,
+        now: 8,
+        text: '8 horas',
+      });
+    });
+
+    it('updates the value text after pressing "Agregar uno"', async () => {
+      function Probe() {
+        const [value, setValue] = useState(3);
+        return <QuantityStepper label="Cantidad" value={value} onChange={setValue} />;
+      }
+      await renderUi(<Probe />);
+
+      await user.press(screen.getByRole('button', { name: 'Agregar uno' }));
+
+      expect(screen.getByRole('adjustable', { name: 'Cantidad' })).toHaveProp(
+        'accessibilityValue',
+        expect.objectContaining({ now: 4, text: '4' }),
+      );
+    });
+
+    it('names its buttons with the product when the screen says so', async () => {
+      await renderUi(
+        <QuantityStepper
+          label="Cantidad"
+          accessibilityLabel="Cantidad de Lámina Colibrí"
+          decrementLabel="Quitar uno a la cantidad de Lámina Colibrí"
+          incrementLabel="Agregar uno a la cantidad de Lámina Colibrí"
+          value={3}
+          onChange={jest.fn()}
+        />,
+      );
+
+      expect(
+        screen.getByRole('button', { name: 'Quitar uno a la cantidad de Lámina Colibrí' }),
+      ).toBeOnTheScreen();
+      expect(
+        screen.getByRole('button', { name: 'Agregar uno a la cantidad de Lámina Colibrí' }),
+      ).toBeOnTheScreen();
     });
   });
 });

@@ -1,8 +1,8 @@
 import { useMemo } from 'react';
 
-import type { ProductId, SaleRecordId } from '@/shared/domain';
+import type { SaleRecordId } from '@/shared/domain';
 
-import { buildSaleRecordView, type SaleRecordView } from '../domain';
+import { buildSaleRecordView, productIdsOf, type SaleRecordView } from '../domain';
 import { useProductsByIds } from './use-products-by-ids';
 import { useSaleRecord } from './use-sale-record';
 
@@ -24,10 +24,7 @@ export interface SaleRecordViewState {
 export function useSaleRecordView(id: SaleRecordId): SaleRecordViewState {
   const recordQuery = useSaleRecord(id);
   const record = recordQuery.data ?? null;
-  const productIds = useMemo(
-    () => [...new Set(record?.items.map((item) => item.productId) ?? [])] satisfies ProductId[],
-    [record],
-  );
+  const productIds = useMemo(() => productIdsOf(record), [record]);
   const productsQuery = useProductsByIds(productIds);
   const products = productsQuery.data;
 

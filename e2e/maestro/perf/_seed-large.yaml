@@ -1,0 +1,13 @@
+appId: com.cuantovendi.local
+---
+- launchApp:
+    clearState: true
+- runFlow:
+    file: ../_shared/seed.yaml
+    env:
+      FIXTURE: large
+- stopApp
+- launchApp
+- extendedWaitUntil:
+    visible: 'Registrar venta'
+    timeout: 30000

@@ -1,4 +1,4 @@
-import { act, render, screen } from '@testing-library/react-native';
+import { act, render, screen, userEvent, waitFor } from '@testing-library/react-native';
 import * as SplashScreen from 'expo-splash-screen';
 import { Text } from 'react-native';
 
@@ -7,8 +7,9 @@ import { createTestDependencies } from '@/core/testing/create-test-dependencies'
 import { err, ok } from '@/shared/domain/result';
 import { UiTestProviders } from '@/shared/ui/testing/render-ui';
 
+import { clearPerfMarks, readPerfMarks } from '@/shared/lib/perf-marks';
 import { DependenciesProvider } from './dependencies-context';
-import { MigrationGate } from './migration-gate';
+import { MigrationGate, type MigrationGateProps } from './migration-gate';
 
 type FontsResult = [boolean, Error | null];
 
@@ -18,12 +19,8 @@ jest.mock('expo-splash-screen', () => ({
   preventAutoHideAsync: jest.fn(),
   hideAsync: jest.fn(),
 }));
-jest.mock('@expo-google-fonts/lexend', () => ({
+jest.mock('@expo-google-fonts/lexend/useFonts', () => ({
   useFonts: (): FontsResult => mockUseFonts(),
-  Lexend_400Regular: 'regular',
-  Lexend_500Medium: 'medium',
-  Lexend_600SemiBold: 'semibold',
-  Lexend_700Bold: 'bold',
 }));
 
 const FOREIGN_KEYS: BootFailure = { kind: 'foreign_key_violation', violations: 1 };
@@ -32,11 +29,16 @@ function gateFor(
   migrateDatabase: () => Promise<MigrationResult>,
   dependencies = createTestDependencies(),
   runAfterFirstRender: () => Promise<void> = () => Promise.resolve(),
+  exportEmergency?: MigrationGateProps['exportEmergency'],
 ) {
   return (
     <UiTestProviders>
       <DependenciesProvider dependencies={dependencies}>
-        <MigrationGate migrateDatabase={migrateDatabase} runAfterFirstRender={runAfterFirstRender}>
+        <MigrationGate
+          migrateDatabase={migrateDatabase}
+          runAfterFirstRender={runAfterFirstRender}
+          exportEmergency={exportEmergency}
+        >
           <Text>Contenido de la app</Text>
         </MigrationGate>
       </DependenciesProvider>
@@ -244,6 +246,137 @@ describe('MigrationGate', () => {
       });
 
       expect(task).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('emergency export', () => {
+    const NEWER: BootFailure = { kind: 'newer_database', appliedMigrations: 4, knownMigrations: 1 };
+    const MIGRATION: BootFailure = { kind: 'migration_failed' };
+    const BUTTON = 'Guardar una copia de mis datos';
+
+    function gateWithEmergency(
+      failure: BootFailure,
+      exportEmergency: NonNullable<MigrationGateProps['exportEmergency']>,
+      dependencies = createTestDependencies(),
+    ) {
+      return gateFor(
+        () => Promise.resolve(err(failure)),
+        dependencies,
+        () => Promise.resolve(),
+        exportEmergency,
+      );
+    }
+
+    test.each([FOREIGN_KEYS, NEWER, MIGRATION])(
+      'offers the copy for %j and exports with the failure kind',
+      async (failure) => {
+        const exportEmergency = jest.fn(() => Promise.resolve(ok(undefined)));
+        const user = userEvent.setup();
+        await render(gateWithEmergency(failure, exportEmergency));
+
+        await user.press(await screen.findByRole('button', { name: BUTTON }));
+
+        expect(exportEmergency).toHaveBeenCalledWith(failure.kind);
+        expect(await screen.findByText(/Copia lista/)).toBeOnTheScreen();
+      },
+    );
+
+    test('does not offer the copy when no export is connected or the app is ready', async () => {
+      await render(gateFor(() => Promise.resolve(err(FOREIGN_KEYS))));
+      await screen.findByText('No pudimos abrir tus datos');
+      expect(screen.queryByRole('button')).not.toBeOnTheScreen();
+    });
+
+    test('ignores a second press while the copy is being prepared', async () => {
+      let finish: (result: ReturnType<typeof ok<undefined>>) => void = () => undefined;
+      const exportEmergency = jest.fn(
+        () =>
+          new Promise<ReturnType<typeof ok<undefined>>>((resolve) => {
+            finish = resolve;
+          }),
+      );
+      const user = userEvent.setup();
+      await render(gateWithEmergency(MIGRATION, exportEmergency));
+
+      await user.press(await screen.findByRole('button', { name: BUTTON }));
+      await user.press(screen.getByRole('button', { name: BUTTON }));
+
+      expect(exportEmergency).toHaveBeenCalledTimes(1);
+      expect(screen.getByText('Preparando la copia…')).toBeOnTheScreen();
+      await act(async () => {
+        finish(ok(undefined));
+        await Promise.resolve();
+      });
+      expect(await screen.findByText(/Copia lista/)).toBeOnTheScreen();
+    });
+
+    test('shows the message of the problem and lets the person try again', async () => {
+      const exportEmergency = jest
+        .fn()
+        .mockResolvedValueOnce(err({ code: 'not_enough_space', requiredBytes: 350_000_000 }))
+        .mockResolvedValueOnce(ok(undefined));
+      const user = userEvent.setup();
+      await render(gateWithEmergency(MIGRATION, exportEmergency));
+
+      await user.press(await screen.findByRole('button', { name: BUTTON }));
+      expect(
+        await screen.findByText(
+          'No hay espacio suficiente para la copia. Libera al menos 350 MB y vuelve a intentarlo.',
+        ),
+      ).toBeOnTheScreen();
+      await user.press(screen.getByRole('button', { name: BUTTON }));
+
+      expect(await screen.findByText(/Copia lista/)).toBeOnTheScreen();
+      expect(exportEmergency).toHaveBeenCalledTimes(2);
+    });
+
+    test('shows a friendly message and logs when the export throws', async () => {
+      const dependencies = createTestDependencies();
+      const exportEmergency = jest.fn(() => Promise.reject(new Error('disk exploded')));
+      const user = userEvent.setup();
+      await render(gateWithEmergency(MIGRATION, exportEmergency, dependencies));
+
+      await user.press(await screen.findByRole('button', { name: BUTTON }));
+
+      expect(
+        await screen.findByText('No pudimos crear la copia. Vuelve a intentarlo en un momento.'),
+      ).toBeOnTheScreen();
+      expect(dependencies.logger.entriesAt('error').map((entry) => entry.event)).toContain(
+        'emergency_export_failed',
+      );
+    });
+  });
+});
+
+describe('MigrationGate performance marks (P1.d)', () => {
+  beforeEach(() => {
+    jest.mocked(SplashScreen.hideAsync).mockResolvedValue(undefined);
+    mockUseFonts.mockReturnValue([true, null]);
+    process.env.EXPO_PUBLIC_E2E = '1';
+  });
+
+  afterEach(() => {
+    delete process.env.EXPO_PUBLIC_E2E;
+    clearPerfMarks();
+  });
+
+  test('marks the start and the end of the migration, in that order', async () => {
+    await render(gateFor(() => Promise.resolve({ ok: true, value: undefined })));
+    await screen.findByText('Contenido de la app');
+
+    expect(readPerfMarks().map(({ name }) => name)).toEqual([
+      'boot:migrate:start',
+      'boot:migrate:end',
+    ]);
+  });
+
+  test('marks the end also when the migration fails', async () => {
+    await render(gateFor(() => Promise.reject(new Error('boom'))));
+    await waitFor(() => {
+      expect(readPerfMarks().map(({ name }) => name)).toEqual([
+        'boot:migrate:start',
+        'boot:migrate:end',
+      ]);
     });
   });
 });

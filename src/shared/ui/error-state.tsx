@@ -1,5 +1,5 @@
 import { WarningCircleIcon } from 'phosphor-react-native/src/icons/WarningCircle';
-import { Text, View } from 'react-native';
+import { ScrollView, Text, View } from 'react-native';
 
 import { useAnnounceWhen } from './announce';
 import { Card } from './card';
@@ -16,12 +16,13 @@ export interface ErrorStateProps {
 /**
  * What a screen shows when its data could not load (design system 6.8): a card with the
  * `WarningCircle` icon, a clear message that is announced and a secondary "Reintentar"
- * button.
+ * button. It scrolls, so
+ * with the largest font the button stays reachable.
  */
 export function ErrorState({ message, onRetry, retryLabel = 'Reintentar' }: ErrorStateProps) {
   useAnnounceWhen(message);
   return (
-    <View className="px-4 pt-4">
+    <ScrollView testID="state-scroll" contentContainerClassName="px-4 pt-4 pb-4">
       <Card>
         <View className="flex-row items-start gap-2">
           <Icon icon={WarningCircleIcon} color="danger" />
@@ -29,6 +30,6 @@ export function ErrorState({ message, onRetry, retryLabel = 'Reintentar' }: Erro
         </View>
         <SecondaryButton label={retryLabel} onPress={onRetry} />
       </Card>
-    </View>
+    </ScrollView>
   );
 }

@@ -151,12 +151,39 @@ describe('configureAndMigrate', () => {
   });
 });
 
+describe('migration 0001 (last_weekly_fire_at)', () => {
+  it('keeps the existing preferences and leaves the new column empty', async () => {
+    const full = loadMigrationBundle(MIGRATIONS_FOLDER);
+    const previous = loadMigrationBundle(MIGRATIONS_FOLDER, { upToIndex: 0 });
+    const database = await createTestDatabase({ bundle: previous });
+    database.raw.exec(
+      "INSERT INTO notification_preferences VALUES ('device', 1, 3, 510, 0, 1700000000000)",
+    );
+
+    const result = await configureAndMigrate(database.raw, database.db, full);
+
+    expect(result.ok).toBe(true);
+    expect(database.db.all(sql`SELECT * FROM notification_preferences`)).toEqual([
+      {
+        id: 'device',
+        weekly_enabled: 1,
+        weekly_weekday: 3,
+        weekly_minute_of_day: 510,
+        monthly_enabled: 0,
+        updated_at: 1700000000000,
+        last_weekly_fire_at: null,
+      },
+    ]);
+    database.close();
+  });
+});
+
 describe('loadMigrationBundle', () => {
   it('builds a bundle with the same shape as migrations.js', () => {
     const bundle = loadMigrationBundle(MIGRATIONS_FOLDER);
 
     expect(bundle.journal.entries[0]).toMatchObject({ idx: 0, breakpoints: true });
-    expect(Object.keys(bundle.migrations)).toEqual(['m0000']);
+    expect(Object.keys(bundle.migrations)).toEqual(['m0000', 'm0001']);
     expect(bundle.migrations.m0000).toContain('CREATE TABLE');
   });
 

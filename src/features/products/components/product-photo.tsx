@@ -46,7 +46,11 @@ export function ProductPhoto({
   const { uri, reportMissing } = usePhotoDisplay(photoId);
   const [hasFailed, setHasFailed] = useState(false);
   const accessibility = isDecorative
-    ? ({ accessible: false, importantForAccessibility: 'no' } as const)
+    ? ({
+        accessible: false,
+        accessibilityElementsHidden: true,
+        importantForAccessibility: 'no-hide-descendants',
+      } as const)
     : ({
         accessible: true,
         accessibilityRole: 'image',

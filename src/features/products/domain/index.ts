@@ -5,6 +5,7 @@ export {
   compareProductsForList,
   createProduct,
   hasSingleActiveVersion,
+  productListSortKey,
   unarchiveProduct,
   updateProduct,
 } from './product';

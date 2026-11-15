@@ -94,3 +94,15 @@ Configuración común:
 - La regla local de comentarios es código propio que hay que mantener; es chica y tiene tests.
 - TypeScript queda atado a la versión que soporta `typescript-eslint`. Al actualizar el SDK se revisan ambas.
 - En la v1 no hay E2E de iOS automatizados. Se agregan con ADR-016 cuando haya un release.
+
+## Enmienda 2026-11-14 (F9.0)
+Regla `no-restricted-globals` para `fetch`, `XMLHttpRequest` y `WebSocket` en `src/**`, que protege la nota de privacidad (la app no envía datos a internet, D-23). Scripts `licenses:generate` y `licenses:check` (ADR-018).
+
+## Enmienda 2026-11-14 (F10.0)
+Marcas de rendimiento internas (`performance.mark`, `rnStartupTiming`, `performance.memory`) solo en el build `e2e`, leídas por la ruta oculta `cuantovendi://e2e/perf`, con el mismo patrón de eliminación del bundle release que el resto del código E2E. Ver `docs/architecture/performance-budgets.md`.
+
+## Enmienda 2026-11-14 (F9.2)
+La regla de red de `src/**` (fuera de los tests) se endurece: además de `no-restricted-globals`, `no-restricted-properties` prohíbe `fetch`, `XMLHttpRequest` y `WebSocket` como propiedad de `globalThis`, `global`, `window` y `self`, y `Linking.openURL`; `no-restricted-syntax` prohíbe el acceso con corchetes, la desestructuración y el alias de esos objetos, los literales `http(s)://` y `ws(s)://` y el identificador `openURL`. `Linking.openSettings` sigue permitido. Se agrega `import/no-extraneous-dependencies` con `devDependencies: false` para el código de la app (los tests y los directorios `testing/` quedan fuera). El generador de licencias (ADR-018) ahora falla con expresiones SPDX mal formadas y con excepciones obsoletas.
+
+## Enmienda 2026-11-14 (F10.4)
+La regla de red de `src/**` suma, en `@typescript-eslint/no-restricted-imports` (dentro de `tools/eslint/layer-boundaries.js`, para todas las capas porque esa regla se reemplaza por bloque): `expo/fetch`, `expo-network`, `expo-web-browser`, `expo-file-system/legacy` y los nombres `UploadTask` y `DownloadTask` de `expo-file-system`. `no-restricted-properties` prohíbe `File.downloadFileAsync`, y `no-restricted-syntax` los métodos de instancia `upload`, `createUploadTask` y `createDownloadTask` (no se pueden distinguir por tipo). Cada caso tiene su fixture en `tools/eslint/layer-boundaries.test.js`. Los tests de los plugins de `plugins/` corren en el proyecto `node` de Jest.

@@ -4,7 +4,10 @@ appId: com.cuantovendi.local
 - tapOn: 'Agregar producto'
 - tapOn: 'Nombre'
 - inputText: ${PRODUCT_NAME}
-- tapOn: '¿A cuánto lo vendes?'
+- hideKeyboard
+- tapOn:
+    text: '¿A cuánto lo vendes?'
+    index: 1
 - inputText: ${PRODUCT_PRICE}
 - hideKeyboard
 - tapOn: 'Guardar'

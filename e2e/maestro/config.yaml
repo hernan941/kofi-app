@@ -3,6 +3,11 @@ flows:
   - 'products/*'
   - 'photos/*'
   - 'sales/*'
+  - 'tracking/*'
+  - 'tips/*'
+  - 'notifications/*'
+  - 'backup/*'
+  - 'settings/*'
 excludeTags:
   - release-only
   - upgrade

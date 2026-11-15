@@ -1,8 +1,8 @@
 import { QuestionIcon } from 'phosphor-react-native/src/icons/Question';
 import { View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { EmptyState } from './empty-state';
+import { StyledSafeAreaView } from './styled-safe-area-view';
 
 /** Props of {@link NotFoundScreen}. */
 export interface NotFoundScreenProps {
@@ -15,7 +15,7 @@ export interface NotFoundScreenProps {
  */
 export function NotFoundScreen({ onGoHome }: NotFoundScreenProps) {
   return (
-    <SafeAreaView className="flex-1 bg-background">
+    <StyledSafeAreaView className="flex-1 bg-background">
       <View className="flex-1">
         <EmptyState
           icon={QuestionIcon}
@@ -24,6 +24,6 @@ export function NotFoundScreen({ onGoHome }: NotFoundScreenProps) {
           primaryAction={{ label: 'Ir al inicio', onPress: onGoHome }}
         />
       </View>
-    </SafeAreaView>
+    </StyledSafeAreaView>
   );
 }

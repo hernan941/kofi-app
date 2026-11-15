@@ -2,4 +2,6 @@ appId: com.cuantovendi.local
 ---
 - launchApp:
     clearState: true
-- assertVisible: 'Todavía no hay ventas esta semana'
+    permissions:
+      notifications: unset
+- assertVisible: 'Aquí vas a ver cuánto vendes'

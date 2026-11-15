@@ -8,6 +8,7 @@ import {
 
 import { TextField, type TextFieldProps } from '../text-field';
 import { describeWith, TEXT_ERROR_MESSAGES } from './error-messages';
+import { useIsFromSubmit } from './use-is-from-submit';
 
 /** Props of {@link FormTextField}. */
 export interface FormTextFieldProps<
@@ -39,6 +40,7 @@ export function FormTextField<
     field: { ref: registerInput, value, onChange, onBlur },
     fieldState: { error },
   } = useController({ control, name });
+  const isFromSubmit = useIsFromSubmit(control);
   return (
     <TextField
       {...props}
@@ -47,6 +49,7 @@ export function FormTextField<
       onChangeText={onChange}
       onBlur={onBlur}
       error={error ? describeError(error) : undefined}
+      canAnnounceError={() => !isFromSubmit()}
     />
   );
 }

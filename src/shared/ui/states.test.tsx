@@ -1,4 +1,4 @@
-import { screen, userEvent } from '@testing-library/react-native';
+import { screen, userEvent, within } from '@testing-library/react-native';
 import { ReceiptIcon } from 'phosphor-react-native/src/icons/Receipt';
 import { AccessibilityInfo } from 'react-native';
 
@@ -45,6 +45,31 @@ describe('LoadingState', () => {
     const loading = screen.getByRole('progressbar', { name: 'Cargando ventas' });
 
     expect(loading).toBeBusy();
+  });
+});
+
+describe('scrolling of the state screens', () => {
+  it('keeps the empty state and its buttons reachable with a large font', async () => {
+    await renderUi(
+      <EmptyState
+        icon={ReceiptIcon}
+        title="Todavía no hay ventas"
+        description="Registra una"
+        primaryAction={{ label: 'Registrar venta', onPress: jest.fn() }}
+      />,
+    );
+
+    const scroll = screen.getByTestId('state-scroll');
+
+    expect(within(scroll).getByRole('button', { name: 'Registrar venta' })).toBeOnTheScreen();
+  });
+
+  it('keeps the error state and its retry button reachable with a large font', async () => {
+    await renderUi(<ErrorState message="No pudimos cargar" onRetry={jest.fn()} />);
+
+    const scroll = screen.getByTestId('state-scroll');
+
+    expect(within(scroll).getByRole('button', { name: 'Reintentar' })).toBeOnTheScreen();
   });
 });
 

@@ -1,0 +1,18 @@
+appId: com.cuantovendi.local
+tags:
+  - backup
+---
+# "Crear respaldo" opens the system share sheet; "Respaldo creado" appears after it is closed.
+- runFlow: ../_shared/launch-clean.yaml
+- runFlow: ../_shared/open-backup.yaml
+- assertVisible: 'El archivo no lleva contraseña.*'
+- tapOn: 'Crear respaldo'
+- extendedWaitUntil:
+    notVisible: 'Crear respaldo'
+    timeout: 20000
+- waitForAnimationToEnd
+- pressKey: back
+- extendedWaitUntil:
+    visible: 'Respaldo creado'
+    timeout: 30000
+- assertVisible: 'Crear respaldo'

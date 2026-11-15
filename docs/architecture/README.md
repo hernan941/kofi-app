@@ -20,6 +20,7 @@ Cada decisión técnica se registra como un ADR corto: contexto, opciones, decis
 | [ADR-014](adr-014-tipografia-e-iconos.md) | Solo Lexend (sin `tnum`; montos alineados a la derecha con un componente `Amount`) e íconos Phosphor importados por ícono | Aceptado |
 | [ADR-015](adr-015-fechas-y-zonas-horarias.md) | Fechas locales con aritmética de calendario pura; única conversión en la zona del dispositivo (`LocalCalendar`), sin `Intl` ni librerías; tests con TZ fija | Aceptado |
 | [ADR-016](adr-016-plataformas-y-builds-locales.md) | Sin web; builds locales de Android con `expo run:android` (`debug`, `release` y `e2e` con `EXPO_PUBLIC_E2E=1`), lista de dependencias de la plantilla, `android.package` local provisional, APK por punto de control y `minSdkVersion` 24 | Aceptado |
+| [ADR-018](adr-018-licencias-de-terceros.md) | Licencias de terceros generadas desde el bundle de release real (source maps de `expo export` + autolinking), módulo TS versionado, lista blanca de licencias y test de frescura por huella del lockfile; sin dependencias nuevas | Aceptado |
 
 ## Pendientes (futuro, fuera de la v1)
 La v1 no se publica y no usa servicios externos: todo es local. Estos ADRs quedan como consideraciones para cuando haya un release:
@@ -28,3 +29,4 @@ La v1 no se publica y no usa servicios externos: todo es local. Estos ADRs queda
 |---|---|---|
 | (nuevo, sin número) | EAS Build y Submit, perfiles de `eas.json`, identificadores definitivos, firma de release, política de EAS Update y rollback (con las migraciones solo en builds nativos, ADR-006) y E2E de iOS. Los puntos de partida están en la sección "Futuro" de [ADR-016](adr-016-plataformas-y-builds-locales.md), que en la v1 solo decide web, builds locales, dependencias y `minSdkVersion` | Pendiente |
 | ADR-017 | Crash reporting externo y destino del `logger` en producción (en la v1 el logger solo escribe en consola en desarrollo, ADR-005), con revisión de privacidad | Pendiente |
+| (nuevo, sin número) | Avisos de licencias de las bibliotecas nativas que no vienen de npm (Gradle, CocoaPods y lo que trae `react-native` en sus binarios), fuera del alcance de [ADR-018](adr-018-licencias-de-terceros.md) en la v1 | Pendiente |

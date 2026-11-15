@@ -13,6 +13,8 @@ export function PrimaryButton({
   onPress,
   icon,
   accessibilityHint,
+  accessibilityLabel,
+  accessibilityState,
   ref,
 }: PrimaryButtonProps) {
   return (
@@ -21,6 +23,8 @@ export function PrimaryButton({
       onPress={onPress}
       icon={icon}
       accessibilityHint={accessibilityHint}
+      accessibilityLabel={accessibilityLabel}
+      accessibilityState={accessibilityState}
       tone="primary"
       ref={ref}
     />

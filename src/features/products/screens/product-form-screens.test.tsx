@@ -24,7 +24,9 @@ describe('NewProductScreen', () => {
     await user.type(screen.getByLabelText('¿A cuánto lo vendes?'), '15000');
     await user.press(screen.getByRole('button', { name: 'Guardar' }));
 
-    expect((await screen.findAllByText('Producto guardado')).length).toBeGreaterThan(0);
+    expect(
+      (await screen.findAllByText('Producto guardado', { includeHiddenElements: true })).length,
+    ).toBeGreaterThan(0);
     const [saved] = await dependencies.products.listActive();
     expect(saved?.name).toBe('Lámina Colibrí');
     expect(onSaved).toHaveBeenCalledWith(saved?.id);
@@ -45,7 +47,11 @@ describe('NewProductScreen', () => {
     await user.press(screen.getByRole('button', { name: 'Guardar' }));
 
     expect(
-      (await screen.findAllByText('No se pudo guardar. Inténtalo de nuevo.')).length,
+      (
+        await screen.findAllByText('No se pudo guardar. Inténtalo de nuevo.', {
+          includeHiddenElements: true,
+        })
+      ).length,
     ).toBeGreaterThan(0);
     expect(screen.getByLabelText('Nombre')).toHaveDisplayValue('Lámina');
     expect(onSaved).not.toHaveBeenCalled();
@@ -72,7 +78,11 @@ describe('NewProductScreen photos after a failed save', () => {
 
     await user.press(screen.getByRole('button', { name: 'Guardar' }));
     expect(
-      (await screen.findAllByText('No se pudo guardar. Inténtalo de nuevo.')).length,
+      (
+        await screen.findAllByText('No se pudo guardar. Inténtalo de nuevo.', {
+          includeHiddenElements: true,
+        })
+      ).length,
     ).toBeGreaterThan(0);
     expect(dependencies.photos.fileIds()).toHaveLength(2);
     await user.press(screen.getByRole('button', { name: 'Guardar' }));
@@ -107,7 +117,9 @@ describe('EditProductScreen', () => {
     await user.type(name, 'Lámina Colibrí');
     await user.press(screen.getByRole('button', { name: 'Guardar' }));
 
-    expect((await screen.findAllByText('Cambios guardados')).length).toBeGreaterThan(0);
+    expect(
+      (await screen.findAllByText('Cambios guardados', { includeHiddenElements: true })).length,
+    ).toBeGreaterThan(0);
     expect((await dependencies.products.findById(PRODUCT_ID))?.name).toBe('Lámina Colibrí');
     expect(onSaved).toHaveBeenCalledWith(PRODUCT_ID);
   });
@@ -153,7 +165,11 @@ describe('EditProductScreen', () => {
     await user.press(screen.getByRole('button', { name: 'Guardar' }));
 
     expect(
-      (await screen.findAllByText('No encontramos este producto. Puede que ya no exista.')).length,
+      (
+        await screen.findAllByText('No encontramos este producto. Puede que ya no exista.', {
+          includeHiddenElements: true,
+        })
+      ).length,
     ).toBeGreaterThan(0);
     expect(onBack).toHaveBeenCalledTimes(1);
   });

@@ -25,13 +25,20 @@ interface AppToastViewProps extends ToastComponentProps {
   readonly message: string;
 }
 
-/** Bruma look of a notice: overlay fill, sticker border and shadow, icon, text and close button. */
+/**
+ * Bruma look of a notice: overlay fill, sticker border and shadow, icon, text and close button.
+ * It is hidden from the screen reader, measuring copy included, and has no live region:
+ * `useAppToast` announces the message once with `announce`, so it is never read twice and no
+ * invisible "Cerrar aviso" button is left in the focus order.
+ */
 function AppToastView({ kind, message, ...toastProps }: AppToastViewProps) {
   return (
     <Toast
       {...toastProps}
       placement="bottom"
-      accessibilityLiveRegion="polite"
+      aria-live="off"
+      accessibilityElementsHidden
+      importantForAccessibility="no-hide-descendants"
       className="mx-4 flex-row items-center gap-3 rounded-3xl border-2 border-border bg-overlay p-4 shadow-sticker"
     >
       {kind === 'success' ? (
@@ -54,7 +61,7 @@ function AppToastView({ kind, message, ...toastProps }: AppToastViewProps) {
 
 /**
  * Shows on-screen notices (design system 6.6) with the HeroUI toast: at the bottom, at
- * least four seconds, closable and announced to the screen reader. Success carries the
+ * least four seconds, closable by touch and announced once to the screen reader. Success carries the
  * filled `CheckCircle`, errors the `WarningCircle` and a message that says what to do.
  * Never use it for something that needs an action: that goes in a dialog or the form.
  */

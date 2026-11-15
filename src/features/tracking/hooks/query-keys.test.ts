@@ -16,6 +16,20 @@ describe('tracking query keys', () => {
     ).toEqual(['tracking', 'sales-between', '2026-06-01', '2026-07-01']);
   });
 
+  it('puts the range of the grid inside the calendar key and the Monday inside the week key', () => {
+    expect(
+      trackingKeys.calendar(
+        localDateSchema.parse('2026-10-26'),
+        localDateSchema.parse('2026-12-06'),
+      ),
+    ).toEqual(['tracking', 'calendar', '2026-10-26', '2026-12-06']);
+    expect(trackingKeys.weekFacts(localDateSchema.parse('2026-11-09'))).toEqual([
+      'tracking',
+      'week-facts',
+      '2026-11-09',
+    ]);
+  });
+
   it('changes the costs key with the set of versions', () => {
     expect(trackingCostKeys.forVersions([version(1)])).not.toEqual(
       trackingCostKeys.forVersions([version(1), version(2)]),

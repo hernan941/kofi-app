@@ -1,0 +1,9 @@
+appId: com.cuantovendi.local
+---
+# After "Listo" on the first sale the app may offer the reminders explanation (Android 13+, where
+# the notification permission is undecided). Flows that are not about it close it with "Ahora no".
+- runFlow:
+    when:
+      visible: '¿Te recordamos anotar tus ventas?'
+    commands:
+      - tapOn: 'Ahora no'

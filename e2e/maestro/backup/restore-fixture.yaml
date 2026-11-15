@@ -1,0 +1,26 @@
+appId: com.cuantovendi.local
+tags:
+  - backup
+---
+# The "basic" fixture goes through the real restoration; its products and the safety copy are visible afterwards.
+- runFlow: ../_shared/launch-clean.yaml
+- runFlow:
+    file: ../_shared/seed.yaml
+    env:
+      FIXTURE: 'basic'
+- launchApp
+- tapOn: 'Productos'
+- assertVisible: 'Lámina ñandú'
+- assertVisible: 'Taza'
+- assertVisible: 'Cuaderno'
+- assertVisible: 'Stickers'
+- openLink: cuantovendi://tracking/monthly?month=2026-10
+- assertVisible: 'Resumen del mes'
+- assertVisible: '[0-9]+ ventas registradas'
+- tapOn: 'Volver'
+- tapOn: 'Ajustes'
+- tapOn: 'Respaldo y planillas.*'
+- scrollUntilVisible:
+    element: 'Copia de seguridad'
+- assertVisible: 'Copia de seguridad'
+- assertVisible: 'Restaurar esta copia'

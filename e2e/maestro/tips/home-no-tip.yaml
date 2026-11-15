@@ -1,0 +1,22 @@
+appId: com.cuantovendi.local
+tags:
+  - tips
+---
+# Inicio never shows tips (D-11): neither right after the sale nor later.
+- runFlow: ../_shared/launch-clean.yaml
+- runFlow:
+    file: ../_shared/create-product.yaml
+    env:
+      PRODUCT_NAME: 'Lámina Colibrí'
+      PRODUCT_PRICE: '15000'
+- runFlow:
+    file: ../_shared/register-sale.yaml
+    env:
+      PRODUCT_ROW: 'Lámina Colibrí.*'
+- assertVisible: '¿Para qué sirve saber cuánto te cuesta?'
+- tapOn: 'Listo'
+- runFlow: ../_shared/dismiss-notification-intro.yaml
+- tapOn: 'Inicio'
+- assertVisible: 'Registrar venta'
+- assertNotVisible: 'Consejo · .*'
+- assertNotVisible: '¿Para qué sirve saber cuánto te cuesta?'

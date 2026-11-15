@@ -136,7 +136,12 @@ function activeSalesPredicate() {
   return and(isNull(saleRecords.deletedAt), isNull(saleItems.deletedAt));
 }
 
-function activeSoldOnDates(db: AppDatabase, from: LocalDate, to: LocalDate): LocalDate[] {
+function activeSoldOnDates(
+  db: AppDatabase,
+  from: LocalDate,
+  to: LocalDate,
+  limit = -1,
+): LocalDate[] {
   return db
     .selectDistinct({ soldOn: saleRecords.soldOn })
     .from(saleRecords)
@@ -149,6 +154,7 @@ function activeSoldOnDates(db: AppDatabase, from: LocalDate, to: LocalDate): Loc
       ),
     )
     .orderBy(asc(saleRecords.soldOn))
+    .limit(limit)
     .all()
     .map((row) => row.soldOn);
 }
@@ -166,7 +172,7 @@ function earliestSoldOn(db: AppDatabase): LocalDate | null {
 }
 
 function hasSalesBetween(db: AppDatabase, from: LocalDate, to: LocalDate): boolean {
-  return activeSoldOnDates(db, from, to).length > 0;
+  return activeSoldOnDates(db, from, to, 1).length > 0;
 }
 
 function assertItemsMatchVersions(db: AppDatabase, record: SaleRecord): void {

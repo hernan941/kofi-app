@@ -60,7 +60,30 @@ describe('ChipGroup', () => {
     expect(onChange).toHaveBeenCalledWith('fair');
   });
 
+  it('reads the visible label before the chips, in both modes', async () => {
+    await renderUi(
+      <ChipGroup label="Dónde vendiste" options={options} value="fair" onChange={jest.fn()} />,
+    );
+
+    expect(screen.getByText('Dónde vendiste')).toBeOnTheScreen();
+  });
+
   describe('with allowDeselect', () => {
+    it('reaches the question as text and has no label on a container with no role', async () => {
+      await renderUi(
+        <ChipGroup
+          label="¿Dónde vendiste? (opcional)"
+          options={options}
+          value={null}
+          allowDeselect
+          onChange={jest.fn()}
+        />,
+      );
+
+      expect(screen.getByText('¿Dónde vendiste? (opcional)')).toBeOnTheScreen();
+      expect(screen.queryByLabelText('¿Dónde vendiste? (opcional)')).not.toBeOnTheScreen();
+    });
+
     it('deselects the chosen chip by pressing it again', async () => {
       const onChange = jest.fn();
       await renderUi(
@@ -95,7 +118,7 @@ describe('ChipGroup', () => {
       expect(onChange).toHaveBeenCalledWith('online');
     });
 
-    it('is a labelled group of toggle buttons with the selected state, not a radio group', async () => {
+    it('is the question followed by toggle buttons with the selected state, not a radio group', async () => {
       await renderUi(
         <ChipGroup
           label="Dónde vendiste"
@@ -106,10 +129,8 @@ describe('ChipGroup', () => {
         />,
       );
 
-      expect(screen.getByLabelText('Dónde vendiste')).not.toHaveProp(
-        'accessibilityRole',
-        'radiogroup',
-      );
+      expect(screen.getByText('Dónde vendiste')).toBeOnTheScreen();
+      expect(screen.queryByRole('radiogroup')).not.toBeOnTheScreen();
       expect(screen.queryByRole('radio')).not.toBeOnTheScreen();
       expect(screen.getByRole('button', { name: 'Feria' })).toBeSelected();
       expect(screen.getByRole('button', { name: 'Por internet' })).not.toBeSelected();

@@ -4,6 +4,7 @@ import { Text, View } from 'react-native';
 import { activeVersions, type Product, type ProductVersion } from '@/features/products/domain';
 import { formatClpAccessible } from '@/shared/domain';
 import {
+  AccessibleGroup,
   Amount,
   ArchiveIcon,
   DeleteButton,
@@ -16,7 +17,7 @@ import {
 
 import { QUANTITY_MAX, QUANTITY_MIN, type SaveSaleRecordInput } from '../domain';
 import { describeSaleError } from './error-messages';
-import { ProductThumbnail, coverPhotoIdOf } from './product-thumbnail';
+import { ProductThumbnail, coverPhotoIdOf } from '@/features/products';
 import { formTotal, itemPath, type SaleFormValues } from './sale-form-schema';
 
 /** Control del formulario de venta. */
@@ -92,7 +93,7 @@ export function SaleItemFields({
         {canChangeVersion ? (
           <TextButton
             label="Cambiar"
-            accessibilityHint={`Cambia la versión de ${name}`}
+            accessibilityLabel={`Cambiar versión de ${name}`}
             onPress={() => {
               onChangeVersion(index);
             }}
@@ -103,6 +104,8 @@ export function SaleItemFields({
         <QuantityStepper
           label="Cantidad"
           accessibilityLabel={`Cantidad de ${name}`}
+          decrementLabel={`Quitar uno a la cantidad de ${name}`}
+          incrementLabel={`Agregar uno a la cantidad de ${name}`}
           value={quantity.field.value}
           onChange={quantity.field.onChange}
           min={QUANTITY_MIN}
@@ -113,6 +116,7 @@ export function SaleItemFields({
             control={control}
             name={`${prefix}.priceText`}
             label="Precio de cada uno"
+            accessibilityLabel={`Precio de cada uno de ${name}`}
             placeholder="15.000"
             helper={row.pricingMode === 'negotiable' ? 'Escribe a cuánto lo vendiste.' : undefined}
             describeError={describeSaleError}
@@ -130,20 +134,19 @@ export function SaleItemFields({
       <View className="flex-row items-center justify-between gap-2">
         <DeleteButton
           label="Quitar"
-          accessibilityHint={`Quita ${name} de esta venta`}
+          accessibilityLabel={`Quitar ${name}`}
           onPress={() => {
             onRemove(index);
           }}
         />
         {row.quantity > 1 ? (
-          <View
-            accessible
-            accessibilityLabel={`Subtotal: ${formatClpAccessible(subtotal)}`}
-            className="flex-row items-baseline gap-2"
+          <AccessibleGroup
+            label={`Subtotal: ${formatClpAccessible(subtotal)}`}
+            contentClassName="flex-row items-baseline gap-2"
           >
             <Text className="text-sm text-muted">Subtotal</Text>
             <Amount value={subtotal} variant="inline" />
-          </View>
+          </AccessibleGroup>
         ) : null}
       </View>
     </View>

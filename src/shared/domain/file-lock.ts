@@ -1,6 +1,6 @@
 /** Quién tiene el lock; sirve para logs y para decidir qué hacer si está ocupado. */
 export type FileLockOwner =
-  'orphan_collection' | 'photo_removal' | 'backup_export' | 'backup_restore';
+  'orphan_collection' | 'photo_removal' | 'backup_export' | 'backup_restore' | 'backup_cleanup';
 
 /** Permiso exclusivo; liberar dos veces no tiene efecto. */
 export interface FileLockLease {

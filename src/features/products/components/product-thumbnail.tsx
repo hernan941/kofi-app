@@ -1,9 +1,10 @@
 import { View } from 'react-native';
 
-import { ProductPhoto } from '@/features/products';
-import { coverPhoto, type Product } from '@/features/products/domain';
 import type { ProductPhotoId } from '@/shared/domain';
 import { Icon, PackageIcon } from '@/shared/ui';
+
+import { coverPhoto, type Product } from '../domain';
+import { ProductPhoto } from './product-photo';
 
 /** Id de la portada de un producto (D-17), o `null` si no tiene fotos. */
 export function coverPhotoIdOf(product: Product | null): ProductPhotoId | null {

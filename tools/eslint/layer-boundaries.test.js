@@ -9,6 +9,10 @@ const IMPORTS_RULE = '@typescript-eslint/no-restricted-imports';
 const ROUTES_RULE = 'local/routes-only-in-app';
 const COMMENTS_RULE = 'local/docstring-only-comments';
 const CONSOLE_RULE = 'no-console';
+const GLOBALS_RULE = 'no-restricted-globals';
+const PROPERTIES_RULE = 'no-restricted-properties';
+const SYNTAX_RULE = 'no-restricted-syntax';
+const EXTRANEOUS_RULE = 'import/no-extraneous-dependencies';
 
 const STUBS = {
   'src/features/products/data/product-repository.ts': 'export const productRepository = 1;\n',
@@ -170,9 +174,219 @@ const VIOLATIONS = [
     code: "/** Logs. */\nexport function log() {\n  console.log('x');\n}\n",
     rule: CONSOLE_RULE,
   },
+  {
+    name: 'fetch in the app',
+    path: 'src/features/products/hooks/network-fetch.ts',
+    code: "/** Loads. */\nexport function load() {\n  return fetch('https://example.com');\n}\n",
+    rule: GLOBALS_RULE,
+  },
+  {
+    name: 'XMLHttpRequest in the app',
+    path: 'src/shared/lib/network-xhr.ts',
+    code: '/** Opens. */\nexport function open() {\n  return new XMLHttpRequest();\n}\n',
+    rule: GLOBALS_RULE,
+  },
+  {
+    name: 'WebSocket in the app',
+    path: 'src/shared/lib/network-socket.ts',
+    code: "/** Connects. */\nexport function connect() {\n  return new WebSocket('wss://example.com');\n}\n",
+    rule: GLOBALS_RULE,
+  },
+  {
+    name: 'globalThis.fetch',
+    path: 'src/shared/lib/evade-global-this.ts',
+    code: "/** Loads. */\nexport function load() {\n  return globalThis.fetch('x');\n}\n",
+    rule: PROPERTIES_RULE,
+  },
+  {
+    name: 'global.fetch',
+    path: 'src/shared/lib/evade-global.ts',
+    code: "/** Loads. */\nexport function load() {\n  return global.fetch('x');\n}\n",
+    rule: PROPERTIES_RULE,
+  },
+  {
+    name: 'window.fetch',
+    path: 'src/shared/lib/evade-window.ts',
+    code: "/** Loads. */\nexport function load() {\n  return window.fetch('x');\n}\n",
+    rule: PROPERTIES_RULE,
+  },
+  {
+    name: 'self.fetch',
+    path: 'src/shared/lib/evade-self.ts',
+    code: "/** Loads. */\nexport function load() {\n  return self.fetch('x');\n}\n",
+    rule: PROPERTIES_RULE,
+  },
+  {
+    name: "globalThis['fetch']",
+    path: 'src/shared/lib/evade-computed.ts',
+    code: "/** Loads. */\nexport function load() {\n  return globalThis['fetch']('x');\n}\n",
+    rule: PROPERTIES_RULE,
+  },
+  {
+    name: 'a computed property of globalThis',
+    path: 'src/shared/lib/evade-computed-variable.ts',
+    code: '/** Loads. */\nexport function load(name: string) {\n  return (globalThis as Record<string, unknown>)[name];\n}\n',
+    rule: SYNTAX_RULE,
+  },
+  {
+    name: 'destructuring fetch from globalThis',
+    path: 'src/shared/lib/evade-destructuring.ts',
+    code: "/** Loads. */\nexport function load() {\n  const { fetch: g } = globalThis;\n  return g('x');\n}\n",
+    rule: SYNTAX_RULE,
+  },
+  {
+    name: 'an alias of globalThis',
+    path: 'src/shared/lib/evade-alias.ts',
+    code: '/** Loads. */\nexport function load() {\n  const g = globalThis;\n  return g;\n}\n',
+    rule: SYNTAX_RULE,
+  },
+  {
+    name: 'new globalThis.WebSocket',
+    path: 'src/shared/lib/evade-socket.ts',
+    code: "/** Connects. */\nexport function connect() {\n  return new globalThis.WebSocket('x');\n}\n",
+    rule: PROPERTIES_RULE,
+  },
+  {
+    name: 'new globalThis.XMLHttpRequest',
+    path: 'src/shared/lib/evade-xhr.ts',
+    code: '/** Opens. */\nexport function open() {\n  return new globalThis.XMLHttpRequest();\n}\n',
+    rule: PROPERTIES_RULE,
+  },
+  {
+    name: 'an http url literal',
+    path: 'src/shared/lib/url-http.ts',
+    code: "/** Url. */\nexport const URL_TEXT = 'https://example.com/api';\n",
+    rule: SYNTAX_RULE,
+  },
+  {
+    name: 'a ws url literal',
+    path: 'src/shared/lib/url-ws.ts',
+    code: "/** Url. */\nexport const URL_TEXT = 'wss://example.com';\n",
+    rule: SYNTAX_RULE,
+  },
+  {
+    name: 'Linking.openURL',
+    path: 'src/shared/lib/open-url.ts',
+    code: "import { Linking } from 'react-native';\n\n/** Opens. */\nexport function open(url: string) {\n  return Linking.openURL(url);\n}\n",
+    rule: PROPERTIES_RULE,
+  },
+  {
+    name: 'an imported openURL',
+    path: 'src/shared/lib/open-url-import.ts',
+    code: "import { openURL } from 'expo-linking';\n\nexport const open = openURL;\n",
+    rule: SYNTAX_RULE,
+  },
+  {
+    name: 'a dev dependency imported by the app',
+    path: 'src/shared/lib/dev-dependency.ts',
+    code: "import { ESLint } from 'eslint';\n\nexport const value = ESLint;\n",
+    rule: EXTRANEOUS_RULE,
+  },
+  {
+    name: 'expo/fetch imported',
+    path: 'src/shared/lib/net-expo-fetch.ts',
+    code: "import { fetch } from 'expo/fetch';\n\nexport const value = fetch;\n",
+    rule: IMPORTS_RULE,
+  },
+  {
+    name: 'expo-network imported',
+    path: 'src/shared/lib/net-expo-network.ts',
+    code: "import * as Network from 'expo-network';\n\nexport const value = Network;\n",
+    rule: IMPORTS_RULE,
+  },
+  {
+    name: 'expo-web-browser imported',
+    path: 'src/shared/lib/net-web-browser.ts',
+    code: "import * as WebBrowser from 'expo-web-browser';\n\nexport const value = WebBrowser;\n",
+    rule: IMPORTS_RULE,
+  },
+  {
+    name: 'expo-file-system/legacy imported',
+    path: 'src/shared/lib/net-fs-legacy.ts',
+    code: "import * as Legacy from 'expo-file-system/legacy';\n\nexport const value = Legacy;\n",
+    rule: IMPORTS_RULE,
+  },
+  {
+    name: 'UploadTask imported from expo-file-system',
+    path: 'src/shared/lib/net-upload-task.ts',
+    code: "import { UploadTask } from 'expo-file-system';\n\nexport const value = UploadTask;\n",
+    rule: IMPORTS_RULE,
+  },
+  {
+    name: 'DownloadTask imported from expo-file-system',
+    path: 'src/shared/lib/net-download-task.ts',
+    code: "import { DownloadTask } from 'expo-file-system';\n\nexport const value = DownloadTask;\n",
+    rule: IMPORTS_RULE,
+  },
+  {
+    name: 'File.downloadFileAsync',
+    path: 'src/shared/lib/net-download-file.ts',
+    code: "import { File, Paths } from 'expo-file-system';\n\n/** Downloads. */\nexport function load() {\n  return File.downloadFileAsync('x', Paths.cache);\n}\n",
+    rule: PROPERTIES_RULE,
+  },
+  {
+    name: 'file.upload',
+    path: 'src/shared/lib/net-file-upload.ts',
+    code: "import type { File } from 'expo-file-system';\n\n/** Uploads. */\nexport function send(file: File) {\n  return file.upload('x');\n}\n",
+    rule: SYNTAX_RULE,
+  },
+  {
+    name: 'file.createUploadTask',
+    path: 'src/shared/lib/net-file-upload-task.ts',
+    code: "import type { File } from 'expo-file-system';\n\n/** Uploads. */\nexport function send(file: File) {\n  return file.createUploadTask('x');\n}\n",
+    rule: SYNTAX_RULE,
+  },
+  {
+    name: 'file.createDownloadTask',
+    path: 'src/shared/lib/net-file-download-task.ts',
+    code: "import type { File } from 'expo-file-system';\n\n/** Downloads. */\nexport function load(file: File) {\n  return file.createDownloadTask('x');\n}\n",
+    rule: SYNTAX_RULE,
+  },
+  {
+    name: 'expo-network imported from a feature adapter',
+    path: 'src/features/products/adapters/net-expo-network.ts',
+    code: "import * as Network from 'expo-network';\n\nexport const value = Network;\n",
+    rule: IMPORTS_RULE,
+  },
 ];
 
 const ALLOWED = [
+  {
+    name: 'Linking.openSettings',
+    path: 'src/shared/lib/open-settings.ts',
+    code: "import { Linking } from 'react-native';\n\n/** Opens. */\nexport function open() {\n  return Linking.openSettings();\n}\n",
+    rules: [PROPERTIES_RULE, SYNTAX_RULE],
+  },
+  {
+    name: 'a computed access to an ordinary object and a plain string',
+    path: 'src/shared/lib/ordinary-access.ts',
+    code: '/** Reads. */\nexport function read(table: Record<string, number>, key: string) {\n  return `${table[key]} http`;\n}\n',
+    rules: [PROPERTIES_RULE, SYNTAX_RULE],
+  },
+  {
+    name: 'network use in a test',
+    path: 'src/shared/lib/network.test.ts',
+    code: "export const value = globalThis.fetch('https://example.com');\n",
+    rules: [PROPERTIES_RULE, SYNTAX_RULE, GLOBALS_RULE],
+  },
+  {
+    name: 'a production dependency imported by the app',
+    path: 'src/shared/lib/prod-dependency.ts',
+    code: "import { z } from 'zod';\n\nexport const value = z;\n",
+    rules: [EXTRANEOUS_RULE],
+  },
+  {
+    name: 'a dev dependency imported by a testing helper',
+    path: 'src/shared/lib/testing/helper.ts',
+    code: "import { ESLint } from 'eslint';\n\nexport const value = ESLint;\n",
+    rules: [EXTRANEOUS_RULE],
+  },
+  {
+    name: 'a dev dependency imported by a test',
+    path: 'src/shared/lib/dev-dependency.test.ts',
+    code: "import { ESLint } from 'eslint';\n\nexport const value = ESLint;\n",
+    rules: [EXTRANEOUS_RULE],
+  },
   {
     name: 'a feature importing another feature domain by relative path',
     path: 'src/features/sales/hooks/relative-domain.ts',
@@ -190,6 +404,12 @@ const ALLOWED = [
     path: 'src/app/_layout.tsx',
     code: "import { createAppDependencies } from '@/core/dependencies';\n\nexport default function Layout() {\n  return createAppDependencies;\n}\n",
     rules: [PATHS_RULE, IMPORTS_RULE, ROUTES_RULE],
+  },
+  {
+    name: 'a method that is called fetch on an object',
+    path: 'src/shared/lib/network-method.ts',
+    code: '/** Reads. */\nexport function read(store: { fetch(): number }) {\n  return store.fetch();\n}\n',
+    rules: [GLOBALS_RULE],
   },
   {
     name: 'the logger using console',

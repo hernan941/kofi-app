@@ -197,3 +197,14 @@ export type NotificationPermission = 'granted' | 'denied' | 'undetermined';
 - Si se desactiva en Ajustes, el plan queda vacío y se cancela todo.
 - En Android la hora puede variar unos minutos.
 - La entrega real se verifica a mano en dispositivo; Maestro no controla bien las notificaciones del sistema.
+
+## Enmienda 2026-11-13 (F7.0)
+Agregados aceptados por el orquestador (no cambian la decisión), detallados en `docs/architecture/notifications.md`:
+1. La deduplicación de respuestas usa `request.identifier` + fecha de entrega (`cv.weekly.repeat` repite el identifier cada semana).
+2. `ScheduledNotification` suma la variante `unrecognized`, para cancelar avisos `cv.*` con payload ilegible.
+3. El contenido del resumen mensual lleva `month` y abre `/tracking/monthly?month=…`.
+4. Las respuestas llegan por un puerto sobre `getLastNotificationResponse` + listener.
+5. Permisos de Android: no hacen falta `VIBRATE` ni `ACCESS_NETWORK_STATE` (bloqueados); se bloquea también `com.google.android.c2dm.permission.RECEIVE`. `WAKE_LOCK` se decide tras ver el manifiesto fusionado (F7.4).
+
+## Enmienda 2026-11-14 (F7.9)
+D-13 se cumple siempre: la reconciliación persiste en `notification_preferences.last_weekly_fire_at` el instante del recordatorio semanal de la semana en curso que planifica. Si ese instante ya pasó y cae en la semana en curso, y el nuevo instante todavía no llega (la persona cambió el día a mitad de semana), el plan no programa otro aviso para esa semana y deja solo el respaldo desde la próxima. Detalle en `docs/architecture/notifications.md`, 6.1 punto 9.

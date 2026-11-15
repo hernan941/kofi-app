@@ -32,7 +32,7 @@ function ToastProbe() {
  * measures its height. The tests look at the visible one.
  */
 async function findVisibleText(text: string) {
-  const [visible] = await screen.findAllByText(text);
+  const [visible] = await screen.findAllByText(text, { includeHiddenElements: true });
   return visible;
 }
 
@@ -47,7 +47,7 @@ describe('useAppToast', () => {
 
     await user.press(screen.getByRole('button', { name: 'Guardar' }));
 
-    expect(await findVisibleText('Venta guardada')).toBeVisible();
+    expect(await findVisibleText('Venta guardada')).toBeOnTheScreen();
     expect(visibleIcon('phosphor-react-native-check-circle-fill')).toBeOnTheScreen();
     expect(spy).toHaveBeenCalledTimes(1);
     expect(spy).toHaveBeenCalledWith('Venta guardada');
@@ -58,8 +58,35 @@ describe('useAppToast', () => {
 
     await user.press(screen.getByRole('button', { name: 'Fallar' }));
 
-    expect(await findVisibleText('No se pudo guardar. Inténtalo de nuevo')).toBeVisible();
+    expect(await findVisibleText('No se pudo guardar. Inténtalo de nuevo')).toBeOnTheScreen();
     expect(visibleIcon('phosphor-react-native-warning-circle-bold')).toBeOnTheScreen();
-    expect(screen.getAllByRole('button', { name: 'Cerrar aviso' })[0]).toBeOnTheScreen();
+    expect(
+      screen.getAllByRole('button', { name: 'Cerrar aviso', hidden: true })[0],
+    ).toBeOnTheScreen();
+  });
+
+  it('hides the whole toast, the measuring copy and its close button from the screen reader', async () => {
+    await renderUi(<ToastProbe />);
+
+    await user.press(screen.getByRole('button', { name: 'Guardar' }));
+    await findVisibleText('Venta guardada');
+
+    expect(screen.queryByText('Venta guardada')).not.toBeOnTheScreen();
+    expect(screen.queryByRole('button', { name: 'Cerrar aviso' })).not.toBeOnTheScreen();
+    expect(
+      screen.getAllByRole('button', { name: 'Cerrar aviso', hidden: true }).length,
+    ).toBeGreaterThan(0);
+  });
+
+  it('does not use a live region, so the only announcement is the explicit one', async () => {
+    await renderUi(<ToastProbe />);
+
+    await user.press(screen.getByRole('button', { name: 'Guardar' }));
+    await findVisibleText('Venta guardada');
+
+    const tree = JSON.stringify(screen.toJSON());
+
+    expect(tree).not.toContain('"accessibilityLiveRegion":"polite"');
+    expect(tree).not.toContain('"aria-live":"polite"');
   });
 });

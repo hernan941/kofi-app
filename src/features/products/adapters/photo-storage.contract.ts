@@ -1,4 +1,4 @@
-import { productPhotoIdSchema } from '@/shared/domain';
+import { productPhotoIdSchema, type ProductPhotoId } from '@/shared/domain';
 
 import { PhotoImportError, type PhotoStorage } from './photo-storage';
 
@@ -9,6 +9,8 @@ export interface PhotoStorageHarness {
   readonly newSource: () => string;
   /** Whether that temporary is still there. */
   readonly sourceExists: (uri: string) => boolean;
+  /** Leaves a `photos/<id>.jpg.part` file, as an interrupted restore would. */
+  readonly addPartial: (id: ProductPhotoId) => void;
 }
 
 const VALID_ID = productPhotoIdSchema.parse('0190aaaa-bbbb-7ccc-8ddd-eeeeeeeeeeee');
@@ -85,6 +87,52 @@ export function describePhotoStorageContract(
         expect(() => storage.uriFor(invalid)).toThrow(PhotoImportError);
         expect(await codeOf(storage.remove(invalid))).toBe('invalid_id');
         expect(await codeOf(storage.removePartial(invalid))).toBe('invalid_id');
+      },
+    );
+
+    it('resolves the URI of a partial file under photos/<id>.jpg.part', () => {
+      const { storage } = create();
+
+      expect(storage.partialUriFor(VALID_ID)).toMatch(
+        new RegExp(`/photos/${VALID_ID}\\.jpg\\.part$`),
+      );
+    });
+
+    it('promotes a partial file to its final name', async () => {
+      const { storage, addPartial } = create();
+      addPartial(VALID_ID);
+
+      await storage.promotePartial(VALID_ID);
+
+      expect((await storage.listFiles()).map((file) => file.id)).toEqual([VALID_ID]);
+      await expect(storage.listPartialFiles()).resolves.toEqual([]);
+    });
+
+    it('fails to promote over an existing photo and keeps the partial file', async () => {
+      const { storage, newSource, addPartial } = create();
+      await storage.importFromPicker(newSource(), VALID_ID);
+      addPartial(VALID_ID);
+
+      await expect(storage.promotePartial(VALID_ID)).rejects.toThrow();
+
+      expect((await storage.listPartialFiles()).map((file) => file.id)).toEqual([VALID_ID]);
+    });
+
+    it('fails to promote a partial file that does not exist', async () => {
+      const { storage } = create();
+
+      await expect(storage.promotePartial(VALID_ID)).rejects.toThrow();
+      await expect(storage.listFiles()).resolves.toEqual([]);
+    });
+
+    it.each(INVALID_IDS.filter((id) => id !== ''))(
+      'rejects the id %j in partialUriFor and promotePartial',
+      async (id) => {
+        const { storage } = create();
+        const invalid = id as never;
+
+        expect(() => storage.partialUriFor(invalid)).toThrow(PhotoImportError);
+        expect(await codeOf(storage.promotePartial(invalid))).toBe('invalid_id');
       },
     );
   });

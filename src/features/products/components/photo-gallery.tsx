@@ -39,6 +39,7 @@ export function PhotoGallery({ photos, productName }: PhotoGalleryProps) {
         <ProductPhoto
           photoId={cover.id}
           label={`Foto 1 de ${String(total)}`}
+          isDecorative
           contentFit="contain"
           placeholderIconSize="xl"
           className="aspect-4/3 w-full rounded-3xl border-2 border-border bg-surface"
@@ -58,6 +59,7 @@ export function PhotoGallery({ photos, productName }: PhotoGalleryProps) {
               <ProductPhoto
                 photoId={photo.id}
                 label={`Foto ${String(index + 1)} de ${String(total)}`}
+                isDecorative
                 className="size-16 rounded-xl border-2 border-border"
               />
             </Pressable>

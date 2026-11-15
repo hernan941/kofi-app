@@ -37,13 +37,13 @@ describe('HomeSummaryCard', () => {
       />,
     );
 
-    expect(screen.getByText('Esta semana')).toBeOnTheScreen();
-    expect(screen.getByText('En noviembre')).toBeOnTheScreen();
-    expect(screen.getAllByLabelText('45.000 pesos')[0]).toHaveProp(
+    expect(screen.getByText('Esta semana', { includeHiddenElements: true })).toBeOnTheScreen();
+    expect(screen.getByText('En noviembre', { includeHiddenElements: true })).toBeOnTheScreen();
+    expect(screen.getAllByText('$45.000', { includeHiddenElements: true })[0]).toHaveProp(
       'className',
       expect.stringContaining('text-display'),
     );
-    expect(screen.getAllByLabelText('120.000 pesos')[0]).toHaveProp(
+    expect(screen.getAllByText('$120.000', { includeHiddenElements: true })[0]).toHaveProp(
       'className',
       expect.stringContaining('text-lg'),
     );
@@ -70,6 +70,21 @@ describe('HomeSummaryCard', () => {
     ).toBeOnTheScreen();
   });
 
+  it('makes each block one stop: the parts and the amounts are not read again', async () => {
+    await renderUi(
+      <HomeSummaryCard
+        {...BASE_PROPS}
+        summary={summaryOf(period(45000, 40000), period(120000, 100000))}
+        profit={null}
+      />,
+    );
+
+    expect(screen.queryByLabelText('45.000 pesos')).not.toBeOnTheScreen();
+    expect(screen.queryByLabelText('120.000 pesos')).not.toBeOnTheScreen();
+    expect(screen.queryByText('Esta semana')).not.toBeOnTheScreen();
+    expect(screen.getByLabelText(/^Esta semana vendiste 45.000 pesos/)).toBeOnTheScreen();
+  });
+
   it('words a drop without blame', async () => {
     await renderUi(
       <HomeSummaryCard
@@ -82,6 +97,7 @@ describe('HomeSummaryCard', () => {
     expect(
       screen.getByText(
         '$5.000 menos que a esta altura de la semana pasada. Cada semana tiene su ritmo.',
+        { includeHiddenElements: true },
       ),
     ).toBeOnTheScreen();
   });

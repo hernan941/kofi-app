@@ -8,6 +8,7 @@ import {
 
 import { MoneyField, type MoneyFieldProps } from '../money-field';
 import { CLP_INPUT_ERROR_MESSAGES, describeWith } from './error-messages';
+import { useIsFromSubmit } from './use-is-from-submit';
 
 /** Props of {@link FormAmountField}. */
 export interface FormAmountFieldProps<
@@ -39,6 +40,7 @@ export function FormAmountField<
     field: { ref: registerInput, value, onChange, onBlur },
     fieldState: { error },
   } = useController({ control, name });
+  const isFromSubmit = useIsFromSubmit(control);
   return (
     <MoneyField
       {...props}
@@ -47,6 +49,7 @@ export function FormAmountField<
       onChangeText={onChange}
       onBlur={onBlur}
       error={error ? describeError(error) : undefined}
+      canAnnounceError={() => !isFromSubmit()}
     />
   );
 }

@@ -1,6 +1,7 @@
 import { Tabs } from 'expo-router';
 import { useThemeColor } from 'heroui-native';
 
+import { perfMark } from '@/shared/lib/perf-marks';
 import {
   CalendarBlankIcon,
   GearIcon,
@@ -16,6 +17,13 @@ export default function TabsLayout() {
   const [surface, border] = useThemeColor(['surface', 'border']);
   return (
     <Tabs
+      screenListeners={({ route }) => ({
+        tabPress: () => {
+          if (process.env.EXPO_PUBLIC_E2E === '1') {
+            perfMark('tab:press', route.name);
+          }
+        },
+      })}
       screenOptions={{
         headerShown: false,
         tabBarStyle: { backgroundColor: surface, borderTopColor: border },

@@ -119,3 +119,58 @@ describe('IconButton', () => {
     expect(screen.getByRole('button')).toBeOnTheScreen();
   });
 });
+
+describe('accessibilityLabel', () => {
+  it('names the button with the long label while the visible text stays short', async () => {
+    await renderUi(
+      <>
+        <PrimaryButton label="Guardar" accessibilityLabel="Guardar la venta" onPress={jest.fn()} />
+        <SecondaryButton
+          label="Marcar que no vendí"
+          accessibilityLabel="Marcar que no vendí esta semana"
+          onPress={jest.fn()}
+        />
+        <TextButton
+          label="Desmarcar"
+          accessibilityLabel="Desmarcar esta semana"
+          onPress={jest.fn()}
+        />
+        <DeleteButton label="Borrar" accessibilityLabel="Borrar la venta" onPress={jest.fn()} />
+      </>,
+    );
+
+    expect(screen.getByRole('button', { name: 'Guardar la venta' })).toBeOnTheScreen();
+    expect(
+      screen.getByRole('button', { name: 'Marcar que no vendí esta semana' }),
+    ).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Desmarcar esta semana' })).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Borrar la venta' })).toBeOnTheScreen();
+    expect(screen.getByText('Marcar que no vendí')).toBeOnTheScreen();
+    expect(screen.getByText('Desmarcar')).toBeOnTheScreen();
+  });
+});
+
+describe('accessibility state of labelled buttons', () => {
+  it('passes the expanded state of a text button to the screen reader', async () => {
+    await renderUi(
+      <TextButton
+        label="Más detalles"
+        onPress={jest.fn()}
+        accessibilityState={{ expanded: false }}
+      />,
+    );
+
+    expect(screen.getByRole('button', { name: 'Más detalles' })).toBeCollapsed();
+  });
+
+  it('passes the busy state of a primary button without disabling it', async () => {
+    await renderUi(
+      <PrimaryButton label="Guardando…" onPress={jest.fn()} accessibilityState={{ busy: true }} />,
+    );
+
+    const button = screen.getByRole('button', { name: 'Guardando…' });
+
+    expect(button).toBeBusy();
+    expect(button).toBeEnabled();
+  });
+});

@@ -1,0 +1,31 @@
+appId: com.cuantovendi.local
+tags:
+  - notifications
+---
+# "Ahora no" is final: a second sale does not offer the explanation again, and the option stays
+# in Ajustes, where "Activar recordatorios" asks for the permission directly.
+- runFlow: ../_shared/launch-clean.yaml
+- runFlow:
+    file: ../_shared/create-product.yaml
+    env:
+      PRODUCT_NAME: 'Lámina Colibrí'
+      PRODUCT_PRICE: '15000'
+- runFlow:
+    file: ../_shared/register-sale.yaml
+    env:
+      PRODUCT_ROW: 'Lámina Colibrí.*'
+- tapOn: 'Listo'
+- assertVisible: '¿Te recordamos anotar tus ventas?'
+- tapOn: 'Ahora no'
+- runFlow:
+    file: ../_shared/register-sale.yaml
+    env:
+      PRODUCT_ROW: 'Lámina Colibrí.*'
+- assertVisible: '¡Venta registrada!'
+- tapOn: 'Listo'
+- assertNotVisible: '¿Te recordamos anotar tus ventas?'
+- assertVisible: 'Registrar venta'
+- tapOn: 'Ajustes'
+- tapOn: 'Recordatorios.*'
+- assertVisible: 'Activa los avisos'
+- assertVisible: 'Activar recordatorios'

@@ -7,6 +7,7 @@ import { DependenciesProvider } from '@/core/providers/dependencies-context';
 import { DataChangesBridge } from '@/core/providers/query/data-changes-bridge';
 import { createQueryClient } from '@/core/providers/query/query-client';
 import { QUERY_DEPENDENCIES } from '@/core/providers/query/query-dependencies';
+import { TodayProvider } from '@/shared/lib/time/today-provider';
 import { UiTestProviders } from '@/shared/ui/testing/render-ui';
 
 import { createTestDependencies } from './create-test-dependencies';
@@ -52,15 +53,17 @@ export function renderWithProviders(
     return (
       <UiTestProviders>
         <DependenciesProvider dependencies={dependencies}>
-          <QueryClientProvider client={queryClient}>
-            {observeDataChanges ? (
-              <DataChangesBridge
-                dataChanges={dependencies.dataChanges}
-                dependencies={QUERY_DEPENDENCIES}
-              />
-            ) : null}
-            {children}
-          </QueryClientProvider>
+          <TodayProvider>
+            <QueryClientProvider client={queryClient}>
+              {observeDataChanges ? (
+                <DataChangesBridge
+                  dataChanges={dependencies.dataChanges}
+                  dependencies={QUERY_DEPENDENCIES}
+                />
+              ) : null}
+              {children}
+            </QueryClientProvider>
+          </TodayProvider>
         </DependenciesProvider>
       </UiTestProviders>
     );

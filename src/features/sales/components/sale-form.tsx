@@ -9,7 +9,6 @@ import {
   Text,
   View,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { activeVersions, type Product, type ProductVersion } from '@/features/products/domain';
 import {
@@ -23,6 +22,7 @@ import { useConfirmLeave } from '@/shared/lib/use-confirm-leave';
 import { useScheduleFrame } from '@/shared/lib/use-schedule-frame';
 import { useToday } from '@/shared/lib/time/use-today';
 import {
+  AccessibleGroup,
   Amount,
   Card,
   CaretDownIcon,
@@ -46,6 +46,7 @@ import {
   createSubmitHandler,
   useAnnounceWhen,
   type ButtonHandle,
+  StyledSafeAreaView,
 } from '@/shared/ui';
 
 import {
@@ -57,12 +58,13 @@ import {
   type SaveSaleRecordInput,
 } from '../domain';
 import { useMarkedWeeks } from '../hooks/use-marked-weeks';
+import { perfMark } from '@/shared/lib/perf-marks';
 import type { SaveSaleRecordResult } from '../use-cases/save-sale-record';
 import { SALE_CHANNEL_LABELS } from './channel-labels';
 import { describeSaleError } from './error-messages';
 import { NoSalesSection } from './no-sales-section';
 import { ProductPicker, ProductPickerSheet } from './product-picker';
-import { anyProductHasCover } from './product-thumbnail';
+import { anyProductHasCover } from '@/features/products';
 import { SaleItemFields } from './sale-item-fields';
 import {
   applySaleErrors,
@@ -198,11 +200,12 @@ export function SaleForm({
   const isUntouched = sameRows(items, initialValues.items);
   const isWeekMarked = markedWeeks?.has(isoWeekStart(soldOn.field.value)) === true;
 
-  const focusAddButton = () => {
+  const focusAddButton = (message?: string) => {
     scheduleFrame(() => {
       if (addButton.current !== null) {
         AccessibilityInfo.sendAccessibilityEvent(addButton.current, 'focus');
       }
+      if (message !== undefined) announce(message);
     });
   };
 
@@ -215,8 +218,8 @@ export function SaleForm({
         ? { focusName: `${itemPath(fields.length)}.priceText` }
         : undefined,
     );
-    announce(addedAnnouncement(product, version, isRepeat));
     setPicker(null);
+    focusAddButton(addedAnnouncement(product, version, isRepeat));
   };
 
   const changeVersion = (index: number, product: Product, version: ProductVersion) => {
@@ -226,8 +229,8 @@ export function SaleForm({
       itemId: current.itemId,
       quantity: current.quantity,
     });
-    announce(`Ahora es ${version.name ?? product.name}.`);
     setPicker(null);
+    focusAddButton(`Ahora es ${version.name ?? product.name}.`);
   };
 
   const pick = (product: Product, version: ProductVersion) => {
@@ -267,6 +270,9 @@ export function SaleForm({
   };
 
   const submit = () => {
+    if (process.env.EXPO_PUBLIC_E2E === '1') {
+      perfMark('sale:save:press');
+    }
     createSubmitHandler(form.handleSubmit, save)();
   };
 
@@ -334,7 +340,11 @@ export function SaleForm({
                     <SaleItemFields
                       control={form.control}
                       index={index}
-                      product={knownProducts.get(items[index]?.productId) ?? null}
+                      product={
+                        items[index] === undefined
+                          ? null
+                          : (knownProducts.get(items[index].productId) ?? null)
+                      }
                       showThumbnail={showThumbnails}
                       onChangeVersion={(rowIndex) => {
                         const product = knownProducts.get(
@@ -391,6 +401,7 @@ export function SaleForm({
               label={detailsLabel(channel.field.value, note)}
               icon={isDetailsOpen ? CaretUpIcon : CaretDownIcon}
               accessibilityHint="Dónde vendiste y una nota"
+              accessibilityState={{ expanded: isDetailsOpen }}
               onPress={() => {
                 setIsDetailsOpen((open) => !open);
               }}
@@ -424,23 +435,22 @@ export function SaleForm({
 
         {mode === 'create' && isUntouched ? <NoSalesSection /> : null}
       </ScrollView>
-      <SafeAreaView edges={['bottom']} className="gap-2 px-4 pt-2 pb-4">
+      <StyledSafeAreaView edges={['bottom']} className="gap-2 px-4 pt-2 pb-4">
         {hasRows ? (
-          <View
-            accessible
-            accessibilityLabel={`Total: ${formatClpAccessible(total)}`}
-            className="flex-row flex-wrap items-baseline justify-between gap-2"
+          <AccessibleGroup
+            label={`Total: ${formatClpAccessible(total)}`}
+            contentClassName="flex-row flex-wrap items-baseline justify-between gap-2"
           >
             <Text className="font-medium text-base text-foreground">Total</Text>
             <Amount value={total} variant="total" />
-          </View>
+          </AccessibleGroup>
         ) : null}
         <PrimaryButton
           label={mode === 'create' ? 'Guardar venta' : 'Guardar cambios'}
           icon={CheckIcon}
           onPress={submit}
         />
-      </SafeAreaView>
+      </StyledSafeAreaView>
       <ProductPickerSheet
         isOpen={picker !== null}
         products={sellable}

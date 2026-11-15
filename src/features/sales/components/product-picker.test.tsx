@@ -1,4 +1,5 @@
 import { screen, userEvent } from '@testing-library/react-native';
+import { AccessibilityInfo } from 'react-native';
 
 import { renderWithProviders } from '@/core/testing/render-with-providers';
 
@@ -209,6 +210,20 @@ describe('ProductPickerSheet', () => {
 
     await user.press(screen.getByRole('button', { name: 'Print A3, 18.000 pesos' }));
     expect(onPick).toHaveBeenCalledWith(several, several.versions[1]);
+  });
+
+  it('moves the screen reader focus to the new title when the step changes', async () => {
+    const spy = jest.spyOn(AccessibilityInfo, 'sendAccessibilityEvent');
+    const { view } = renderSheet();
+    await view;
+    expect(spy.mock.calls).toHaveLength(0);
+
+    await user.press(screen.getByRole('button', { name: /Print, 3 versiones/ }));
+    expect(spy.mock.calls).toHaveLength(1);
+
+    await user.press(screen.getByRole('button', { name: 'Ver todos los productos' }));
+    expect(spy.mock.calls).toHaveLength(2);
+    expect(spy.mock.calls[1]?.[1]).toBe('focus');
   });
 
   it('goes back to all the products from the version step', async () => {

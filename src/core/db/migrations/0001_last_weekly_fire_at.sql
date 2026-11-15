@@ -1,0 +1,1 @@
+ALTER TABLE `notification_preferences` ADD `last_weekly_fire_at` integer;

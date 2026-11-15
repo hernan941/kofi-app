@@ -10,6 +10,10 @@ const mockCreateTransactionRunner = jest.fn();
 const mockCreateDrizzleProductRepository = jest.fn();
 const mockCollectOrphanPhotos = jest.fn();
 const mockSweepStaleCacheFiles = jest.fn();
+const mockSetNotificationHandler = jest.fn();
+const mockCleanupBackupTemporaries = jest.fn();
+const mockExportEmergency = jest.fn();
+const mockCreateDatabaseCopier = jest.fn();
 
 const mockBundle: MigrationBundle = { journal: { entries: [] }, migrations: {} };
 const mockHandle = { raw: { exec: jest.fn(), pragmaValue: jest.fn() }, db: {} };
@@ -35,11 +39,30 @@ jest.mock('@/features/products', () => ({
   createExpoPhotoStorage: () => ({ uriFor: jest.fn() }),
   createExpoPhotoPicker: () => ({ takePhoto: jest.fn() }),
 }));
+jest.mock('@/features/backup', () => ({
+  cleanupBackupTemporaries: (...args: unknown[]): unknown => mockCleanupBackupTemporaries(...args),
+  exportEmergency: (...args: unknown[]): unknown => mockExportEmergency(...args),
+  createExpoArchiveIo: () => ({ kind: 'archive-io' }),
+  createExpoBackupFiles: () => ({ kind: 'backup-files' }),
+  createExpoFileSharer: () => ({ kind: 'file-sharer' }),
+  createExpoDocumentPicker: () => ({ kind: 'document-picker' }),
+}));
+jest.mock('@/features/backup/data/drizzle-backup-store', () => ({
+  createDrizzleBackupStore: () => ({ kind: 'backup-store' }),
+}));
+jest.mock('@/core/db/database-copier', () => ({
+  createDatabaseCopier: (...args: unknown[]): unknown => mockCreateDatabaseCopier(...args),
+}));
 jest.mock('@/core/db/migrations/migrations', () => ({
   __esModule: true,
   get default(): MigrationBundle {
     return mockBundle;
   },
+}));
+jest.mock('expo-notifications', () => ({
+  AndroidImportance: { DEFAULT: 5 },
+  DEFAULT_ACTION_IDENTIFIER: 'default',
+  setNotificationHandler: (...args: unknown[]): unknown => mockSetNotificationHandler(...args),
 }));
 jest.mock('expo-crypto', () => ({ getRandomBytes: (length: number) => new Uint8Array(length) }));
 
@@ -52,6 +75,9 @@ describe('createAppDependencies', () => {
     mockCreateRunInTransaction.mockReturnValue('run-in-transaction');
     mockCreateTransactionRunner.mockReturnValue({ run: jest.fn().mockResolvedValue('done') });
     mockCreateDrizzleProductRepository.mockReturnValue({ kind: 'product-store' });
+    mockCleanupBackupTemporaries.mockResolvedValue({ removed: 0 });
+    mockCollectOrphanPhotos.mockResolvedValue({ kind: 'done' });
+    mockCreateDatabaseCopier.mockReturnValue({ kind: 'database-copier' });
   });
 
   test('builds the real adapters without opening the database', () => {
@@ -63,6 +89,16 @@ describe('createAppDependencies', () => {
     expect(typeof dependencies.logger.info).toBe('function');
     expect(typeof dependencies.dataChanges.subscribe).toBe('function');
     expect(mockOpenAppDatabase).not.toHaveBeenCalled();
+  });
+
+  test('installs the notification presentation once and exposes the notification ports', () => {
+    const { dependencies } = createAppDependencies();
+
+    expect(mockSetNotificationHandler).toHaveBeenCalledTimes(1);
+    expect(typeof dependencies.notifications.listScheduled).toBe('function');
+    expect(typeof dependencies.notificationReconciler.request).toBe('function');
+    expect(typeof dependencies.notificationResponses.getLast).toBe('function');
+    expect(typeof dependencies.registeredWeeks.isRegistered).toBe('function');
   });
 
   test('migrateDatabase opens the database and migrates it with the bundled migrations', async () => {
@@ -150,6 +186,89 @@ describe('createAppDependencies', () => {
       await expect(runAfterFirstRender()).resolves.toBeUndefined();
 
       expect(mockCollectOrphanPhotos).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('backup', () => {
+    test('exposes the backup ports and the app version', () => {
+      const { dependencies } = createAppDependencies();
+
+      expect(dependencies.backupStore).toEqual({ kind: 'backup-store' });
+      expect(dependencies.archiveIo).toEqual({ kind: 'archive-io' });
+      expect(dependencies.backupFiles).toEqual({ kind: 'backup-files' });
+      expect(dependencies.fileSharer).toEqual({ kind: 'file-sharer' });
+      expect(dependencies.documentPicker).toEqual({ kind: 'document-picker' });
+      expect(dependencies.appVersion).toEqual(expect.stringMatching(/\S/));
+    });
+
+    test('cleans the backup temporaries after the orphan collection with the shared lock', async () => {
+      const order: string[] = [];
+      mockCollectOrphanPhotos.mockImplementation(() => {
+        order.push('orphans');
+        return Promise.resolve({ kind: 'done' });
+      });
+      mockCleanupBackupTemporaries.mockImplementation(() => {
+        order.push('cleanup');
+        return Promise.resolve({ removed: 0 });
+      });
+      const { dependencies, runAfterFirstRender } = createAppDependencies();
+
+      await runAfterFirstRender();
+
+      expect(order).toEqual(['orphans', 'cleanup']);
+      expect(mockCleanupBackupTemporaries).toHaveBeenCalledWith(
+        expect.objectContaining({
+          backupFiles: dependencies.backupFiles,
+          fileLock: dependencies.fileLock,
+          logger: dependencies.logger,
+        }),
+      );
+    });
+
+    test('still cleans the temporaries when the orphan collection fails', async () => {
+      mockCollectOrphanPhotos.mockRejectedValue(new Error('collect failed'));
+      const { runAfterFirstRender } = createAppDependencies();
+
+      await expect(runAfterFirstRender()).rejects.toThrow('collect failed');
+
+      expect(mockCleanupBackupTemporaries).toHaveBeenCalledTimes(1);
+    });
+
+    test('logs and keeps going when the cleanup fails', async () => {
+      mockCleanupBackupTemporaries.mockRejectedValue(new Error('sweep failed'));
+      const { runAfterFirstRender } = createAppDependencies();
+
+      await expect(runAfterFirstRender()).resolves.toBeUndefined();
+    });
+
+    test('runs the emergency export with the copier, the photos and the failure reason', async () => {
+      mockExportEmergency.mockResolvedValue(ok(undefined));
+      const { dependencies, exportEmergency } = createAppDependencies();
+
+      const result = await exportEmergency('newer_database');
+
+      expect(result).toEqual(ok(undefined));
+      expect(mockExportEmergency).toHaveBeenCalledWith(
+        expect.objectContaining({
+          copier: { kind: 'database-copier' },
+          photos: dependencies.photos,
+          archiveIo: dependencies.archiveIo,
+          backupFiles: dependencies.backupFiles,
+          fileSharer: dependencies.fileSharer,
+          appVersion: dependencies.appVersion,
+        }),
+        'newer_database',
+      );
+    });
+
+    test('hands the copier a lazy handle: the database is opened only when copying', () => {
+      createAppDependencies();
+
+      const [copierDeps] =
+        (mockCreateDatabaseCopier.mock.calls as [{ getHandle: () => unknown }][])[0] ?? [];
+      expect(mockOpenAppDatabase).not.toHaveBeenCalled();
+      expect(copierDeps?.getHandle()).toBe(mockHandle);
+      expect(mockOpenAppDatabase).toHaveBeenCalledTimes(1);
     });
   });
 

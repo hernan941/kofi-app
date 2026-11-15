@@ -61,6 +61,22 @@ describe('MonthSwitcher', () => {
     expect(announce).toHaveBeenCalledWith('Resumen de octubre');
   });
 
+  it('does not mark the title as a live region so the month is announced only once', async () => {
+    await renderUi(
+      <MonthSwitcher
+        month={month('2026-11')}
+        today={today}
+        navigation={{ canGoBack: true, canGoForward: false }}
+        announcePrefix="Resumen de"
+        onChange={jest.fn()}
+      />,
+    );
+
+    const title = screen.getByRole('header');
+
+    expect(title.props.accessibilityLiveRegion).toBeUndefined();
+  });
+
   it('disables the limits with their state and without answering to touches', async () => {
     const onChange = jest.fn();
     await renderUi(

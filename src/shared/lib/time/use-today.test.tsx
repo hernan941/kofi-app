@@ -9,6 +9,7 @@ import { advanceClockAndTimers } from '@/shared/domain/testing/advance-clock-and
 import { FakeClock } from '@/shared/domain/testing/fake-clock';
 
 import { useCurrentWeek } from './use-current-week';
+import { TodayProvider } from './today-provider';
 import { useToday } from './use-today';
 
 const at = (iso: string) => epochMsSchema.parse(Date.parse(iso));
@@ -36,7 +37,11 @@ function spyOnAppState(): AppStateSpy {
 function wrapperFor(clock: FakeClock) {
   const dependencies = createTestDependencies({ clock });
   return function Wrapper({ children }: { children: ReactNode }) {
-    return <DependenciesProvider dependencies={dependencies}>{children}</DependenciesProvider>;
+    return (
+      <DependenciesProvider dependencies={dependencies}>
+        <TodayProvider>{children}</TodayProvider>
+      </DependenciesProvider>
+    );
   };
 }
 
@@ -121,7 +126,9 @@ describe('useToday', () => {
     const dependencies = createTestDependencies({ clock });
     const localDateOf = jest.spyOn(dependencies.calendar, 'localDateOf');
     const wrapper = ({ children }: { children: ReactNode }) => (
-      <DependenciesProvider dependencies={dependencies}>{children}</DependenciesProvider>
+      <DependenciesProvider dependencies={dependencies}>
+        <TodayProvider>{children}</TodayProvider>
+      </DependenciesProvider>
     );
     const { unmount } = await renderHook(() => useToday(), { wrapper });
     const callsWhileMounted = localDateOf.mock.calls.length;
@@ -131,6 +138,61 @@ describe('useToday', () => {
 
     expect(localDateOf).toHaveBeenCalledTimes(callsWhileMounted);
     expect(appState.remove).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('TodayProvider', () => {
+  beforeEach(() => {
+    jest.useFakeTimers();
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
+  test('schedules a single refresh timer and a single AppState listener for many consumers', async () => {
+    const addEventListener = jest.spyOn(AppState, 'addEventListener');
+    const setTimeoutSpy = jest.spyOn(globalThis, 'setTimeout');
+    const clock = new FakeClock(at('2026-07-01T16:00:00Z'));
+    const hourMs = 3_600_000;
+
+    await renderHook(
+      () => {
+        useToday();
+        useToday();
+        useCurrentWeek();
+        useToday();
+      },
+      { wrapper: wrapperFor(clock) },
+    );
+
+    const refreshTimers = setTimeoutSpy.mock.calls.filter(([, delay]) => delay === hourMs);
+    expect(refreshTimers).toHaveLength(1);
+    expect(addEventListener).toHaveBeenCalledTimes(1);
+  });
+
+  test('gives every consumer the same date when midnight passes', async () => {
+    spyOnAppState();
+    const clock = new FakeClock(at('2026-07-02T03:30:00Z'));
+    const { result } = await renderHook(() => [useToday(), useToday()], {
+      wrapper: wrapperFor(clock),
+    });
+
+    await act(() => {
+      advanceClockAndTimers(clock, 31 * 60_000);
+    });
+
+    expect(result.current).toEqual(['2026-07-02', '2026-07-02']);
+  });
+
+  test('fails with a clear message when there is no provider', async () => {
+    jest.spyOn(console, 'error').mockImplementation(() => undefined);
+    const dependencies = createTestDependencies();
+    const wrapper = ({ children }: { children: ReactNode }) => (
+      <DependenciesProvider dependencies={dependencies}>{children}</DependenciesProvider>
+    );
+
+    await expect(renderHook(() => useToday(), { wrapper })).rejects.toThrow('TodayProvider');
   });
 });
 

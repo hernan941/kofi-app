@@ -88,10 +88,10 @@ Verificado simulando la desinstalación en una copia de `package.json` y `packag
 | Script | Valor | Motivo |
 |---|---|---|
 | `web` | se quita | Sin web. |
-| `android` | `expo run:android` (antes `expo start --android`) | Build `debug` de desarrollo (sección 4). |
+| `android` | `npx expo prebuild --clean --platform android && expo run:android` (enmienda 2026-11-15; antes `expo start --android`) | Build `debug` de desarrollo (sección 4). |
 | `ios` | `expo run:ios` (antes `expo start --ios`) | Se conserva por simetría para el release futuro; en Linux no corre. |
-| `android:release` | `rm -rf android/app/build && expo run:android --variant release` | Build `release` para el teléfono del usuario (sección 4). |
-| `e2e:build` | `rm -rf android/app/build && EXPO_PUBLIC_E2E=1 expo run:android --variant release` | Build `e2e` (ADR-013, sección 4). |
+| `android:release` | `npx expo prebuild --clean --platform android && rm -rf android/app/build && expo run:android --variant release` | Build `release` para el teléfono del usuario (sección 4). |
+| `e2e:build` | `npm run e2e:fixtures && npx expo prebuild --clean --platform android && rm -rf android/app/build && EXPO_PUBLIC_E2E=1 expo run:android --variant release` | Build `e2e` (ADR-013, sección 4). |
 | `start` | `expo start` | Sin cambios. |
 
 Los demás scripts de ADR-013 los agrega F0.5.
@@ -147,3 +147,23 @@ Nada de esto se hace en la v1 (D-23, plan, sección 10):
 - La firma con la clave de depuración solo es aceptable mientras no se publique.
 - Borrar `android/app/build` antes de cada build `release` o `e2e` hace los builds más lentos, a cambio de no mezclar bundles. La comprobación posterior detecta el error si igual ocurriera.
 - Hasta que el usuario habilite Android SDK, emulador y Maestro, los comandos de la sección 4 no se pueden ejecutar aquí: las tareas que los necesitan quedan "pendientes de entorno" (plan, sección 0.4).
+
+## Enmienda 2026-11-13 (F8.0)
+Se agrega `expo-asset` (~58.0.21, ya incluido por `expo`) solo para leer el respaldo *fixture* empaquetado en el build `e2e` (F8.11). Se usa únicamente dentro de la rama del flag de E2E, que el bundle release elimina.
+
+## Enmienda 2026-11-14 (F9.2)
+`android.allowBackup` pasa a `false` en `app.json`. Expo lo deja en `true` por defecto, y entonces Auto Backup copia la base de datos y las fotos a Google Drive: la nota de privacidad de Ajustes ("no envía nada a internet", "si cambias de teléfono tus datos no se pasan solos") sería falsa en Android (D-23, D-28). El respaldo propio de ADR-012 es el único camino para llevar los datos a otro teléfono. Un test (`src/__tests__/app-config.test.ts`) exige `allowBackup: false`, `enableRemoteNotifications: false` y la lista de `blockedPermissions`, y `npx expo config --type introspect` muestra `android:allowBackup="false"` en el manifiesto.
+
+Para el futuro (iOS): el contenido de `Documents` y `Library` se incluye en los respaldos de iCloud y del dispositivo por defecto. Cuando se prepare el build de iOS hay que decidir si se excluyen la base y las fotos (por ejemplo con el atributo `NSURLIsExcludedFromBackupKey`), con el mismo criterio de esta enmienda, y revisar que la nota de privacidad siga siendo cierta.
+
+## Enmienda 2026-11-14 (F10.4)
+Auditoría de permisos y secretos. Dos plugins de configuración locales en `plugins/` (CommonJS, con su test) y registrados en `app.json`:
+1. `with-release-without-internet`: escribe `android/app/src/release/AndroidManifest.xml` con `<uses-permission android:name="android.permission.INTERNET" tools:node="remove"/>`. Los builds `release` y `e2e` (que también es `release`) salen sin INTERNET (D-23, DT-19). El build `debug` lo conserva porque Metro lo necesita. El código de la app no usa red (lo garantiza la regla de ADR-013), y Maestro habla con el dispositivo por `adb`, así que no hace falta.
+2. `with-no-device-transfer`: agrega `android:dataExtractionRules="@xml/data_extraction_rules"` (Android 12 o posterior) y `android:fullBackupContent="@xml/full_backup_content"` (Android 11 o anterior). Ambos XML excluyen `root`, `file`, `database`, `sharedpref` y `external`; el primero lo hace en `<cloud-backup>` y en `<device-transfer>`. Complementa `allowBackup: false` y mantiene cierta la frase "Si borras la app o cambias de teléfono, tus datos no se pasan solos".
+
+Menores en `app.json`: `ios.bundleIdentifier` `com.cuantovendi.local` y `ios.infoPlist.NSAppTransportSecurity` con `NSAllowsArbitraryLoads: false` y `NSAllowsLocalNetworking: true`. `src/__tests__/app-config.test.ts` exige los dos plugins y estos valores. `npx expo config --type introspect` muestra `dataExtractionRules` y `fullBackupContent` en el manifiesto; el manifiesto de la variante `release` y los XML solo se generan en `prebuild`, y se verifican con los tests de los plugins.
+
+## Enmienda 2026-11-15 (gate F10.7, hallazgo I1)
+`expo run:android` solo ejecuta `expo prebuild` si `android/` no existe, y no vuelve a aplicar los config plugins sobre uno existente. El `android/` local quedó anterior a los cambios de `app.json` de F10.4 (sin el manifiesto de `release` que quita INTERNET y sin `dataExtractionRules`), de modo que un build habría salido con permisos y copias de seguridad distintos de los auditados. La sección 3 decía que `expo run:android` regenera "si hace falta", y ese criterio no detecta cambios de `app.json`.
+
+Decisión: los tres scripts que compilan (`android`, `android:release` y `e2e:build`) ejecutan antes `npx expo prebuild --clean --platform android &&`, de modo que cada build parte de un proyecto nativo generado desde el `app.json` y los plugins actuales. En `e2e:build` va después de generar los fixtures. `rm -rf android/app/build` se conserva por claridad aunque `--clean` ya borra `android/`. El costo es compilar todo desde cero en cada build, y el tiempo no es criterio. `src/__tests__/app-config.test.ts` exige el prebuild delante de `expo run:android` en los tres scripts. En un worktree de un commit anterior (V-E2E-UPG) el `package.json` no lo tiene, así que ahí se ejecuta a mano.

@@ -50,4 +50,13 @@ describe('Amount', () => {
       expect.stringMatching(/text-heading.*font-bold.*text-accent.*text-right/),
     );
   });
+
+  it('is not a stop of its own inside a group that already carries its label', async () => {
+    await renderUi(<Amount value={clpSchema.parse(15000)} isGrouped />);
+
+    const amount = screen.getByText('$15.000', { includeHiddenElements: true });
+
+    expect(amount).toHaveProp('accessible', false);
+    expect(amount).not.toHaveProp('accessibilityLabel');
+  });
 });

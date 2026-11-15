@@ -1,0 +1,34 @@
+appId: com.cuantovendi.local
+tags:
+  - upgrade
+---
+# Step 3 of V-E2E-UPG: loads, through the UI of the PREVIOUS build, the data that
+# upgrade-verify.yaml looks for after installing the new build on top. It does not use the seed
+# (e2e/seed) because the previous build may not have it. Run it with the previous build installed
+# and do not clear the app data afterwards. Everything is created today, so verify the same day.
+- runFlow: ../_shared/launch-clean.yaml
+- runFlow:
+    file: ../_shared/create-product.yaml
+    env:
+      PRODUCT_NAME: 'Lámina Colibrí'
+      PRODUCT_PRICE: '15000'
+- runFlow:
+    file: ../_shared/register-sale.yaml
+    env:
+      PRODUCT_ROW: 'Lámina Colibrí.*'
+- tapOn: 'Listo'
+- runFlow: ../_shared/dismiss-notification-intro.yaml
+# The current week now has a sale, so only last week can be marked "no vendí".
+- tapOn: 'Calendario'
+- tapOn:
+    text: 'Marcar que no vendí'
+    index: 0
+- assertVisible: 'Marcada como "no vendí"'
+# A reminder preference that is not the default (Domingos a las 20:00).
+- tapOn: 'Ajustes'
+- tapOn: 'Recordatorios.*'
+- tapOn: 'Día y hora.*'
+- tapOn: 'Viernes'
+- tapOn: '15'
+- tapOn: 'Guardar'
+- assertVisible: 'Viernes a las 20:15'

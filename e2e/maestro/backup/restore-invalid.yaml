@@ -1,0 +1,22 @@
+appId: com.cuantovendi.local
+tags:
+  - backup
+---
+# Needs the text file in the phone's Downloads before running:
+#   adb push e2e/maestro/assets/no-es-un-respaldo.txt /sdcard/Download/
+- runFlow: ../_shared/launch-clean.yaml
+- runFlow: ../_shared/open-backup.yaml
+- tapOn: 'Elegir un respaldo'
+- runFlow:
+    when:
+      notVisible: 'no-es-un-respaldo.txt'
+    commands:
+      - tapOn: 'Show roots|Mostrar raíces'
+      - tapOn: 'Downloads|Descargas'
+- tapOn: 'no-es-un-respaldo.txt'
+- extendedWaitUntil:
+    visible: 'Este archivo no es un respaldo de cuantovendi'
+    timeout: 20000
+- assertVisible: 'Elige el archivo que creaste con "Crear respaldo".*'
+- assertVisible: 'Elegir otro archivo'
+- assertNotVisible: 'Tus datos siguen como estaban.'

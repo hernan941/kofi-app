@@ -9,6 +9,7 @@ export {
   SALE_NOTE_MAX_LENGTH,
   activeItemsTotal,
   hasItems,
+  productIdsOf,
   recordTotal,
 } from './sale';
 export type { NoSalesWeek, SaleChannel, SaleItem, SaleRecord } from './sale';

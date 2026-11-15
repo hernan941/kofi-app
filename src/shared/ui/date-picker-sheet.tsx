@@ -52,10 +52,16 @@ interface DayCellProps {
   readonly onPick: (day: LocalDate) => void;
 }
 
-/** One cell of the grid: a day button of at least 48 × 48, or an empty space of the same size. */
+const DAY_NUMBER_MAX_FONT_SCALE = 2;
+
+/**
+ * One cell of the grid: a day button whose circle is at least 48 × 48, or an empty space of
+ * the same minimum height. Cells share the row width (no fixed size), so seven columns fit
+ * a 360 wide screen and a large font grows the circle instead of cutting the number.
+ */
 function DayCell({ day, value, maxDate, today, onPick }: DayCellProps) {
   if (day === null) {
-    return <View className="size-12" />;
+    return <View className="min-h-12 flex-1" />;
   }
   const isSelected = day === value;
   const isToday = day === today;
@@ -73,11 +79,18 @@ function DayCell({ day, value, maxDate, today, onPick }: DayCellProps) {
       onPress={() => {
         onPick(day);
       }}
-      className={`size-12 items-center justify-center rounded-full ${fill} ${border} ${isDisabled ? 'opacity-disabled' : ''}`}
+      className={`min-h-12 flex-1 items-center justify-center ${isDisabled ? 'opacity-disabled' : ''}`}
     >
-      <Text className={`font-medium text-base ${textColor}`}>
-        {String(localDateParts(day).day)}
-      </Text>
+      <View
+        className={`min-h-12 min-w-12 items-center justify-center rounded-full ${fill} ${border}`}
+      >
+        <Text
+          maxFontSizeMultiplier={DAY_NUMBER_MAX_FONT_SCALE}
+          className={`font-medium text-base ${textColor}`}
+        >
+          {String(localDateParts(day).day)}
+        </Text>
+      </View>
     </Pressable>
   );
 }
@@ -134,7 +147,7 @@ function MonthCalendar({
           <View
             key={`${initial}-${String(index)}`}
             testID="date-picker-weekday"
-            className="size-12 items-center justify-center"
+            className="min-h-12 flex-1 items-center justify-center"
           >
             <Text className="font-medium text-xs text-muted">{initial}</Text>
           </View>

@@ -29,8 +29,10 @@ yarn-error.*
 .DS_Store
 *.pem
 
-# local env files
-.env*.local
+# env files (never commit; only .env.example)
+.env
+.env.*
+!.env.example
 
 # typescript
 *.tsbuildinfo
@@ -43,3 +45,6 @@ example
 
 # local APK builds
 builds/
+
+# generated E2E fixtures (npm run e2e:fixtures); basic.zip is versioned
+/e2e/fixtures/large.zip

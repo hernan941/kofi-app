@@ -1,5 +1,6 @@
-import { useMemo, useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
 
+import { perfMark } from '@/shared/lib/perf-marks';
 import { useToday } from '@/shared/lib/time/use-today';
 import {
   EmptyState,
@@ -13,7 +14,7 @@ import {
 import { View } from 'react-native';
 
 import type { Product } from '@/features/products/domain';
-import type { Clp, ProductId } from '@/shared/domain';
+import type { Clp, LocalDate, ProductId } from '@/shared/domain';
 import { SALE_ERROR_MESSAGES } from '../components/error-messages';
 import { NoSalesSection } from '../components/no-sales-section';
 import { SaleForm } from '../components/sale-form';
@@ -37,6 +38,8 @@ export interface NewSaleScreenProps {
   /** Sin productos: lleva a crear uno. */
   readonly onCreateProduct: () => void;
   readonly onCancel: () => void;
+  /** Día de la venta; sin él, o si es futuro (D-03), arranca en hoy. */
+  readonly initialSoldOn?: LocalDate;
   /** Lo que se dibuja en el lugar reservado de la celebración (el consejo de F6). */
   readonly renderAfterSave?: (outcome: SaleSavedOutcome, controls: AfterSaveControls) => ReactNode;
 }
@@ -59,6 +62,11 @@ function Celebration({
   readonly renderAfterSave: NewSaleScreenProps['renderAfterSave'];
 }) {
   const today = useToday();
+  useEffect(() => {
+    if (process.env.EXPO_PUBLIC_E2E === '1') {
+      perfMark('sale:celebration:visible');
+    }
+  }, []);
   const finish = useFinishOnLeave(true, () => {
     onFinished(saved.outcome);
   });
@@ -86,6 +94,7 @@ export function NewSaleScreen({
   onFinished,
   onCreateProduct,
   onCancel,
+  initialSoldOn,
   renderAfterSave,
 }: NewSaleScreenProps) {
   const sellable = useSellableProducts();
@@ -94,9 +103,16 @@ export function NewSaleScreen({
   const toast = useAppToast();
   const [saved, setSaved] = useState<SavedSale | null>(null);
   const products = sellable.data;
+  const isFormReady = !sellable.isPending;
+  useEffect(() => {
+    if (process.env.EXPO_PUBLIC_E2E === '1' && isFormReady) {
+      perfMark('sale-form:ready');
+    }
+  }, [isFormReady]);
+  const soldOn = initialSoldOn === undefined || initialSoldOn > today ? today : initialSoldOn;
   const initialValues = useMemo(
-    () => toSaleFormValues(null, today, products ?? []),
-    [today, products],
+    () => toSaleFormValues(null, soldOn, products ?? []),
+    [soldOn, products],
   );
 
   if (saved !== null) {

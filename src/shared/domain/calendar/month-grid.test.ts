@@ -1,4 +1,4 @@
-import { monthGrid } from './month-grid';
+import { monthGrid, monthGridRange } from './month-grid';
 import { yearMonthSchema } from './year-month';
 
 const month = (text: string) => yearMonthSchema.parse(text);
@@ -46,5 +46,23 @@ describe('monthGrid', () => {
 
     expect(days.filter((day) => day !== null).at(-1)).toBe('2026-12-31');
     expect(days.filter((day) => day !== null).every((day) => day.startsWith('2026-12'))).toBe(true);
+  });
+});
+
+describe('monthGridRange', () => {
+  test('covers February 2027, which starts on a Monday, in exactly four weeks', () => {
+    expect(monthGridRange(month('2027-02'))).toEqual({ start: '2027-02-01', end: '2027-02-28' });
+  });
+
+  test('covers November 2026, which starts on a Sunday, from the Monday before to the last Sunday', () => {
+    expect(monthGridRange(month('2026-11'))).toEqual({ start: '2026-10-26', end: '2026-12-06' });
+  });
+
+  test('covers a leap February', () => {
+    expect(monthGridRange(month('2028-02'))).toEqual({ start: '2028-01-31', end: '2028-03-05' });
+  });
+
+  test('crosses into January from December', () => {
+    expect(monthGridRange(month('2026-12'))).toEqual({ start: '2026-11-30', end: '2027-01-03' });
   });
 });

@@ -55,7 +55,11 @@ describe('ProductDetailScreen of an active product', () => {
     await user.press(screen.getAllByRole('button', { name: 'Archivar' }).at(-1) as never);
 
     expect(
-      (await screen.findAllByText('Producto archivado. Lo encuentras en Archivados.')).length,
+      (
+        await screen.findAllByText('Producto archivado. Lo encuentras en Archivados.', {
+          includeHiddenElements: true,
+        })
+      ).length,
     ).toBeGreaterThan(0);
     expect(onArchived).toHaveBeenCalledTimes(1);
     expect(await dependencies.products.listArchived()).toHaveLength(1);
@@ -80,7 +84,11 @@ describe('ProductDetailScreen of an active product', () => {
     await user.press(screen.getAllByRole('button', { name: 'Archivar' }).at(-1) as never);
 
     expect(
-      (await screen.findAllByText('No se pudo archivar. Inténtalo de nuevo.')).length,
+      (
+        await screen.findAllByText('No se pudo archivar. Inténtalo de nuevo.', {
+          includeHiddenElements: true,
+        })
+      ).length,
     ).toBeGreaterThan(0);
     expect(onArchived).not.toHaveBeenCalled();
   });
@@ -96,7 +104,11 @@ describe('ProductDetailScreen of an archived product', () => {
     await user.press(screen.getByRole('button', { name: 'Volver a usar' }));
 
     expect(
-      (await screen.findAllByText('Listo, vuelve a estar en tu lista.')).length,
+      (
+        await screen.findAllByText('Listo, vuelve a estar en tu lista.', {
+          includeHiddenElements: true,
+        })
+      ).length,
     ).toBeGreaterThan(0);
     expect(await dependencies.products.listActive()).toHaveLength(1);
     expect(await screen.findByRole('button', { name: 'Archivar' })).toBeOnTheScreen();
@@ -122,7 +134,11 @@ describe('ProductDetailScreen of an archived product', () => {
     });
 
     expect(
-      (await screen.findAllByText('Listo, vuelve a estar en tu lista.')).length,
+      (
+        await screen.findAllByText('Listo, vuelve a estar en tu lista.', {
+          includeHiddenElements: true,
+        })
+      ).length,
     ).toBeGreaterThan(0);
     expect(run).toHaveBeenCalledTimes(1);
   });

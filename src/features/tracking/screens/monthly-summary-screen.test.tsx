@@ -28,9 +28,11 @@ describe('MonthlySummaryScreen', () => {
 
     expect(await screen.findByRole('header', { name: 'Resumen del mes' })).toBeOnTheScreen();
     expect(await screen.findByRole('header', { name: 'Julio' })).toBeOnTheScreen();
-    expect(await screen.findByText('Vendiste')).toBeOnTheScreen();
-    expect(screen.getByText('1 venta registrada')).toBeOnTheScreen();
-    expect(screen.getAllByLabelText('30.000 pesos')).toHaveLength(2);
+    expect(await screen.findByText('Vendiste', { includeHiddenElements: true })).toBeOnTheScreen();
+    expect(
+      screen.getByText('1 venta registrada', { includeHiddenElements: true }),
+    ).toBeOnTheScreen();
+    expect(screen.getAllByText('$30.000', { includeHiddenElements: true })).toHaveLength(2);
     expect(screen.getByRole('header', { name: 'Lo que más vendiste' })).toBeOnTheScreen();
   });
 
@@ -46,10 +48,11 @@ describe('MonthlySummaryScreen', () => {
   });
 
   it('shows the loading state first', async () => {
-    await renderWithProviders(<MonthlySummaryScreen {...props()} />, { dependencies: seeded() });
+    const dependencies = seeded();
+    jest.spyOn(dependencies.sales, 'listBetween').mockReturnValue(new Promise(() => undefined));
+    await renderWithProviders(<MonthlySummaryScreen {...props()} />, { dependencies });
 
     expect(screen.getByLabelText('Cargando el resumen')).toBeOnTheScreen();
-    await screen.findByText('Vendiste');
   });
 
   it('limits the navigation to the first month with sales and to the current month', async () => {
@@ -117,6 +120,6 @@ describe('MonthlySummaryScreen', () => {
 
     await user.press(screen.getByRole('button', { name: 'Reintentar' }));
 
-    expect(await screen.findByText('Vendiste')).toBeOnTheScreen();
+    expect(await screen.findByText('Vendiste', { includeHiddenElements: true })).toBeOnTheScreen();
   });
 });

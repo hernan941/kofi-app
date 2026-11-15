@@ -47,8 +47,8 @@ describe('SaleDetail', () => {
     const { view } = renderDetail(makeSaleRecord([makeSaleItem(1, { unitPrice: clp(15000) })]));
     await view;
 
-    expect(screen.getByText('Total')).toBeOnTheScreen();
-    expect(screen.getAllByLabelText('15.000 pesos')).not.toHaveLength(0);
+    expect(screen.getByText('Total', { includeHiddenElements: true })).toBeOnTheScreen();
+    expect(screen.getByLabelText('Total: 15.000 pesos')).toBeOnTheScreen();
     expect(screen.getByRole('header', { name: 'Lo que vendiste' })).toBeOnTheScreen();
     expect(screen.getByLabelText('Lámina Colibrí, 15.000 pesos')).toBeOnTheScreen();
   });
@@ -59,7 +59,7 @@ describe('SaleDetail', () => {
     );
     await view;
 
-    expect(screen.getByText('2 × $15.000')).toBeOnTheScreen();
+    expect(screen.getByText('2 × $15.000', { includeHiddenElements: true })).toBeOnTheScreen();
     expect(
       screen.getByLabelText('Lámina Colibrí, 2 de 15.000 pesos, 30.000 pesos'),
     ).toBeOnTheScreen();
@@ -78,7 +78,9 @@ describe('SaleDetail', () => {
     );
     await view;
 
-    expect(screen.getByText('Print A4 · 2 × $15.000')).toBeOnTheScreen();
+    expect(
+      screen.getByText('Print A4 · 2 × $15.000', { includeHiddenElements: true }),
+    ).toBeOnTheScreen();
     expect(
       screen.getByLabelText('Print, Print A4, 2 de 15.000 pesos, 30.000 pesos'),
     ).toBeOnTheScreen();
@@ -92,7 +94,7 @@ describe('SaleDetail', () => {
     const { view } = renderDetail(undefined, productsById(archived));
     await view;
 
-    expect(screen.getByText('Archivado')).toBeOnTheScreen();
+    expect(screen.getByText('Archivado', { includeHiddenElements: true })).toBeOnTheScreen();
     expect(screen.getByLabelText('Lámina Colibrí, archivado, 15.000 pesos')).toBeOnTheScreen();
   });
 

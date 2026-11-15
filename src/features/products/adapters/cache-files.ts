@@ -1,21 +1,9 @@
 import { Directory, File, Paths } from 'expo-file-system';
 
+import { isCacheUri, uriScheme } from '@/core/files/cache-uri';
 import type { Logger } from '@/shared/lib/logger';
 
 const SWEPT_FOLDERS = ['ImagePicker', 'ImageManipulator'] as const;
-
-function hasParentSegment(uri: string): boolean {
-  return uri.split('/').some((segment) => ['..', '%2e%2e'].includes(segment.toLowerCase()));
-}
-
-/**
- * Indica si `uri` es un archivo dentro de `Paths.cache`. Rechaza otros esquemas, el propio
- * directorio y cualquier ruta con `..`, para que nunca se borre algo fuera de la caché.
- */
-export function isCacheUri(uri: string): boolean {
-  const cache = `${Paths.cache.uri.replace(/\/+$/, '')}/`;
-  return uri.length > cache.length && uri.startsWith(cache) && !hasParentSegment(uri);
-}
 
 /**
  * Borra un temporal del selector o del manipulador si está bajo `Paths.cache`. Es el único
@@ -24,7 +12,7 @@ export function isCacheUri(uri: string): boolean {
  */
 export function deleteCacheFile(uri: string, logger: Logger): void {
   if (!isCacheUri(uri)) {
-    logger.warn('photo_temp_outside_cache', { uri });
+    logger.warn('photo_temp_outside_cache', { scheme: uriScheme(uri) });
     return;
   }
   try {

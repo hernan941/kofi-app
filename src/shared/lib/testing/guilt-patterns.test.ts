@@ -12,6 +12,15 @@ describe('findGuiltPattern', () => {
     'Lo hiciste mal',
     'Perdiste tu racha',
     'Tienes que registrar más',
+    'Aún no registras ventas',
+    'No has registrado nada',
+    'Dejaste de anotar',
+    'Te falta anotar costos',
+    'Te faltan costos',
+    'Hace 3 días que no registras',
+    'Hace dos semanas que no vendes',
+    'Deberias anotar tus ventas',
+    'TODAVIA NO hay ventas',
   ])('detects "%s"', (text) => {
     expect(findGuiltPattern(text)).not.toBeNull();
   });
@@ -22,6 +31,8 @@ describe('findGuiltPattern', () => {
     'Tu racha ya va en 3 semanas',
     'Animal, formal y normal no son palabras de culpa',
     'Errores de cálculo comunes',
+    'Hace 3 días registraste una venta',
+    'Tu falta de tiempo no importa',
   ])('accepts "%s"', (text) => {
     expect(findGuiltPattern(text)).toBeNull();
   });

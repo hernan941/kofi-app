@@ -66,8 +66,10 @@ describe('ProductDetail with several versions', () => {
     expect(
       screen.getByLabelText('Personalizado, precio a convenir, te cuesta 3.000 pesos'),
     ).toBeOnTheScreen();
-    expect(screen.getByText('Te cuesta $3.000')).toBeOnTheScreen();
-    expect(screen.getByText('A convenir · te cuesta $3.000')).toBeOnTheScreen();
+    expect(screen.getByText('Te cuesta $3.000', { includeHiddenElements: true })).toBeOnTheScreen();
+    expect(
+      screen.getByText('A convenir · te cuesta $3.000', { includeHiddenElements: true }),
+    ).toBeOnTheScreen();
     expect(screen.queryByText('Vieja')).not.toBeOnTheScreen();
   });
 });

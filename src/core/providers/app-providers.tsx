@@ -3,6 +3,8 @@ import { HeroUINativeProvider } from 'heroui-native';
 import { useState, type ReactNode } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
+import { TodayProvider } from '@/shared/lib/time/today-provider';
+
 import type { AppComposition } from './app-dependencies';
 import { DependenciesProvider } from './dependencies-context';
 import { MigrationGate } from './migration-gate';
@@ -20,7 +22,7 @@ export interface AppProvidersProps {
 
 /**
  * Árbol de providers de la app (de afuera hacia adentro): raíz de gestos, HeroUI Native,
- * dependencias, puerta de arranque, `QueryClient` (ADR-009) y puente de invalidación. Los valores por defecto de
+ * dependencias, "hoy" compartido, puerta de arranque, `QueryClient` (ADR-009) y puente de invalidación. Los valores por defecto de
  * los íconos no pasan por `IconContext`: `Icon` de `shared/ui` fija tamaño y peso, y los
  * íconos importados uno por uno (`phosphor-react-native/src/icons/*`) no comparten el contexto
  * del paquete principal.
@@ -33,18 +35,21 @@ export function AppProviders({ composition, children }: AppProvidersProps) {
     <GestureHandlerRootView style={ROOT_STYLE}>
       <HeroUINativeProvider>
         <DependenciesProvider dependencies={dependencies}>
-          <MigrationGate
-            migrateDatabase={composition.migrateDatabase}
-            runAfterFirstRender={composition.runAfterFirstRender}
-          >
-            <QueryClientProvider client={queryClient}>
-              <DataChangesBridge
-                dataChanges={dependencies.dataChanges}
-                dependencies={QUERY_DEPENDENCIES}
-              />
-              {children}
-            </QueryClientProvider>
-          </MigrationGate>
+          <TodayProvider>
+            <MigrationGate
+              migrateDatabase={composition.migrateDatabase}
+              runAfterFirstRender={composition.runAfterFirstRender}
+              exportEmergency={composition.exportEmergency}
+            >
+              <QueryClientProvider client={queryClient}>
+                <DataChangesBridge
+                  dataChanges={dependencies.dataChanges}
+                  dependencies={QUERY_DEPENDENCIES}
+                />
+                {children}
+              </QueryClientProvider>
+            </MigrationGate>
+          </TodayProvider>
         </DependenciesProvider>
       </HeroUINativeProvider>
     </GestureHandlerRootView>

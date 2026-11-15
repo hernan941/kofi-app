@@ -11,6 +11,8 @@ export interface ChipOption<T extends string> {
 /** Props shared by both modes of {@link ChipGroup}. */
 interface ChipGroupBaseProps<T extends string> {
   readonly label: string;
+  /** Name of the radio group for the screen reader when it must say more than the visible `label`. */
+  readonly accessibilityLabel?: string;
   readonly options: readonly ChipOption<T>[];
   readonly value: T | null;
 }
@@ -32,9 +34,10 @@ export type ChipGroupProps<T extends string> = RequiredChoiceProps<T> | Optional
 
 /**
  * Single choice between a few options shown as chips ("Dónde vendiste", the version of a
- * product). By default it is read as a radio group named by its visible label. With
- * `allowDeselect` (optional answers) a radio cannot be unchecked, so the group is a labelled
- * set of toggle buttons with the `selected` state and pressing the chosen one clears it. The
+ * product). The visible label is read as text before the chips. By default it is also a
+ * radio group named by that label. With
+ * `allowDeselect` (optional answers) a radio cannot be unchecked, so the group is the label
+ * followed by a set of toggle buttons with the `selected` state and pressing the chosen one clears it. The
  * chips wrap onto new lines when they do not fit.
  */
 export function ChipGroup<T extends string>(props: ChipGroupProps<T>) {
@@ -50,16 +53,10 @@ export function ChipGroup<T extends string>(props: ChipGroupProps<T>) {
 
   return (
     <View className="gap-2">
-      <Text
-        accessibilityElementsHidden
-        importantForAccessibility="no-hide-descendants"
-        className="font-medium text-sm text-foreground"
-      >
-        {label}
-      </Text>
+      <Text className="font-medium text-sm text-foreground">{label}</Text>
       <View
         accessibilityRole={isDeselectable ? undefined : 'radiogroup'}
-        accessibilityLabel={label}
+        accessibilityLabel={isDeselectable ? undefined : (props.accessibilityLabel ?? label)}
         className="flex-row flex-wrap gap-2"
       >
         {options.map((option) => (

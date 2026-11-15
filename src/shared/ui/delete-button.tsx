@@ -9,6 +9,7 @@ export interface DeleteButtonProps {
   readonly isFilled?: boolean;
   readonly isDisabled?: boolean;
   readonly accessibilityHint?: string;
+  readonly accessibilityLabel?: string;
 }
 
 /**

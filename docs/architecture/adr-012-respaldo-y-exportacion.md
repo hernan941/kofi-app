@@ -262,3 +262,6 @@ export type RestoreError =
 - La restauración no toca nada actual hasta el commit final, y no depende de la caché purgable.
 - **Riesgo a medir**: el CRC32 en JS al exportar unos 50 MB en un Android de gama baja. Si no es aceptable, el CRC32 de cada foto se calcula y guarda al importarla (columna nueva por migración) y el escritor lo reutiliza.
 - Se agregan `expo-sharing` y `expo-document-picker` (módulos de Expo). No se agrega ninguna librería de ZIP.
+
+## Enmienda 2026-11-13 (F8.0)
+Agregados de firma aceptados por el orquestador (detalle en `docs/architecture/backup.md`): `PhotoStorage.partialUriFor` y `promotePartial`, `FileSharer.isAvailable`, `SequentialWriter`, los puertos `BackupFiles` y `DatabaseCopier`, el dueño `'backup_cleanup'` del lock y `isCacheUri` en `core/files`. `data.json` se arma en memoria. Los fixtures E2E: `basic.zip` se versiona; `large.zip` (~50 MB) se genera de forma determinista con `npm run e2e:fixtures` y no se versiona.

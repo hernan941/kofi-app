@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { ScrollView, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 import type { ProductId } from '@/shared/domain';
 import {
@@ -15,6 +14,7 @@ import {
   Screen,
   ScreenHeader,
   SecondaryButton,
+  StyledSafeAreaView,
   useAppToast,
 } from '@/shared/ui';
 
@@ -110,7 +110,7 @@ export function ProductDetailScreen({
             </View>
           ) : null}
         </ScrollView>
-        <SafeAreaView edges={['bottom']} className="px-4 pt-2 pb-4">
+        <StyledSafeAreaView edges={['bottom']} className="px-4 pt-2 pb-4">
           {canReuse ? (
             <PrimaryButton
               label="Volver a usar"
@@ -122,7 +122,7 @@ export function ProductDetailScreen({
           ) : (
             <PrimaryButton label="Editar producto" icon={PencilSimpleIcon} onPress={onEdit} />
           )}
-        </SafeAreaView>
+        </StyledSafeAreaView>
         <ConfirmDialog
           isOpen={isConfirmOpen}
           title={`¿Archivar ${product.name}?`}

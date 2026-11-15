@@ -1,0 +1,34 @@
+appId: com.cuantovendi.local
+tags:
+  - settings
+---
+# The license list opens the full text of HeroUI Native (Apache 2.0), Lexend (MIT and OFL) and
+# Phosphor Icons (MIT). The list is alphabetical, so each one is found by scrolling down.
+- runFlow: ../_shared/launch-clean.yaml
+- tapOn: 'Ajustes'
+- scrollUntilVisible:
+    element: 'Licencias de terceros.*'
+- tapOn: 'Licencias de terceros.*'
+- assertVisible: 'cuantovendi usa bibliotecas de código abierto.*'
+- scrollUntilVisible:
+    element: 'HeroUI Native.*'
+- tapOn: 'HeroUI Native.*'
+- assertVisible: 'HeroUI Native'
+- assertVisible: '.*Apache License.*'
+- tapOn: 'Volver'
+- scrollUntilVisible:
+    element: 'Lexend.*'
+- tapOn: 'Lexend.*'
+- assertVisible: 'Lexend'
+- assertVisible: 'Licencia del código: MIT'
+- assertVisible: '.*SIL Open Font License.*'
+- tapOn: 'Volver'
+- scrollUntilVisible:
+    element: 'Phosphor Icons.*'
+- tapOn: 'Phosphor Icons.*'
+- assertVisible: 'Phosphor Icons'
+- assertVisible: '.*MIT License.*'
+- tapOn: 'Volver'
+- assertVisible: 'Licencias de terceros'
+- tapOn: 'Volver'
+- assertVisible: 'Privacidad'

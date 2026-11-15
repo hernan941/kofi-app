@@ -7,7 +7,10 @@ tags:
 - tapOn: 'Agregar producto'
 - tapOn: 'Nombre'
 - inputText: 'Lámina Colibrí'
-- tapOn: '¿A cuánto lo vendes?'
+- hideKeyboard
+- tapOn:
+    text: '¿A cuánto lo vendes?'
+    index: 1
 - inputText: '15000'
 - hideKeyboard
 - tapOn: 'Agregar costo'
@@ -18,6 +21,13 @@ tags:
 - inputText: 'Print A3'
 - hideKeyboard
 - scrollUntilVisible:
+    element:
+      text: 'A convenir'
+      below: 'Print A3'
+- tapOn:
+    text: 'A convenir'
+    below: 'Print A3'
+- scrollUntilVisible:
     element: 'Agregar otra versión'
 - tapOn: 'Agregar otra versión'
 - inputText: 'Original'
@@ -25,10 +35,10 @@ tags:
 - scrollUntilVisible:
     element:
       text: 'A convenir'
-      index: 2
+      below: 'Original'
 - tapOn:
     text: 'A convenir'
-    index: 2
+    below: 'Original'
 - assertVisible: 'El precio lo escribes al registrar cada venta.'
 - scrollUntilVisible:
     element: 'Guardar'

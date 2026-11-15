@@ -4,15 +4,15 @@ tags:
 ---
 - runFlow: ../_shared/launch-clean.yaml
 - tapOn: 'Calendario'
-- assertVisible: 'Aquí verás tus ventas día por día.'
+- assertVisible: 'Los días en que registres ventas se marcan aquí con puntos.'
 - tapOn: 'Productos'
-- assertVisible: 'Aquí guardarás lo que vendes, con sus precios.'
+- assertVisible: 'Aquí vas a ver tus productos'
 - tapOn: 'Consejos'
-- assertVisible: 'Aquí encontrarás ideas breves para vender mejor.'
+- assertVisible: 'Ideas breves para llevar tu negocio.*'
 - tapOn: 'Ajustes'
-- assertVisible: 'Aquí podrás cuidar tus recordatorios y tus respaldos.'
+- assertVisible: 'Privacidad'
 - tapOn: 'Inicio'
-- assertVisible: 'Todavía no hay ventas esta semana'
+- assertVisible: 'Aquí vas a ver cuánto vendes'
 - openLink: cuantovendi://e2e/diagnostics
 - assertVisible: 'Diagnóstico de fechas'
 - assertVisible: 'Todos los casos coinciden'

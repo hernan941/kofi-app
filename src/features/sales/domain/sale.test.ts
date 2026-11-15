@@ -1,5 +1,5 @@
-import { MAX_SALE_TOTAL, activeItemsTotal, hasItems, recordTotal } from './sale';
-import { clp, makeSaleItem, makeSaleRecord } from './testing/sale-fixtures';
+import { MAX_SALE_TOTAL, activeItemsTotal, hasItems, productIdsOf, recordTotal } from './sale';
+import { clp, makeSaleItem, makeSaleRecord, productId } from './testing/sale-fixtures';
 
 describe('recordTotal', () => {
   test('sums quantity times unit price', () => {
@@ -39,5 +39,23 @@ describe('hasItems', () => {
   test('is false for a broken record and true otherwise', () => {
     expect(hasItems(makeSaleRecord([]))).toBe(false);
     expect(hasItems(makeSaleRecord())).toBe(true);
+  });
+});
+
+describe('productIdsOf', () => {
+  test('lists each product once, in order of appearance', () => {
+    const first = makeSaleItem(1, { productId: productId(1) });
+    const same = makeSaleItem(2, { productId: productId(1) });
+    const other = makeSaleItem(3, { productId: productId(3) });
+
+    expect(productIdsOf(makeSaleRecord([first, same, other]))).toEqual([
+      first.productId,
+      other.productId,
+    ]);
+  });
+
+  test('is empty for a record without items, and for no record', () => {
+    expect(productIdsOf(makeSaleRecord([]))).toEqual([]);
+    expect(productIdsOf(null)).toEqual([]);
   });
 });

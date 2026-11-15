@@ -9,11 +9,12 @@ import {
   ListRow,
   ListSeparator,
   StorefrontIcon,
+  AccessibleGroup,
 } from '@/shared/ui';
 
 import { activeItemsTotal, type SaleItemView, type SaleRecordView } from '../domain';
 import { SALE_CHANNEL_LABELS } from './channel-labels';
-import { ProductThumbnail } from './product-thumbnail';
+import { ProductThumbnail } from '@/features/products';
 
 /** Props of {@link SaleDetail}. */
 export interface SaleDetailProps {
@@ -65,10 +66,10 @@ export function SaleDetail({ view, onDelete }: SaleDetailProps) {
   const showThumbnails = view.items.some((item) => item.coverPhotoId !== null);
   return (
     <ScrollView contentContainerClassName="gap-6 px-4 pb-6">
-      <View className="gap-1">
+      <AccessibleGroup label={`Total: ${formatClpAccessible(view.total)}`} contentClassName="gap-1">
         <Text className="font-medium text-sm text-muted">Total</Text>
         <Amount value={view.total} variant="display" />
-      </View>
+      </AccessibleGroup>
       <Card title="Lo que vendiste">
         {view.items.map((itemView, index) => {
           const name = itemView.productName ?? 'Producto sin nombre';

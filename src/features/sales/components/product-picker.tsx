@@ -18,7 +18,7 @@ import {
   TextField,
 } from '@/shared/ui';
 
-import { ProductThumbnail, coverPhotoIdOf } from './product-thumbnail';
+import { ProductThumbnail, coverPhotoIdOf } from '@/features/products';
 
 const SEARCH_MIN_PRODUCTS = 10;
 const INLINE_PRODUCTS_MAX = 20;
@@ -298,6 +298,8 @@ export function ProductPickerSheet({
       isOpen={isOpen}
       title={chosen === undefined ? '¿Qué más vendiste?' : `¿Qué versión de ${chosen.name}?`}
       onClose={onClose}
+      focusKey={chosen === undefined ? 'list' : 'versions'}
+      isScrollable={chosen !== undefined}
     >
       {chosen === undefined ? (
         <VirtualizedProductList

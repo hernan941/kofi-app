@@ -20,3 +20,8 @@ export { useActiveProducts } from './hooks/use-active-products';
 export { ProductPhoto } from './components/product-photo';
 export type { ProductPhotoProps } from './components/product-photo';
 export { activeVersions } from './domain/product';
+export {
+  ProductThumbnail,
+  anyProductHasCover,
+  coverPhotoIdOf,
+} from './components/product-thumbnail';

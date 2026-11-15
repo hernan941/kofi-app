@@ -1,0 +1,19 @@
+appId: com.cuantovendi.local
+tags:
+  - settings
+---
+# The "basic" fixture is restored through the real restoration, which leaves a safety copy:
+# Ajustes mentions it and Respaldo offers to restore it. It does not restore: F8.10 covers that.
+- runFlow: ../_shared/launch-clean.yaml
+- runFlow:
+    file: ../_shared/seed.yaml
+    env:
+      FIXTURE: 'basic'
+- launchApp
+- tapOn: 'Ajustes'
+- assertVisible: '.*Tienes una copia de seguridad.*'
+- tapOn: 'Respaldo y planillas.*'
+- scrollUntilVisible:
+    element: 'Copia de seguridad'
+- assertVisible: 'Copia de seguridad'
+- assertVisible: 'Restaurar esta copia'

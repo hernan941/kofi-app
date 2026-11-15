@@ -33,7 +33,7 @@ describe('PhotoGallery', () => {
     expect(
       screen.getByRole('button', { name: 'Foto 1 de 1 de Lámina, portada' }),
     ).toBeOnTheScreen();
-    expect(screen.getAllByRole('image')).toHaveLength(1);
+    expect(screen.queryAllByRole('image')).toHaveLength(0);
   });
 
   it('shows the cover and one thumbnail per photo, in cover order', async () => {
@@ -46,7 +46,8 @@ describe('PhotoGallery', () => {
     ).toBeOnTheScreen();
     expect(screen.getByRole('button', { name: 'Foto 1 de 3' })).toBeOnTheScreen();
     expect(screen.getByRole('button', { name: 'Foto 3 de 3' })).toBeOnTheScreen();
-    expect(screen.getAllByRole('image')).toHaveLength(4);
+    expect(screen.queryAllByRole('image')).toHaveLength(0);
+    expect(screen.getAllByRole('button')).toHaveLength(4);
   });
 
   it('opens a read only sheet that navigates with Anterior and Siguiente', async () => {
@@ -62,5 +63,14 @@ describe('PhotoGallery', () => {
     await user.press(screen.getByRole('button', { name: 'Anterior' }));
 
     expect(screen.getByRole('header', { name: 'Foto 1 de 2' })).toBeOnTheScreen();
+  });
+
+  it('draws the photos as decorative, so each button is a single stop', async () => {
+    await renderWithProviders(<PhotoGallery photos={[photo(1, 0)]} productName="Lámina" />);
+
+    expect(screen.queryByLabelText('Foto 1 de 1')).not.toBeOnTheScreen();
+    expect(
+      screen.getByRole('button', { name: 'Foto 1 de 1 de Lámina, portada' }),
+    ).toBeOnTheScreen();
   });
 });

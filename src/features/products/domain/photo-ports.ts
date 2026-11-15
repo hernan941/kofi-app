@@ -37,6 +37,14 @@ export interface PhotoStorage {
   listPartialFiles(): Promise<readonly PhotoFileInfo[]>;
   /** Elimina `photos/<id>.jpg.part`; no falla si no existe. */
   removePartial(id: ProductPhotoId): Promise<void>;
+  /** URI de `photos/<id>.jpg.part`; lanza si el id no es UUID. Solo este módulo conoce `photos/`. */
+  partialUriFor(id: ProductPhotoId): string;
+  /**
+   * Renombra `photos/<id>.jpg.part` a `photos/<id>.jpg`; falla, sin sobrescribir, si el
+   * destino ya existe o si el `.part` no existe.
+   * @throws {PhotoImportError} Si el id no es UUID.
+   */
+  promotePartial(id: ProductPhotoId): Promise<void>;
 }
 
 /** Resultado de abrir la cámara. */

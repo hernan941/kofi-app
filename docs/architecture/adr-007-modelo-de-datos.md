@@ -119,6 +119,7 @@ erDiagram
     int weekly_minute_of_day "0-1439"
     int monthly_enabled "0|1"
     int updated_at
+    int last_weekly_fire_at "nullable, epoch ms (migración 0001)"
   }
 ```
 
@@ -389,6 +390,10 @@ export interface NoSalesWeekRepository {
 10. **Límites de longitud**: nombres de producto y de versión 80 caracteres, descripción 1000, nota 500.
 
 ## Enmiendas
+
+### 2026-11-14 — `notification_preferences.last_weekly_fire_at` (F7.9)
+- **Origen**: revisión de notificaciones. Para cumplir D-13 (a lo sumo un recordatorio semanal por semana) aunque la persona cambie el día a mitad de semana, la reconciliación recuerda el instante del recordatorio semanal que planificó.
+- **Esquema**: columna `last_weekly_fire_at integer` (nullable, epoch ms) en `notification_preferences`, migración `0001_last_weekly_fire_at`. Las filas existentes quedan en `NULL`. Es contabilidad interna del dispositivo: no viaja en el respaldo (D-28), no emite `DataChanges` y `save` no la modifica.
 
 ### 2026-11-13 — Categorías y contextos de los consejos (F6.0)
 - **Origen**: nota 13 de la sección 2.3 de `docs/plan-v1.md`. El contenido aprobado (`docs/content/consejos.md`, F6.1) usa seis categorías y cinco contextos de prioridad, mientras que `Tip.topic` tenía cuatro valores. **Decisión del orquestador**: se adoptan las seis categorías del contenido y se registra como enmienda de este ADR, sin un ADR nuevo. El detalle está en `docs/architecture/tips.md`.

@@ -1,6 +1,7 @@
 import { screen, userEvent, waitFor } from '@testing-library/react-native';
 
 import { createTestDependencies } from '@/core/testing/create-test-dependencies';
+import { findGuiltPattern } from '@/shared/lib/testing/guilt-patterns';
 import { renderWithProviders } from '@/core/testing/render-with-providers';
 import { saleRecordIdSchema } from '@/shared/domain';
 
@@ -90,6 +91,11 @@ describe('SaleDetailScreen', () => {
         'Se borra la venta del martes 30 de junio por $30.000. No se puede deshacer.',
       ),
     ).toBeOnTheScreen();
+    expect(
+      screen.getByLabelText(
+        'Se borra la venta del martes 30 de junio por 30.000 pesos. No se puede deshacer.',
+      ),
+    ).toBeOnTheScreen();
     await user.press(screen.getByRole('button', { name: 'Cancelar' }));
 
     expect(await dependencies.sales.findById(RECORD_ID)).not.toBeNull();
@@ -106,7 +112,9 @@ describe('SaleDetailScreen', () => {
     await waitFor(() => {
       expect(handlers.onDeleted).toHaveBeenCalledTimes(1);
     });
-    expect((await screen.findAllByText('Venta borrada')).length).toBeGreaterThan(0);
+    expect(
+      (await screen.findAllByText('Venta borrada', { includeHiddenElements: true })).length,
+    ).toBeGreaterThan(0);
     expect(await dependencies.sales.findById(RECORD_ID)).toBeNull();
   });
 
@@ -122,9 +130,14 @@ describe('SaleDetailScreen', () => {
     await user.press(screen.getAllByRole('button', { name: 'Borrar venta' }).at(-1) as never);
 
     expect(
-      (await screen.findAllByText('No se pudo borrar la venta. Inténtalo de nuevo.')).length,
+      (
+        await screen.findAllByText('No se pudo borrar la venta. Inténtalo de nuevo.', {
+          includeHiddenElements: true,
+        })
+      ).length,
     ).toBeGreaterThan(0);
     expect(handlers.onDeleted).not.toHaveBeenCalled();
+    expect(findGuiltPattern('No se pudo borrar la venta. Inténtalo de nuevo.')).toBeNull();
   });
 
   it('shows the not-found state for a valid id that does not exist', async () => {
@@ -157,7 +170,7 @@ describe('EditSaleScreen', () => {
     const { dependencies, handlers, view } = renderEdit();
     await view;
 
-    await user.press(await screen.findByRole('button', { name: 'Agregar uno' }));
+    await user.press(await screen.findByRole('button', { name: /^Agregar uno a la cantidad de/ }));
     await user.press(screen.getByRole('button', { name: 'Guardar cambios' }));
 
     await waitFor(() => {
@@ -165,7 +178,9 @@ describe('EditSaleScreen', () => {
         expect.objectContaining({ kind: 'updated', recordId: RECORD_ID }),
       );
     });
-    expect((await screen.findAllByText('Cambios guardados')).length).toBeGreaterThan(0);
+    expect(
+      (await screen.findAllByText('Cambios guardados', { includeHiddenElements: true })).length,
+    ).toBeGreaterThan(0);
     expect(screen.queryByText('¡Venta registrada!')).not.toBeOnTheScreen();
     expect((await dependencies.sales.findById(RECORD_ID))?.items[0]?.quantity).toBe(3);
   });
@@ -174,7 +189,7 @@ describe('EditSaleScreen', () => {
     const { dependencies, handlers, view } = renderEdit();
     await view;
 
-    await user.press(await screen.findByRole('button', { name: 'Quitar' }));
+    await user.press(await screen.findByRole('button', { name: 'Quitar Lámina Colibrí' }));
     await user.press(screen.getAllByRole('button', { name: 'Borrar venta' }).at(-1) as never);
 
     await waitFor(() => {
@@ -190,7 +205,7 @@ describe('EditSaleScreen', () => {
     await view;
 
     expect(await screen.findByText('Archivado')).toBeOnTheScreen();
-    expect(screen.queryByRole('button', { name: 'Cambiar' })).not.toBeOnTheScreen();
+    expect(screen.queryByRole('button', { name: /^Cambiar/ })).not.toBeOnTheScreen();
   });
 
   it('shows the not-found state for a valid id that does not exist', async () => {

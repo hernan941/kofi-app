@@ -1,6 +1,8 @@
+import { useEffect } from 'react';
 import { View } from 'react-native';
 
 import type { ProductId } from '@/shared/domain';
+import { perfMark } from '@/shared/lib/perf-marks';
 import {
   EmptyState,
   ErrorState,
@@ -37,6 +39,12 @@ export function ProductsScreen({
   const active = useActiveProducts();
   const archived = useArchivedProducts();
   const archivedCount = archived.data?.length ?? 0;
+  const isPainted = !active.isPending;
+  useEffect(() => {
+    if (process.env.EXPO_PUBLIC_E2E === '1' && isPainted) {
+      perfMark('products:ready');
+    }
+  }, [isPainted]);
 
   return (
     <Screen>

@@ -37,9 +37,15 @@ describe('TabBarLabel', () => {
     expect(label).toHaveProp('className', expect.stringContaining('text-muted'));
   });
 
-  it('allows the system font size to grow up to 1.5 times', async () => {
+  it('allows the system font size to grow up to 1.3 times', async () => {
     await renderUi(<TabBarLabel label="Inicio" focused={false} />);
 
-    expect(screen.getByText('Inicio')).toHaveProp('maxFontSizeMultiplier', 1.5);
+    expect(screen.getByText('Inicio')).toHaveProp('maxFontSizeMultiplier', 1.3);
+  });
+
+  it('wraps onto two lines instead of cutting a long label', async () => {
+    await renderUi(<TabBarLabel label="Calendario" focused={false} />);
+
+    expect(screen.getByText('Calendario')).toHaveProp('numberOfLines', 2);
   });
 });

@@ -2,7 +2,22 @@ appId: com.cuantovendi.local
 tags:
   - upgrade
 ---
+# Step 5 of V-E2E-UPG: after installing the new build on top of the previous one (with the data
+# of upgrade-seed.yaml), the app opens without the error screen and the data is still there.
 - launchApp
 - assertNotVisible: 'No pudimos abrir tus datos'
 - assertNotVisible: 'Actualiza la app'
 - assertVisible: 'Inicio'
+# Product.
+- tapOn: 'Productos'
+- assertVisible: 'Lámina Colibrí.*'
+# Sale of the product (registered today).
+- tapOn: 'Calendario'
+- assertVisible: 'Hoy, .*15.000 pesos, 1 venta'
+# "No vendí" mark of last week, and the streak that counts it.
+- assertVisible: 'Marcada como "no vendí"'
+- assertVisible: '2 semanas seguidas'
+# Reminder preference that is not the default.
+- tapOn: 'Ajustes'
+- tapOn: 'Recordatorios.*'
+- assertVisible: 'Viernes a las 20:15'

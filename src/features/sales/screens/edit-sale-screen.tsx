@@ -1,12 +1,13 @@
 import { useMemo } from 'react';
 
-import type { ProductId, SaleRecordId } from '@/shared/domain';
+import type { SaleRecordId } from '@/shared/domain';
 import { useToday } from '@/shared/lib/time/use-today';
 import { ErrorState, LoadingState, Screen, ScreenHeader, useAppToast } from '@/shared/ui';
 
 import { SALE_ERROR_MESSAGES } from '../components/error-messages';
 import { SaleForm } from '../components/sale-form';
 import { toSaleFormValues, toSaveSaleRecordCommand } from '../components/sale-form-schema';
+import { productIdsOf } from '../domain';
 import { useProductsByIds } from '../hooks/use-products-by-ids';
 import { useSaleRecord } from '../hooks/use-sale-record';
 import { useSaveSaleRecord } from '../hooks/use-save-sale-record';
@@ -39,10 +40,7 @@ export function EditSaleScreen({
 }: EditSaleScreenProps) {
   const recordQuery = useSaleRecord(saleRecordId);
   const record = recordQuery.data ?? null;
-  const productIds = useMemo(
-    () => [...new Set(record?.items.map((item) => item.productId) ?? [])] satisfies ProductId[],
-    [record],
-  );
+  const productIds = useMemo(() => productIdsOf(record), [record]);
   const productsQuery = useProductsByIds(productIds);
   const sellable = useSellableProducts();
   const today = useToday();

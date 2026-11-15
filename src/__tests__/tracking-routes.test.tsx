@@ -22,13 +22,6 @@ jest.mock('expo-splash-screen', () => ({
   preventAutoHideAsync: jest.fn(() => Promise.resolve()),
   hideAsync: jest.fn(() => Promise.resolve()),
 }));
-jest.mock('@expo-google-fonts/lexend', () => ({
-  useFonts: (): [boolean, null] => [true, null],
-  Lexend_400Regular: 'regular',
-  Lexend_500Medium: 'medium',
-  Lexend_600SemiBold: 'semibold',
-  Lexend_700Bold: 'bold',
-}));
 
 const user = userEvent.setup();
 
@@ -54,7 +47,7 @@ function seed() {
 describe('tracking routes', () => {
   it('opens the monthly summary from Inicio and goes back', async () => {
     await renderRouter('src/app');
-    await screen.findByText('Aquí vas a ver cuánto vendes');
+    await screen.findByRole('header', { name: 'Inicio' });
     seed();
     await testRouter.navigate('/');
     await user.press(await screen.findByRole('button', { name: 'Ver resumen de julio' }));
@@ -69,7 +62,7 @@ describe('tracking routes', () => {
 
   it('opens the detail of a recent sale from Inicio', async () => {
     await renderRouter('src/app');
-    await screen.findByText('Aquí vas a ver cuánto vendes');
+    await screen.findByRole('header', { name: 'Inicio' });
     seed();
     await testRouter.navigate('/');
 
@@ -122,5 +115,60 @@ describe('tracking routes', () => {
     await user.press(await screen.findByRole('button', { name: 'Volver' }));
 
     expect(screen).toHavePathname('/');
+  });
+
+  it('opens the detail of a day from the Calendario and goes back', async () => {
+    await renderRouter('src/app');
+    await screen.findByRole('header', { name: 'Inicio' });
+    seed();
+    await testRouter.navigate('/calendar');
+
+    await user.press(
+      await screen.findByRole('button', { name: 'Hoy, 1 de julio, 15.000 pesos, 1 venta' }),
+    );
+
+    expect(screen).toHavePathname('/tracking/day/2026-07-01');
+    expect(
+      await screen.findByRole('header', { name: 'Hoy, miércoles 1 de julio' }),
+    ).toBeOnTheScreen();
+
+    await user.press(screen.getByRole('button', { name: 'Volver' }));
+
+    expect(screen).toHavePathname('/calendar');
+  });
+
+  it.each(['2026-02-30', 'abc'])('shows not-found for the invalid day %s', async (date) => {
+    await renderWithSales(`/tracking/day/${date}`);
+
+    expect(await screen.findByText('No encontramos esa pantalla')).toBeOnTheScreen();
+  });
+
+  it('shows a future day without the option to register', async () => {
+    await renderWithSales('/tracking/day/2026-07-02');
+
+    expect(
+      await screen.findByText('Puedes registrar ventas de hoy o de días anteriores.'),
+    ).toBeOnTheScreen();
+    expect(
+      screen.queryByRole('button', { name: 'Registrar una venta este día' }),
+    ).not.toBeOnTheScreen();
+  });
+
+  it('registers a sale for the day of the detail', async () => {
+    await renderWithSales('/tracking/day/2026-06-20');
+
+    await user.press(await screen.findByRole('button', { name: 'Registrar una venta este día' }));
+
+    expect(screen).toHavePathname('/sales/new');
+    expect(screen).toHaveSearchParams({ date: '2026-06-20' });
+  });
+
+  it('starts the registration on the date of the link, and on today when it is future or invalid', async () => {
+    await renderWithSales('/sales/new?date=2026-06-20');
+    seed();
+    expect(await screen.findByText(/20 de junio/)).toBeOnTheScreen();
+
+    await testRouter.navigate('/sales/new?date=2026-07-09');
+    expect(await screen.findByText(/Hoy, miércoles 1 de julio/)).toBeOnTheScreen();
   });
 });

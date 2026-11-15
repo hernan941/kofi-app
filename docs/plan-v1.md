@@ -100,32 +100,32 @@ Entregar una app con código para iOS y Android, verificada en la v1 solo en And
 ### 1.2 Definición de terminado (criterios verificables)
 
 **Funcionalidad (trazabilidad con `docs/product.md`)**
-- [ ] DT-01 **Productos**: crear, editar, archivar y desarchivar; versiones con precio fijo o "a convenir"; costo opcional detrás de "agregar costo"; con una sola versión la UI no muestra el concepto. Lo cubren F1 y su E2E.
-- [ ] DT-02 **Fotos**: hasta 6 por producto, desde la galería o la cámara, guardadas como JPEG de 1600 px y sin EXIF. Lo cubren F2, su E2E y la verificación manual F2.9.
-- [ ] DT-03 **Ventas**: registrar con fecha (hoy por defecto, sin fechas futuras), ítems, y canal y nota opcionales; editar y borrar con confirmación; "Esta semana no vendí"; una venta en una semana marcada quita la marca. Lo cubren F3 y su E2E.
-- [ ] DT-04 **Inicio y resumen mensual**: totales, comparación suave, últimas ventas, producto más vendido, canal principal y ganancia aproximada solo con costos cargados. Inicio no muestra consejos (D-11). Lo cubre F4.
-- [ ] DT-05 **Calendario** por intensidad con el detalle del día, y **racha** semanal. Lo cubre F5.
-- [ ] DT-06 **Consejos**: catálogo de 20 a 30 consejos con fuentes, mostrados de a uno después de guardar una venta, contextuales, y sección "Consejos" con los vistos marcados. Lo cubre F6.
-- [ ] DT-07 **Notificaciones locales**: recordatorio semanal (domingo 20:00 por defecto, configurable o desactivable, con texto adaptado) que sigue llegando con un texto neutro aunque la app no se abra (D-13), y resumen mensual (día 1 a las 10:00, desactivable). Nunca llegan dos recordatorios semanales en la misma semana. El permiso se pide después de la primera venta y ningún texto culpa. Lo cubren F7 y la verificación manual en el dispositivo.
-- [ ] DT-08 **Respaldo y exportación**: CSV de ventas y de productos (dos archivos); respaldo ZIP completo sin contraseña; restauración que reemplaza todo, con un respaldo de seguridad previo, y que rechaza archivos manipulados (rutas peligrosas, entradas comprimidas o duplicadas, tamaños fuera de límite, falta de espacio). Lo cubre F8.
-- [ ] DT-09 **Ajustes**: reúnen notificaciones, respaldo y exportación, y las licencias de terceros (Apache 2.0 de HeroUI Native, OFL de Lexend, MIT de Phosphor y el resto). Lo cubre F9.
+- [~] DT-01 **Productos**: crear, editar, archivar y desarchivar; versiones con precio fijo o "a convenir"; costo opcional detrás de "agregar costo"; con una sola versión la UI no muestra el concepto. Lo cubren F1 y su E2E.
+- [~] DT-02 **Fotos**: hasta 6 por producto, desde la galería o la cámara, guardadas como JPEG de 1600 px y sin EXIF. Lo cubren F2, su E2E y la verificación manual F2.9.
+- [~] DT-03 **Ventas**: registrar con fecha (hoy por defecto, sin fechas futuras), ítems, y canal y nota opcionales; editar y borrar con confirmación; "Esta semana no vendí"; una venta en una semana marcada quita la marca. Lo cubren F3 y su E2E.
+- [~] DT-04 **Inicio y resumen mensual**: totales, comparación suave, últimas ventas, producto más vendido, canal principal y ganancia aproximada solo con costos cargados. Inicio no muestra consejos (D-11). Lo cubre F4.
+- [~] DT-05 **Calendario** por intensidad con el detalle del día, y **racha** semanal. Lo cubre F5.
+- [~] DT-06 **Consejos**: catálogo de 20 a 30 consejos con fuentes, mostrados de a uno después de guardar una venta, contextuales, y sección "Consejos" con los vistos marcados. Lo cubre F6.
+- [~] DT-07 **Notificaciones locales**: recordatorio semanal (domingo 20:00 por defecto, configurable o desactivable, con texto adaptado) que sigue llegando con un texto neutro aunque la app no se abra (D-13), y resumen mensual (día 1 a las 10:00, desactivable). Nunca llegan dos recordatorios semanales en la misma semana. El permiso se pide después de la primera venta y ningún texto culpa. Lo cubren F7 y la verificación manual en el dispositivo.
+- [~] DT-08 **Respaldo y exportación**: CSV de ventas y de productos (dos archivos); respaldo ZIP completo sin contraseña; restauración que reemplaza todo, con un respaldo de seguridad previo, y que rechaza archivos manipulados (rutas peligrosas, entradas comprimidas o duplicadas, tamaños fuera de límite, falta de espacio). Lo cubre F8.
+- [~] DT-09 **Ajustes**: reúnen notificaciones, respaldo y exportación, y las licencias de terceros (Apache 2.0 de HeroUI Native, OFL de Lexend, MIT de Phosphor y el resto). Lo cubre F9.
 
 **Calidad**
-- [ ] DT-10 V-BASE en verde sobre todo el repo: `tsc --noEmit` y `npx expo lint` sin errores, Prettier sin diferencias, y todos los tests de Jest (proyectos `node` y `ui`) en verde.
-- [ ] DT-11 V-DEPS sano y V-AUDIT sin vulnerabilidades altas o críticas sin justificar.
-- [ ] DT-12 (requiere entorno Android) Toda la suite de Maestro (`e2e/maestro/**`) pasa en el build `e2e` local de Android, incluidos los E2E de instalación nueva y de actualización.
-- [ ] DT-13 Cada migración tiene su test con datos previos y pasa por `configureAndMigrate`, con `foreign_key_check` limpio (ADR-006). El formato de respaldo v1 tiene *fixtures* válidos y adversariales en el repo (ADR-012).
-- [ ] DT-14 El reviewer no tiene hallazgos críticos ni importantes abiertos en ninguna feature.
+- [x] DT-10 V-BASE en verde sobre todo el repo: `tsc --noEmit` y `npx expo lint` sin errores, Prettier sin diferencias, y todos los tests de Jest (proyectos `node` y `ui`) en verde.
+- [x] DT-11 V-DEPS sano y V-AUDIT sin vulnerabilidades altas o críticas sin justificar.
+- [~] DT-12 (requiere entorno Android) Toda la suite de Maestro (`e2e/maestro/**`) pasa en el build `e2e` local de Android, incluidos los E2E de instalación nueva y de actualización.
+- [x] DT-13 Cada migración tiene su test con datos previos y pasa por `configureAndMigrate`, con `foreign_key_check` limpio (ADR-006). El formato de respaldo v1 tiene *fixtures* válidos y adversariales en el repo (ADR-012).
+- [x] DT-14 El reviewer no tiene hallazgos críticos ni importantes abiertos en ninguna feature.
 
 **Accesibilidad y rendimiento**
-- [ ] DT-15 Los flujos críticos (registrar venta, "no vendí", crear producto, ver resumen, respaldar) se recorren completos con TalkBack en el teléfono Android del usuario, y con el tamaño de fuente máximo del sistema sin texto cortado (F10.1).
-- [ ] DT-16 Todos los pares de tokens de texto y fondo cumplen WCAG AA en tema claro y oscuro, con un test automático (F0.12). La intensidad del calendario, lo elegido y los errores no dependen solo del color.
-- [ ] DT-17 Se cumplen los presupuestos de rendimiento que fija F10.0, en un Android de gama baja de referencia y con el conjunto grande de datos de prueba.
+- [~] DT-15 Los flujos críticos (registrar venta, "no vendí", crear producto, ver resumen, respaldar) se recorren completos con TalkBack en el teléfono Android del usuario, y con el tamaño de fuente máximo del sistema sin texto cortado (F10.1).
+- [x] DT-16 Todos los pares de tokens de texto y fondo cumplen WCAG AA en tema claro y oscuro, con un test automático (F0.12). La intensidad del calendario, lo elegido y los errores no dependen solo del color.
+- [~] DT-17 Se cumplen los presupuestos de rendimiento que fija F10.0, en un Android de gama baja de referencia y con el conjunto grande de datos de prueba.
 
 **Cierre local**
-- [ ] DT-18 Se completa el gate de cierre local de la v1 (F10.7).
-- [ ] DT-19 La app declara solo los permisos necesarios: cámara y notificaciones. Sin push remoto (`enableRemoteNotifications: false`), sin `SCHEDULE_EXACT_ALARM` y sin acceso a la galería completa.
-- [ ] DT-20 El usuario aprobó la v1 en el punto de control final (CP12). La v1 no se publica (D-23).
+- [~] DT-18 Se completa el gate de cierre local de la v1 (F10.7).
+- [~] DT-19 La app declara solo los permisos necesarios: cámara y notificaciones. Sin push remoto (`enableRemoteNotifications: false`), sin `SCHEDULE_EXACT_ALARM` y sin acceso a la galería completa.
+- [~] DT-20 El usuario aprobó la v1 en el punto de control final (CP12). La v1 no se publica (D-23).
 
 ---
 
@@ -888,12 +888,12 @@ F7+F8 ──► F9 Ajustes ──► F10 Cierre (accesibilidad, rendimiento, gat
 
 #### F3.8 — Revisión de ventas
 
-- [ ] F3.8
+- [x] F3.8
 - **Agente**: reviewer. **Foco extra**: la atomicidad de D-02; que las fechas sean siempre `LocalDate` obtenidas de `Clock` o `useToday`; las promesas no esperadas. **Depende de**: F3.2 a F3.7.
 
 #### F3.9 — E2E de ventas
 
-- [ ] F3.9
+- [~] F3.9
 - **Agente**: code-writer (a pedido del orquestador) + reviewer.
 - **Flujos** (`e2e/maestro/sales/`):
   - Registrar una venta por el camino más corto, en el número de toques de F3.1.
@@ -957,14 +957,14 @@ F7+F8 ──► F9 Ajustes ──► F10 Cierre (accesibilidad, rendimiento, gat
 
 #### F4.3 — Hooks de Inicio y resumen
 
-- [ ] F4.3
+- [x] F4.3
 - **Agente**: code-writer.
 - **Tests primero**: se piden solo los rangos necesarios; el hook de ganancia pide `currentCostsFor` solo con las versiones del rango y su key depende de `product_versions`; los agregados se calculan en el dominio y nunca en componentes; los datos se actualizan al guardar una venta, al cambiar un costo y al cambiar de semana con `useCurrentWeek`.
 - **Depende de**: F4.2, F3.5, F1.4.
 
 #### F4.4 — Componentes y pantallas de Inicio y resumen
 
-- [ ] F4.4
+- [x] F4.4
 - **Agente**: code-writer. **Archivos**: `src/features/tracking/{components,screens}/*`, `src/app/(tabs)/index.tsx` y `src/app/tracking/monthly.tsx`.
 - **Tests primero**:
   - El primer uso invita a registrar.
@@ -979,12 +979,12 @@ F7+F8 ──► F9 Ajustes ──► F10 Cierre (accesibilidad, rendimiento, gat
 
 #### F4.5 — Revisión
 
-- [ ] F4.5
+- [x] F4.5
 - **Agente**: reviewer. **Depende de**: F4.2 a F4.4.
 
 #### F4.6 — E2E de Inicio y resumen
 
-- [ ] F4.6
+- [~] F4.6
 - **Flujos** (`e2e/maestro/tracking/home-*.yaml`):
   - Con datos creados por los subflujos de F0.15 (en ventas de hoy y de días anteriores), Inicio muestra los totales esperados. *(Ajustado en F0.1: la semilla `basic` existe recién en F8.11.)*
   - Registrar una venta actualiza Inicio.
@@ -1023,7 +1023,7 @@ F7+F8 ──► F9 Ajustes ──► F10 Cierre (accesibilidad, rendimiento, gat
 
 #### F5.2 — Dominio de calendario y racha
 
-- [ ] F5.2
+- [x] F5.2
 - **Agente**: code-writer.
 - **Tests primero**:
   - La cuadrícula de un febrero que empieza en lunes y la de un mes que empieza en domingo.
@@ -1039,7 +1039,7 @@ F7+F8 ──► F9 Ajustes ──► F10 Cierre (accesibilidad, rendimiento, gat
 
 #### F5.3 — Hooks, componentes y pantallas
 
-- [ ] F5.3
+- [x] F5.3
 - **Agente**: code-writer. **Archivos**: `src/app/(tabs)/calendar.tsx` y `src/app/tracking/day/[date].tsx` (o lo que defina F5.0).
 - **Tests primero**:
   - La etiqueta accesible de cada día dice la fecha y lo vendido ("12 de noviembre, 45.000 pesos, 2 ventas").
@@ -1052,12 +1052,12 @@ F7+F8 ──► F9 Ajustes ──► F10 Cierre (accesibilidad, rendimiento, gat
 
 #### F5.4 — Revisión
 
-- [ ] F5.4
+- [x] F5.4
 - **Agente**: reviewer. **Foco extra**: el render del mes, sin listas virtualizadas anidadas. **Depende de**: F5.2 y F5.3.
 
 #### F5.5 — E2E de calendario y racha
 
-- [ ] F5.5
+- [~] F5.5
 - **Flujos** (`e2e/maestro/tracking/calendar-*.yaml`): ver los días marcados, con datos creados por los subflujos de F0.15 *(ajustado en F0.1)*; abrir el detalle de un día; marcar "no vendí" y ver la racha.
 - **Depende de**: F5.4. **Punto de control**: **CP6**.
 
@@ -1130,7 +1130,7 @@ F7+F8 ──► F9 Ajustes ──► F10 Cierre (accesibilidad, rendimiento, gat
 
 #### F6.4 — Catálogo de consejos
 
-- [ ] F6.4
+- [x] F6.4
 - **Agente**: code-writer. **Archivo**: `src/features/tips/domain/catalog.ts`.
 - **Tests primero** (sobre el contenido):
   - los ids son únicos y están en kebab-case;
@@ -1143,7 +1143,7 @@ F7+F8 ──► F9 Ajustes ──► F10 Cierre (accesibilidad, rendimiento, gat
 
 #### F6.5 — Repositorio, hooks e integración
 
-- [ ] F6.5
+- [x] F6.5
 - **Agente**: code-writer.
 - **Tests primero**:
   - `TipViewRepository` (integración) conserva `first_seen_at`.
@@ -1154,19 +1154,19 @@ F7+F8 ──► F9 Ajustes ──► F10 Cierre (accesibilidad, rendimiento, gat
 
 #### F6.6 — Pantallas y rutas de consejos
 
-- [ ] F6.6
+- [x] F6.6
 - **Agente**: code-writer. **Archivos**: `src/app/(tabs)/tips.tsx` y `src/app/tips/[id].tsx`.
 - **Tests primero**: un id desconocido lleva a la lista; el consejo de la confirmación se cierra y no vuelve a aparecer en esa venta.
 - **Depende de**: F6.2, F6.5.
 
 #### F6.7 — Revisión
 
-- [ ] F6.7
+- [x] F6.7
 - **Agente**: reviewer. **Depende de**: F6.3 a F6.6.
 
 #### F6.8 — E2E de consejos
 
-- [ ] F6.8
+- [~] F6.8
 - **Flujos** (`e2e/maestro/tips/`): sin costos cargados, la primera venta muestra el consejo de costos; cerrarlo; verlo marcado en "Consejos"; Inicio no muestra el consejo.
 - **Depende de**: F6.7. **Punto de control**: **CP7**.
 
@@ -1176,7 +1176,7 @@ F7+F8 ──► F9 Ajustes ──► F10 Cierre (accesibilidad, rendimiento, gat
 
 #### F7.0 — Diseño técnico de notificaciones
 
-- [ ] F7.0
+- [x] F7.0
 - **Agente**: architect. **Archivo**: `docs/architecture/notifications.md`.
 - **Objetivo**: aplicar ADR-011 con D-06 y D-07:
   - `planNotifications`, `diffNotifications`, `toExpoWeekday` y el catálogo de textos con las variantes `already_registered` y `neutral` (ADR-011);
@@ -1191,14 +1191,14 @@ F7+F8 ──► F9 Ajustes ──► F10 Cierre (accesibilidad, rendimiento, gat
 
 #### F7.1 — Especificación de pantallas de notificaciones
 
-- [ ] F7.1
+- [x] F7.1
 - **Agente**: designer.
 - **Objetivo**: la pantalla explicativa después de la primera venta (D-06), con "ahora no" y sin insistir; las preferencias del recordatorio semanal (día y hora) y del resumen mensual; el estado del permiso, con la opción de abrir los ajustes del sistema si está denegado.
 - **Depende de**: F7.0.
 
 #### F7.2 — Dominio de notificaciones
 
-- [ ] F7.2
+- [x] F7.2
 - **Agente**: code-writer.
 - **Tests primero**:
   - Valores por defecto: domingo 20:00 y día 1 a las 10:00.
@@ -1217,14 +1217,14 @@ F7+F8 ──► F9 Ajustes ──► F10 Cierre (accesibilidad, rendimiento, gat
 
 #### F7.3 — Repositorio de preferencias
 
-- [ ] F7.3
+- [x] F7.3
 - **Agente**: code-writer.
 - **Tests primero** (integración): sin fila devuelve los valores por defecto; guardar y leer; valida `weekday` entre 1 y 7 y `minuteOfDay` entre 0 y 1439; emite `notification_preferences`.
 - **Depende de**: F7.2.
 
 #### F7.4 — Adaptador de notificaciones
 
-- [ ] F7.4
+- [x] F7.4
 - **Agente**: code-writer. **Archivo**: `src/features/notifications/adapters/expo-notification-scheduler.ts` (ADR-005 prohíbe `expo-*` en `data/`). *(Ajustado en F0.1.)*
 - **Tests primero** (con `jest.mock` de `expo-notifications`):
   - En Android, el canal se crea antes de pedir el permiso.
@@ -1236,7 +1236,7 @@ F7+F8 ──► F9 Ajustes ──► F10 Cierre (accesibilidad, rendimiento, gat
 
 #### F7.5 — Reconciliación serializada y sus disparadores
 
-- [ ] F7.5
+- [x] F7.5
 - **Agente**: code-writer.
 - **Tests primero**:
   - Sin permiso no se programa nada.
@@ -1249,21 +1249,21 @@ F7+F8 ──► F9 Ajustes ──► F10 Cierre (accesibilidad, rendimiento, gat
 
 #### F7.6 — Respuesta al tocar una notificación
 
-- [ ] F7.6
+- [x] F7.6
 - **Agente**: code-writer.
 - **Tests primero**: un payload válido navega a `/sales/new` o a `/tracking/monthly` con el mes; uno inválido abre Inicio; la misma respuesta llegada por `useLastNotificationResponse` y por el listener se procesa una sola vez (por `request.identifier`) y después se llama a `clearLastNotificationResponseAsync`; no navega antes de que el router raíz esté listo; `setNotificationHandler` muestra un banner sin sonido; el listener se limpia.
 - **Depende de**: F7.5, F4.4, F3.7. **ADRs**: ADR-010.
 
 #### F7.7 — UI de preferencias
 
-- [ ] F7.7
+- [x] F7.7
 - **Agente**: code-writer.
 - **Tests primero**: cambiar el día y la hora se guarda y reconcilia; se puede desactivar; con el permiso denegado se muestra el estado y el acceso a los ajustes del sistema, sin insistir.
 - **Depende de**: F7.1, F7.5.
 
 #### F7.8 — Pedido de permiso después de la primera venta
 
-- [ ] F7.8
+- [x] F7.8
 - **Agente**: code-writer.
 - **Tests primero**:
   - La pantalla explicativa aparece solo en la primera venta y con el permiso en `undetermined`.
@@ -1274,12 +1274,12 @@ F7+F8 ──► F9 Ajustes ──► F10 Cierre (accesibilidad, rendimiento, gat
 
 #### F7.9 — Revisión
 
-- [ ] F7.9
+- [x] F7.9
 - **Agente**: reviewer. **Foco extra**: permisos mínimos, limpieza de listeners, la serialización y que no haya textos de culpa. **Depende de**: F7.2 a F7.8.
 
 #### F7.10 — E2E y verificación manual
 
-- [ ] F7.10
+- [~] F7.10
 - **E2E** (`e2e/maestro/notifications/`): la primera venta muestra la pantalla explicativa; "ahora no"; cambiar el día y la hora en preferencias.
 - **Manual** (Android, con la acción de prueba):
   - el recordatorio llega con el texto que corresponde a la semana;
@@ -1295,7 +1295,7 @@ F7+F8 ──► F9 Ajustes ──► F10 Cierre (accesibilidad, rendimiento, gat
 
 #### F8.0 — Diseño técnico de respaldo y exportación
 
-- [ ] F8.0
+- [x] F8.0
 - **Agente**: architect. **Archivo**: `docs/architecture/backup.md`.
 - **Objetivo**: aplicar ADR-012 en su versión revisada, con D-08, D-09 y D-10:
   - los mapeos entre dominio y `BackupDataV1`, y los esquemas Zod *strict*;
@@ -1311,7 +1311,7 @@ F7+F8 ──► F9 Ajustes ──► F10 Cierre (accesibilidad, rendimiento, gat
 
 #### F8.1 — Especificación de pantallas de respaldo y exportación
 
-- [ ] F8.1
+- [x] F8.1
 - **Agente**: designer.
 - **Objetivo**:
   - exportar los dos CSV (ícono `Export`);
@@ -1323,7 +1323,7 @@ F7+F8 ──► F9 Ajustes ──► F10 Cierre (accesibilidad, rendimiento, gat
 
 #### F8.2 — CSV
 
-- [ ] F8.2
+- [x] F8.2
 - **Agente**: code-writer. **Archivos**: `src/features/backup/domain/csv/*` y sus tests.
 - **Tests primero**:
   - Formato: comillas, `;`, saltos de línea y comillas dobles dentro de una celda (RFC 4180); BOM y CRLF; montos como enteros sin símbolo; fechas `AAAA-MM-DD`; encabezados en español.
@@ -1334,7 +1334,7 @@ F7+F8 ──► F9 Ajustes ──► F10 Cierre (accesibilidad, rendimiento, gat
 
 #### F8.3 — Parser ZIP puro, formato de respaldo y validación
 
-- [ ] F8.3
+- [x] F8.3
 - **Agente**: code-writer. **Archivos**: `src/features/backup/domain/zip/*` (o donde lo ubique F8.0), `src/features/backup/domain/format/*` y `__fixtures__/`.
 - **Tests primero**:
   - **CRC32** contra vectores conocidos.
@@ -1367,7 +1367,7 @@ F7+F8 ──► F9 Ajustes ──► F10 Cierre (accesibilidad, rendimiento, gat
 
 #### F8.4 — Adaptador de E/S de ZIP
 
-- [ ] F8.4
+- [x] F8.4
 - **Agente**: code-writer. **Archivo**: `src/features/backup/adapters/expo-archive-io.ts` (ADR-012: adaptador delgado sobre `FileHandle` de `expo-file-system`; o el nombre que fije F8.0). *(Ajustado en F0.1: antes decía `src/core/files/`.)*
 - **Tests primero** (proyecto `ui`, con `jest.mock` de `expo-file-system` y `expo-crypto`):
   - `openForRead` lee rangos por offset; `createForWrite` escribe en orden; escribir con el escritor puro y volver a leer produce bytes idénticos.
@@ -1379,7 +1379,7 @@ F7+F8 ──► F9 Ajustes ──► F10 Cierre (accesibilidad, rendimiento, gat
 
 #### F8.5 — Caso de uso de exportación del respaldo
 
-- [ ] F8.5
+- [x] F8.5
 - **Agente**: code-writer.
 - **Tests primero**:
   - Toma el lock de archivos y lo libera también si falla.
@@ -1393,7 +1393,7 @@ F7+F8 ──► F9 Ajustes ──► F10 Cierre (accesibilidad, rendimiento, gat
 
 #### F8.6 — Caso de uso de restauración
 
-- [ ] F8.6
+- [x] F8.6
 - **Agente**: code-writer.
 - **Tests primero** (integración, con la base en memoria y archivos falsos):
   - Un archivo válido produce la vista previa sin tocar nada.
@@ -1411,14 +1411,14 @@ F7+F8 ──► F9 Ajustes ──► F10 Cierre (accesibilidad, rendimiento, gat
 
 #### F8.7 — Hooks, componentes y pantallas de respaldo
 
-- [ ] F8.7
+- [x] F8.7
 - **Agente**: code-writer.
 - **Tests primero**: el progreso tiene un texto accesible; cada `RestoreError` tiene un mensaje en español sin tecnicismos; la confirmación es explícita; cancelar el selector de archivos no muestra un error.
 - **Depende de**: F8.1, F8.6, F8.2.
 
 #### F8.8 — Exportar desde la pantalla de error de arranque
 
-- [ ] F8.8
+- [x] F8.8
 - **Agente**: code-writer.
 - **Objetivo**: conectar la opción de F0.10 con la **exportación de emergencia** de ADR-006: copia cruda de la base con `backupDatabaseAsync` a un `.db` nuevo, más `photos/`, empaquetada con el escritor STORED y compartida. No usa el mapeo de dominio ni `BackupDataV1`; restaurar ese archivo no se soporta en la v1. *(Ajustado en F0.1: antes reutilizaba la exportación normal de F8.5.)*
 - **Tests primero**: la acción está disponible en los estados `failed` (también `newer_database`) y no escribe en la base; el ZIP contiene el `.db` y las fotos.
@@ -1426,12 +1426,12 @@ F7+F8 ──► F9 Ajustes ──► F10 Cierre (accesibilidad, rendimiento, gat
 
 #### F8.9 — Revisión
 
-- [ ] F8.9
+- [x] F8.9
 - **Agente**: reviewer. **Foco extra**: el parser frente a entradas hostiles, que nada escriba fuera de `photos/`, `safety/` y la caché con nombres derivados de ids validados, la atomicidad, el espacio libre y que no haya datos del negocio en los logs. **Depende de**: F8.2 a F8.8 y F8.11. *(Ajustado en F0.1.)*
 
 #### F8.10 — E2E y medición de respaldo
 
-- [ ] F8.10
+- [~] F8.10
 - **E2E** (`e2e/maestro/backup/`):
   - Exportar los dos CSV (se abre el menú de compartir).
   - Crear un respaldo.
@@ -1443,7 +1443,7 @@ F7+F8 ──► F9 Ajustes ──► F10 Cierre (accesibilidad, rendimiento, gat
 
 #### F8.11 — Semillas de E2E por restauración de *fixtures* *(agregada en F0.1)*
 
-- [ ] F8.11
+- [x] F8.11
 - **Agente**: code-writer.
 - **Objetivo**: implementar la semilla de ADR-013: la ruta oculta `cuantovendi://e2e/seed?fixture=<nombre>`, que existe solo con `EXPO_PUBLIC_E2E=1` (F0.15) y **restaura un respaldo *fixture* incluido en el bundle por el camino real de restauración** (F8.6). Los *fixtures* `basic` y `large` (por ejemplo, tres años de ventas, 200 productos y fotos) se generan con un script de Node a partir de fábricas puras y deterministas (`FakeClock`, `SequentialIdGenerator`) y del escritor ZIP puro de F8.3, y se versionan en `e2e/fixtures/`.
 - **Tests primero**: las fábricas producen entidades que pasan las validaciones del dominio y `BackupDataV1`; generar dos veces da bytes idénticos; el parser de F8.3 acepta los *fixtures*; con el *flag* en `false` la ruta no existe ni se empaquetan los *fixtures*.
@@ -1457,7 +1457,7 @@ F7+F8 ──► F9 Ajustes ──► F10 Cierre (accesibilidad, rendimiento, gat
 
 #### F9.0 — Diseño técnico y especificación de Ajustes
 
-- [ ] F9.0
+- [x] F9.0
 - **Agente**: architect (`docs/architecture/settings.md`) → designer (pantalla).
 - **Objetivo**: definir una pantalla que reúne:
   - las preferencias de notificación (F7.7);
@@ -1471,7 +1471,7 @@ F7+F8 ──► F9 Ajustes ──► F10 Cierre (accesibilidad, rendimiento, gat
 
 #### F9.1 — Implementación de Ajustes
 
-- [ ] F9.1
+- [x] F9.1
 - **Agente**: code-writer. **Archivos**: `src/features/settings/*`, `src/app/(tabs)/settings.tsx` y `src/app/settings/licenses.tsx`.
 - **Tests primero**: se muestran las secciones con sus estados; las licencias incluyen HeroUI Native, Lexend y Phosphor con su texto; un test falla si una dependencia de producción no tiene su licencia en la lista generada.
 - **Verificación**: V-UI, V-BASE.
@@ -1479,12 +1479,12 @@ F7+F8 ──► F9 Ajustes ──► F10 Cierre (accesibilidad, rendimiento, gat
 
 #### F9.2 — Revisión
 
-- [ ] F9.2
+- [x] F9.2
 - **Agente**: reviewer. **Depende de**: F9.1.
 
 #### F9.3 — E2E de Ajustes
 
-- [ ] F9.3
+- [~] F9.3
 - **Flujos** (`e2e/maestro/settings/`): navegar a cada sección y abrir las licencias.
 - **Depende de**: F9.2. **Punto de control**: **CP10**.
 
@@ -1494,7 +1494,7 @@ F7+F8 ──► F9 Ajustes ──► F10 Cierre (accesibilidad, rendimiento, gat
 
 #### F10.0 — Presupuestos de rendimiento
 
-- [ ] F10.0
+- [x] F10.0
 - **Agente**: architect.
 - **Objetivo**: fijar presupuestos de rendimiento medibles en el Android de referencia local (un teléfono de gama baja conectado o un emulador con recursos limitados):
   - el arranque en frío hasta que Inicio responde;
@@ -1507,7 +1507,7 @@ F7+F8 ──► F9 Ajustes ──► F10 Cierre (accesibilidad, rendimiento, gat
 
 #### F10.1 — Auditoría de accesibilidad
 
-- [ ] F10.1
+- [~] F10.1
 - **Agente**: designer (auditoría) + code-writer (correcciones con tests) + usuario (recorrido con TalkBack en su teléfono Android conectado).
 - **Checklist** (`accessibility.md` y sección 7 de `docs/design-system.md`):
   - roles y etiquetas en todo lo interactivo, y `accessibilityState` en los estados;
@@ -1525,7 +1525,7 @@ F7+F8 ──► F9 Ajustes ──► F10 Cierre (accesibilidad, rendimiento, gat
 
 #### F10.2 — Rendimiento en Android de gama baja
 
-- [ ] F10.2
+- [~] F10.2
 - **Agente**: code-writer (mediciones y correcciones) + reviewer.
 - **Objetivo**: medir con el conjunto `large`, en el build `e2e` local, contra los presupuestos de F10.0. Se usan el profiler de React DevTools, el profiler de Hermes y el monitor de rendimiento. Se revisan las listas, las imágenes, los renders, la memoria al navegar y el trabajo síncrono en el hilo de JS (el driver de SQLite y el CRC32).
 - **Aceptación**: se cumple DT-17. Cada optimización tiene su medición antes y después, y no se agrega memoización manual sin una medición que la justifique.
@@ -1537,7 +1537,7 @@ F7+F8 ──► F9 Ajustes ──► F10 Cierre (accesibilidad, rendimiento, gat
 
 #### F10.4 — Auditoría local de permisos y secretos
 
-- [ ] F10.4
+- [~] F10.4
 - **Agente**: code-writer + reviewer.
 - **Objetivo**:
   - comprobar que el `app.json` y el manifiesto generado declaran solo cámara y notificaciones (DT-19), con sus textos en español;
@@ -1547,7 +1547,7 @@ F7+F8 ──► F9 Ajustes ──► F10 Cierre (accesibilidad, rendimiento, gat
 
 #### F10.5 — Regresión E2E completa
 
-- [ ] F10.5
+- [~] F10.5
 - **Agente**: code-writer (a pedido del orquestador) + reviewer.
 - **Objetivo**: correr toda la suite de `e2e/maestro/` localmente en el build `e2e` de Android, más los E2E de instalación nueva y de **actualización desde el build de CP1** (V-E2E-UPG).
 - **Aceptación**: se cumple DT-12.
@@ -1555,14 +1555,14 @@ F7+F8 ──► F9 Ajustes ──► F10 Cierre (accesibilidad, rendimiento, gat
 
 #### F10.6 — Prueba en el teléfono del usuario
 
-- [ ] F10.6
+- [~] F10.6
 - **Agente**: usuario, guiado por el orquestador.
 - **Objetivo**: recorrer todos los flujos críticos en el teléfono Android del usuario conectado a este entorno, incluidas las notificaciones reales, la cámara, compartir y restaurar. La verificación en iOS queda para el futuro (sección 10).
 - **Depende de**: F10.5.
 
 #### F10.7 — Gate de cierre local de la v1
 
-- [ ] F10.7
+- [~] F10.7
 - **Agente**: reviewer (verifica) + orquestador (consolida).
 - **Checklist** (sección 1.2):
   - `npm run typecheck` y `npm run lint` limpios;
@@ -1731,3 +1731,57 @@ Quien cierra una tarea agrega aquí una fila (la más reciente al final). La col
 | 2026-11-13 | F2.8 / F2.9 / CP3 | code-writer | `[~]` 3 flujos Maestro de fotos escritos; verificación manual de EXIF/orientación y permisos sobre APK pendientes de entorno | CP3 registrado. |
 | 2026-11-13 | F3.6 | code-writer | V-BASE ok | DatePickerSheet, Amount total, ChipGroup allowDeselect, QuantityStepper editable, monthGrid. 'de nuevo' en vez de 'otra vez' (patrón de culpa). Algunos helpers escritos junto con sus tests (desvío TDD). |
 | 2026-11-13 | F3.7 | code-writer | V-BASE ok · rutas de ventas probadas (6) | `renderAfterSave`/`focusDone` ya expuestos para F6.5. Botón 'Registrar venta' de Inicio conectado. |
+| 2026-11-13 | F3.8 | reviewer + code-writer | 'F3 aprobado' (D-02 atómico, fechas vía Clock/useToday, sin promesas sueltas); 4 importantes + 8 menores corregidos · V-BASE ok · jest 1893 tests · test:tz ok | `runAsPromise` a core/db; lint impide imports entre features por ruta relativa; `goBackOrHome`; selector virtualizado (hoja con FlatList, inline máx. 20 con buscador). Tests inestables bajo carga (`products-routes`, `sale-form` con 100 filas): revisar en F10.5. |
+| 2026-11-13 | F3.9 / CP4 | code-writer | `[~]` 7 flujos Maestro de ventas escritos (rama lunes/martes en no-sales); sin ejecutar | CP4 registrado. |
+| 2026-11-13 | F4.3 | code-writer | V-BASE ok · jest 181 suites / 1893 tests · test:tz ok | Una sola consulta para Inicio; costos solo de ítems sin unitCost; `useStreak` creado (reutilizar en F5). |
+| 2026-11-13 | F4.4 | code-writer | V-BASE ok | AmountSentence, formatShortDateLabel, ListRow.accessibilityHint. Sin consejos en Inicio (D-11). |
+| 2026-11-13 | F4.5 | code-writer | V-BASE ok · 8 tests de ruta de `/tracking/monthly` | F4 no tiene tarea de revisión propia: la revisión de F5.4 cubre F4.3–F4.5 (decisión del orquestador). |
+| 2026-11-13 | F4.6 / CP5 | code-writer | `[~]` 4 flujos Maestro de tracking escritos; sin ejecutar | CP5 registrado. |
+| 2026-11-13 | F6.4 | code-writer | Catálogo de 30 consejos con tests de contenido (ids, categorías, límites 50/240, culpa, ≥3 por categoría) y fidelidad con consejos.md | Hecho junto con F6.3. CP7a: contenido pendiente de revisión del usuario. |
+| 2026-11-13 | F7.0 | architect | `docs/architecture/notifications.md` | ADR-011 enmendado (dedupe por id+fecha, `unrecognized`, `month` en payload, permisos). Preguntas → D-43. Bloqueado `c2dm.RECEIVE` en app.json. Instalado `expo-notifications` ~58.1.9. |
+| 2026-11-13 | F8.0 | architect | `docs/architecture/backup.md` | Condición de parada (`expo-asset` para F8.11) resuelta por el orquestador: enmienda de ADR-016, instalado ~58.0.21. ADR-012 enmendado. `large.zip` no se versiona (se genera). Preguntas → D-44. Instalados `expo-sharing`, `expo-document-picker`. |
+| 2026-11-13 | F5.2 | code-writer | jest 206 suites / 2066 tests (maxWorkers=3) · test:tz ok · lint/typecheck limpios en tracking | `monthGridRange` agregado; intensidad 1–3 con bordes probados; racha en cambio de semana con FakeClock. |
+| 2026-11-13 | F5.3 | code-writer | ídem | `/tracking/day/[date]`, `/sales/new?date=` (initialSoldOn). Botones 'no vendí' con texto largo (ButtonBase sin etiqueta accesible propia). Timeouts de 5 s bajo carga: el orquestador fija `maxWorkers: '50%'` y `testTimeout: 15000` en jest.config. |
+| 2026-11-13 | F6.5 | code-writer | jest 208 suites / 2087 tests (maxWorkers=3) · test:tz ok · sin errores en tips | Tarjeta después de la venta (vista al mostrarse, X, foco a 'Listo'), solo en ventas nuevas. |
+| 2026-11-13 | F6.6 | code-writer | ídem · 6 tests de ruta | El agente revirtió por error cambios de app.json (bloqueo c2dm, plugins expo-sharing/expo-asset); restaurados por el orquestador y regla agregada en CLAUDE.md. |
+| 2026-11-13 | F7.1 | designer | `docs/design/notifications.md` (~590 textos sin patrones de culpa) | Preguntas → D-45. El PNG del ícono de notificación (96×96 blanco) se genera en F7.4. |
+| 2026-11-13 | F8.1 | designer | `docs/design/backup.md` | `prepareRestore` devuelve un código propio para la copia de emergencia (decisión del orquestador, en vez de detectar por nombre). Componentes: SwitchRow, ProgressBlock, InlineNotice.tone, usePreventLeave. Íconos de lanzador/adaptiveIcon de plantilla: resolver en F10. |
+| 2026-11-13 | F5.4 | reviewer | 'F4+F5 aprobados': 0 críticos, 0 importantes, 9 menores · jest 221 suites / 2345 tests · test:tz ok · lint/typecheck limpios en lo revisado | Cubre también F4.3–F4.5. Menores (un solo proveedor de 'hoy', guard de doble toque, etiqueta accesible en ButtonBase, archivado falso, Thumbnail como función, regla de navegación en dominio, test de listas virtualizadas, a11y iOS de relleno, doble anuncio) → lote de pulido antes de F10. |
+| 2026-11-13 | F5.5 / CP6 | code-writer | `[~]` 3 flujos Maestro de calendario escritos; sin ejecutar | CP6 registrado. |
+| 2026-11-13 | F6.7 | reviewer | 'F6 aprobado': 3 importantes (padding del encabezado, Volver sin historial, dependencia tips→sales) + 10 menores | Dependencia tips→sales aceptada en ADR-005; el resto se corrige ahora. |
+| 2026-11-13 | F7.2 | code-writer | typecheck 0 · format ok · test:tz ok (3 zonas) · D-13 probado en ~1.200 combinaciones · nunca >64 pendientes | `expo-weekday.ts` → `to-expo-weekday.ts` por el lint de dominio. |
+| 2026-11-13 | F7.3 | code-writer | V-DB sin cambios · contrato Drizzle + doble | Fila inválida → valores por defecto + log. Implementado sin correr el rojo por separado (desvío TDD, para el reviewer F7.9). |
+| 2026-11-13 | F8.2 | code-writer | typecheck 0 · format ok · jest 224 suites / 2379 tests · test:tz ok · lint limpio en backup | CSV con BOM, `;`, CRLF, prefijo contra fórmulas. `productListSortKey` exportado de products. |
+| 2026-11-13 | F8.3 | code-writer | ídem · fixtures adversariales para todos los códigos de rechazo (traversal, comprimidas, duplicadas, solapes, bytes escondidos, segundo EOCD, ZIP64, cifrado, zip bomb) · PK dentro de JPEG se lee bien | ZIP de herramienta estándar generado con `zipfile` de Python (no hay `zip`). Fixtures v1 congelados. Parte de utf8/formato/reader escrita junto con sus tests (desvío TDD, para el reviewer F8.9). |
+| 2026-11-13 | F6.7 (correcciones) | code-writer | V-BASE ok · jest 224 suites / 2386 tests · test:tz ok | Encabezado fuera del SectionList; Volver sin historial → `/tips`; patrones de culpa ampliados (aún no, no has, dejaste de, te falta, hace … que no) con normalización sin tildes: ningún texto real los activa. `listAll` descarta filas inválidas con log. |
+| 2026-11-13 | F6.8 / CP7 | code-writer | `[~]` 4 flujos Maestro de consejos escritos; sin ejecutar | CP7a y CP7 registrados. |
+| 2026-11-13 | F5.4 (pulido de menores) | code-writer | jest tracking 242 tests · test:tz ok · sin errores propios | Un solo `TodayProvider` (un timer y un listener para toda la app); `ButtonBase.accessibilityLabel`; reglas de navegación del calendario en dominio; test de re-render de una sola celda. RNTL 14 no tiene `UNSAFE_*`. |
+| 2026-11-13 | F7.4 | code-writer | V-BASE completo (orquestador): typecheck 0 · lint 0 · prettier ok · jest 266 suites / 2773 tests · test:tz ok · doctor 20/20 | Plugin expo-notifications en app.json (sin quitar nada). Ícono 96×96 generado con `tools/assets/generate-notification-icon.py`. AAR declara solo RECEIVE_BOOT_COMPLETED y POST_NOTIFICATIONS; WAKE_LOCK no se bloquea (permiso normal, riesgo de SecurityException): revisar en el manifiesto fusionado cuando haya entorno. |
+| 2026-11-13 | F7.5 | code-writer | ídem | Cola serializada probada con scheduler lento; disparadores por tablas, primer plano y permiso. |
+| 2026-11-13 | F7.6 | code-writer | ídem | Dedupe id@fecha; espera navegación lista. `clearLastNotificationResponse` síncrono (la versión async está deprecada). |
+| 2026-11-13 | F7.7 | code-writer | ídem | `/settings/notifications`; SwitchRow, InlineNotice.tone, ListRow.trailing. |
+| 2026-11-13 | F7.8 | code-writer | ídem | Explicación solo tras 'Listo' en la primera venta con permiso sin decidir. 10 flujos Maestro ajenos ahora cierran la explicación. Mock global de expo-notifications en jest.setup. Algunos adaptadores escritos junto con sus tests (desvío TDD, para F7.9). |
+| 2026-11-13 | F8.4 | code-writer | ídem | Adaptadores de archivo/compartir; `PhotoStorage.partialUriFor`/`promotePartial`; `isCacheUri` en core/files. |
+| 2026-11-13 | F8.5 | code-writer | ídem | Exportación de respaldo con lock, sha desde disco, foto sin archivo exportada como borrada. CSV. Se verifica 'compartir disponible' antes de escribir. |
+| 2026-11-13 | F8.8 | code-writer | ídem | Exportación de emergencia desde la pantalla de error (`backupDatabaseAsync` con copia cruda de respaldo); el lector de restauración la rechaza a propósito. Ruta sin `file://` verificada solo en Android. |
+| 2026-11-14 | F7.9 | reviewer + code-writer | Revisión: 1 crítico (la cola podía correr dos reconciliaciones a la vez, reproducido) + 2 importantes (doble aviso al cambiar de día a mitad de semana; doble toque en Activar) + 8 menores, corregidos · V-BASE completo (orquestador): typecheck 0 · lint 0 · prettier ok · jest 274 suites / 2893 tests · V-DB sin cambios · test:tz ok | D-13 se cumple siempre: columna `last_weekly_fire_at` con **migración 0001** (con test de datos previos). Enmiendas en ADR-007 y ADR-011. |
+| 2026-11-14 | F7.10 / CP8 | code-writer | `[~]` 4 flujos Maestro de notificaciones escritos (requieren Android 13+); sin ejecutar. La migración 0001 exige V-E2E-UPG al cierre (pendiente de entorno) | CP8 registrado. |
+| 2026-11-14 | F8.6 | code-writer | V-BASE completo (orquestador): typecheck 0 · lint 0 · prettier ok · jest 274 suites / 2893 tests · V-DB sin cambios | Restauración validada (contenido, entradas = manifest, CRC/sha, esquema, integridad, fotos), respaldo de seguridad previo (D-22), fotos a `.part` con sha antes del commit, reemplazo en una transacción sin tocar preferencias. Código `emergency_backup`. Decisión del orquestador: agregar código `current_data_too_large` (en F8.7) en vez de lanzar si el respaldo de seguridad excede los límites. |
+| 2026-11-14 | F8.11 | code-writer | V-BASE completo (orquestador): typecheck 0 · lint 0 · prettier ok · jest 274 suites / 2893 tests · V-DB sin cambios · bundle release sin zips ni textos de la semilla (verificado) | `basic.zip` versionado; `large.zip` generado con `npm run e2e:fixtures` e ignorado. Falta un test que restaure `basic.zip` por el flujo real: se agrega en F8.7. |
+| 2026-11-14 | F9.0 | architect + designer | `docs/architecture/settings.md`, ADR-018 (licencias, aceptado por el orquestador), `docs/design/settings.md` (textos sin patrones de culpa) | D-46. ADR-013 enmendado (no-restricted-globals fetch/XHR/WebSocket). Preguntas del designer aceptadas: `CardListItem`/`CardListSeparator` a shared/ui; 'Apagados' tiene prioridad en `summarizeReminders`. F9.1 espera a que cierre F8.7 (comparten la pantalla de Ajustes). |
+| 2026-11-14 | F10.0 | architect | `docs/architecture/performance-budgets.md` · medido aquí: `.hbc` release 7.879.806 B (umbral 9.000.000) · CRC32 48,5 MiB ≈ 5 s con `--jitless` en Node | Riesgo: exportar/restaurar `large` por CRC32 en JS. Decisiones del orquestador: umbrales aceptados como provisionales (aprobación final del usuario en CP11); marcas internas aprobadas (enmienda ADR-013); en F10.2 se aplican ya el bucle por índice del CRC32, ceder la UI entre bloques y las fuentes por subruta (~390 KB); 50 MP en Android 7 y APK se deciden con medición en el teléfono. Recomendado teléfono físico de 2 GB para DT-17. |
+| 2026-11-14 | F8.7 | code-writer | typecheck 0 · lint 0 · prettier ok · jest 292 suites / 3082 tests · test:tz ok | Pantalla Respaldo completa; `current_data_too_large`; test que restaura `basic.zip` por el flujo real (5 productos, 2 fotos). `DocumentPicker` puerto y adaptador; `BackupFiles.restoreCopyTarget`. Un fallo intermitente no identificado en una corrida de `npm test` (pasa en las siguientes): vigilar en F10.5. Algunos tests escritos junto con su código (desvío TDD, para F8.9). |
+| 2026-11-14 | F9.1 | code-writer | typecheck 0 · lint 0 (con no-restricted-globals) · prettier ok · jest 313 suites / 3327 tests · test:tz ok · licenses:check ok (81 paquetes) | `CardListItem` en shared/ui; resúmenes de Recordatorios/Respaldo; licencias generadas con test de frescura. Excepción `metro-runtime` con texto de react-native y copyright de `standard-navigation` sin verificar en la web: para el reviewer F9.2. Algunos tests escritos junto con su código (desvío TDD). |
+| 2026-11-14 | F8.9 | reviewer + code-writer | 'F8 aprobado': 0 críticos, 1 importante (doble toque en restaurar) + 11 menores, corregidos · typecheck 0 · lint 0 · prettier ok · jest 313 suites / 3327 tests · test:tz ok · bundle release sin fixtures (verificado) | CRC32 sin JIT 4,3 s → 3,1 s (48,5 MiB, escritorio). `inconsistent_data`, `countActive`, `clearEmergencyDirectory`; backup.md actualizado por el orquestador. |
+| 2026-11-14 | F8.10 / CP9 | code-writer | `[~]` 4 flujos Maestro de respaldo escritos; medición de exportar/restaurar `large` en el teléfono pendiente de entorno | CP9 registrado. |
+| 2026-11-14 | F9.2 (correcciones) | code-writer | lint 0 · test:tz ok · licenses:check ok (81) · introspect `allowBackup=false` · tests propios en verde | Decisión del orquestador: `android.allowBackup=false` (la nota de privacidad era falsa con Auto Backup) + test de configuración; enmienda ADR-016. Regla de red endurecida (globalThis/global/window/self, computado, desestructuración, URLs, `Linking.openURL`); enmienda ADR-013. Párrafos de Apache legibles; parser SPDX estricto; Apache canónico. V-BASE completo pendiente de las correcciones de accesibilidad en curso. |
+| 2026-11-14 | F10.2 | code-writer | `[~]` parte local hecha: assets 729.914 → 337.166 B (Lexend por subruta), `.hbc` 8.004.770 B (≤ 9 MB) · EXPLAIN QUERY PLAN sobre `large`: sin SCAN completo de sale_records/sale_items (sin migración 0002) · marcas `perfMark` solo en build e2e (verificado con expo export) · 4 flujos Maestro de medición + `tools/perf/parse-marks.js` | Mediciones P1–P7 en dispositivo pendientes del usuario (Android Studio). |
+| 2026-11-14 | F9.2 | reviewer + code-writer | V-BASE completo (reviewer, subagente): typecheck 0 · lint 0 · prettier ok · jest 322 suites / 3493 tests · test:tz ok (3 zonas) · V-DB sin cambios · licenses:check ok (81) · doctor 20/20 | 2 bloqueantes (allowBackup, evasión de la regla de red) + 2 importantes + 8 menores corregidos. |
+| 2026-11-14 | F9.3 / CP10 | code-writer | `[~]` 3 flujos Maestro de Ajustes escritos; sin ejecutar | CP10 registrado. |
+| 2026-11-14 | F10.1 | designer + code-writer | `[~]` auditoría (26 hallazgos) y correcciones de los 5 altos, 12 medios y bajos de código, con tests · V-BASE completo (reviewer, subagente): typecheck 0 · lint 0 · prettier ok · jest 322 suites / 3493 tests · test:tz ok (3 zonas) · V-DB sin cambios · licenses:check ok (81) · doctor 20/20 | Decisiones: toast oculto al lector + announce único; ConfirmDialog sobre Modal de RN; pestañas en 2 líneas a 1,3×. Recorrido con TalkBack (sección 6 de `docs/design/accessibility-audit.md`) pendiente del usuario. El foco no vuelve al botón que abrió el diálogo (anotado). |
+| 2026-11-14 | F10.4 | reviewer + code-writer | `[~]` sin secretos (archivos e historial); 3 importantes corregidos: INTERNET quitado del release (plugin), exclusión de cloud-backup y device-transfer (plugin `dataExtractionRules` + `fullBackupContent`), regla de red ampliada (`expo/fetch`, descargas de expo-file-system); ATS e `bundleIdentifier` de iOS · typecheck 0 · lint 0 · prettier ok · jest 324 suites / 3521 tests | Pendiente de entorno: `aapt dump permissions` del APK e2e (manifiesto fusionado, WAKE_LOCK). Enmiendas ADR-013 y ADR-016. |
+| 2026-11-14 | F10.5 | — | `[~]` regresión E2E completa pendiente: el usuario la hará con Android Studio | Entorno instalado (SDK, NDK, CMake, Maestro 2.12.1, AVD API 34); el usuario pidió no correr E2E en el emulador. |
+| 2026-11-14 | F10.6 | usuario | `[~]` prueba en el teléfono pendiente del usuario | — |
+| 2026-11-15 | F10.7 (gate local, 1ª pasada) | reviewer | typecheck 0 · lint 0 · prettier ok · jest 324 suites / 3521 tests · test:tz ok · V-DB sin cambios · licenses ok (81) · doctor 20/20 · audit sin altas/críticas · `.hbc` 8.011.391 B · bundle sin textos E2E (26 buscados, UTF-8 y UTF-16) | 4 importantes (prebuild en scripts, `check-jpeg-metadata`, `upgrade-verify` sin datos, miniaturas UX-F7) en corrección. DT-10/11/13/16 cumplidos; el resto `[~]` pendiente del usuario. Íconos de lanzador y splash: fuera de alcance v1 (sección 10). Guía: `docs/v1-pendiente-usuario.md`. |
+| 2026-11-15 | F10.7 (gate local, cierre) / CP11 | code-writer + orquestador | typecheck 0 · lint 0 · prettier ok · jest 326 suites / 3548 tests · test:tz ok · licenses ok (81) | 4 importantes del gate cerrados: prebuild automático en `android`/`android:release`/`e2e:build` (con test); `tools/photos/check-jpeg-metadata.mjs` (11 tests); `upgrade-seed` + `upgrade-verify` con datos; miniaturas en Productos y Archivados. DT-14 cumplido. **v1 lista localmente; `[~]` pendiente de verificación en dispositivo por el usuario** (guía `docs/v1-pendiente-usuario.md`) y aprobación final CP12. |
+| 2026-11-15 | F10.5 (emulador) | code-writer | `[~]` maestro 38/38 flujos en `cuantovendi_api34` (+ `release-has-no-e2e` OK en release limpio) · 3 bugs de la app corregidos con test (SafeAreaView sin estilos en Android, `toSorted` ausente en Hermes, permiso de notificaciones nunca "undetermined" en Android) · flujos YAML ajustados a la UI real | V-E2E-UPG (actualización) no ejecutado: el build `ef90f82` tiene el bug de SafeAreaView (Productos en blanco) y no permite cargar datos por la UI. Pendiente del usuario: teléfono, TalkBack, notificaciones reales. |

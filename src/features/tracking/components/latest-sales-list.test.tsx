@@ -1,4 +1,5 @@
 import { screen, userEvent } from '@testing-library/react-native';
+import { AccessibilityInfo } from 'react-native';
 
 import { buildSaleRecordView, type SaleRecordView } from '@/features/sales';
 import {
@@ -62,7 +63,7 @@ describe('LatestSalesList', () => {
     );
 
     expect(screen.getByRole('header', { name: 'Últimas ventas' })).toBeOnTheScreen();
-    expect(screen.getByLabelText('15.000 pesos')).toBeOnTheScreen();
+    expect(screen.getByText('$15.000', { includeHiddenElements: true })).toBeOnTheScreen();
   });
 
   it('opens the detail of the pressed sale', async () => {
@@ -97,9 +98,11 @@ describe('LatestSalesList', () => {
       />,
     );
 
-    expect(screen.getByText('Hoy')).toBeOnTheScreen();
-    expect(screen.getByText('Ayer')).toBeOnTheScreen();
-    expect(screen.getByText('28 de diciembre de 2025')).toBeOnTheScreen();
+    expect(screen.getByText('Hoy', { includeHiddenElements: true })).toBeOnTheScreen();
+    expect(screen.getByText('Ayer', { includeHiddenElements: true })).toBeOnTheScreen();
+    expect(
+      screen.getByText('28 de diciembre de 2025', { includeHiddenElements: true }),
+    ).toBeOnTheScreen();
     expect(
       screen.getByRole('button', {
         name: 'Lámina Colibrí, hoy, viernes 13 de noviembre, 15.000 pesos',
@@ -131,7 +134,9 @@ describe('LatestSalesList', () => {
       />,
     );
 
-    expect(screen.getByText('Lámina Colibrí y 2 más')).toBeOnTheScreen();
+    expect(
+      screen.getByText('Lámina Colibrí y 2 más', { includeHiddenElements: true }),
+    ).toBeOnTheScreen();
     expect(
       screen.getByRole('button', {
         name: 'Lámina Colibrí y 2 más, hoy, viernes 13 de noviembre, 45.000 pesos',
@@ -153,7 +158,7 @@ describe('LatestSalesList', () => {
       />,
     );
 
-    expect(screen.getByText('Hoy · Archivado')).toBeOnTheScreen();
+    expect(screen.getByText('Hoy · Archivado', { includeHiddenElements: true })).toBeOnTheScreen();
     expect(
       screen.getByRole('button', { name: /^Taza, .*archivado, 1\.000 pesos$/ }),
     ).toBeOnTheScreen();
@@ -173,7 +178,7 @@ describe('LatestSalesList', () => {
       />,
     );
 
-    expect(screen.getByText('A4 · Hoy')).toBeOnTheScreen();
+    expect(screen.getByText('A4 · Hoy', { includeHiddenElements: true })).toBeOnTheScreen();
   });
 
   it('calls an unknown product "Producto sin nombre"', async () => {
@@ -193,7 +198,9 @@ describe('LatestSalesList', () => {
       />,
     );
 
-    expect(screen.getByText('Producto sin nombre')).toBeOnTheScreen();
+    expect(
+      screen.getByText('Producto sin nombre', { includeHiddenElements: true }),
+    ).toBeOnTheScreen();
   });
 
   it('shows a record with a total of $0', async () => {
@@ -208,7 +215,22 @@ describe('LatestSalesList', () => {
       />,
     );
 
-    expect(screen.getByLabelText('0 pesos')).toHaveTextContent('$0');
+    expect(screen.getByText('$0', { includeHiddenElements: true })).toHaveTextContent('$0');
+  });
+
+  it('announces the load error as a problem', async () => {
+    const announce = jest.spyOn(AccessibilityInfo, 'announceForAccessibility');
+    await renderUi(
+      <LatestSalesList
+        status="error"
+        sales={[]}
+        today={today}
+        onOpenSale={jest.fn()}
+        onRetry={jest.fn()}
+      />,
+    );
+
+    expect(announce).toHaveBeenCalledWith('No se pudieron cargar tus últimas ventas.');
   });
 
   it('shows a notice with a retry when the latest sales failed to load', async () => {

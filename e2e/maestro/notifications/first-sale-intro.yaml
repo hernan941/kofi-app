@@ -1,0 +1,28 @@
+appId: com.cuantovendi.local
+tags:
+  - notifications
+---
+# Needs an Android 13+ emulator: before that the permission is granted by default and the
+# explanation is never offered. The system dialog is never opened (Maestro does not control it).
+# The permission is left undecided: "clearState" resets it.
+- runFlow: ../_shared/launch-clean.yaml
+- runFlow:
+    file: ../_shared/create-product.yaml
+    env:
+      PRODUCT_NAME: 'Lámina Colibrí'
+      PRODUCT_PRICE: '15000'
+- runFlow:
+    file: ../_shared/register-sale.yaml
+    env:
+      PRODUCT_ROW: 'Lámina Colibrí.*'
+- assertVisible: '¡Registraste tu primera venta!'
+- assertNotVisible: '¿Te recordamos anotar tus ventas?'
+- tapOn: 'Listo'
+- assertVisible: '¿Te recordamos anotar tus ventas?'
+- assertVisible: 'Un aviso por semana, los domingos a las 20:00.'
+- assertVisible: 'El día 1 de cada mes, tu resumen del mes anterior.'
+- assertVisible: 'Nunca te llega más de un recordatorio por semana.'
+- assertVisible: 'Activar recordatorios'
+- tapOn: 'Ahora no'
+- assertVisible: 'Registrar venta'
+- assertNotVisible: '¿Te recordamos anotar tus ventas?'

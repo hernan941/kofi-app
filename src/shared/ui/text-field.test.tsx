@@ -75,4 +75,36 @@ describe('TextField', () => {
       'Lo que te costó hacerlo',
     );
   });
+
+  it('is named by accessibilityLabel for the screen reader while the visible label stays', async () => {
+    await renderUi(
+      <TextField
+        label="Precio de cada uno"
+        accessibilityLabel="Precio de cada uno de Lámina Colibrí"
+        value=""
+        onChangeText={jest.fn()}
+      />,
+    );
+
+    expect(screen.getByLabelText('Precio de cada uno de Lámina Colibrí')).toBeOnTheScreen();
+    expect(
+      screen.getByText('Precio de cada uno', { includeHiddenElements: true }),
+    ).toBeOnTheScreen();
+  });
+
+  it('does not announce its error when canAnnounceError says no', async () => {
+    const spy = jest.spyOn(AccessibilityInfo, 'announceForAccessibility');
+    await renderUi(
+      <TextField
+        label="Nombre"
+        value=""
+        onChangeText={jest.fn()}
+        error="Completa este campo"
+        canAnnounceError={() => false}
+      />,
+    );
+
+    expect(screen.getByText('Completa este campo')).toBeOnTheScreen();
+    expect(spy).not.toHaveBeenCalled();
+  });
 });

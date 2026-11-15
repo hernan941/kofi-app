@@ -202,5 +202,15 @@ export function createExpoPhotoStorage(logger: Logger): PhotoStorage {
       attempt(() => {
         deleteIfExists(partialFile(id));
       }),
+    partialUriFor: (id) => partialFile(id).uri,
+    promotePartial: (id) =>
+      attempt(() => {
+        const partial = partialFile(id);
+        const destination = photoFile(id);
+        if (destination.exists) {
+          throw new Error('The photo file already exists and photos are immutable.');
+        }
+        return { partial, destination };
+      }).then(({ partial, destination }) => partial.move(destination)),
   };
 }

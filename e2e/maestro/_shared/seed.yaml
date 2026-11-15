@@ -1,0 +1,6 @@
+appId: com.cuantovendi.local
+---
+- openLink: cuantovendi://e2e/seed?fixture=${FIXTURE}
+- extendedWaitUntil:
+    visible: 'Datos de prueba cargados: ${FIXTURE}'
+    timeout: 120000

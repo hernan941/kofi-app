@@ -1,18 +1,18 @@
-import {
-  Lexend_400Regular,
-  Lexend_500Medium,
-  Lexend_600SemiBold,
-  Lexend_700Bold,
-  useFonts,
-} from '@expo-google-fonts/lexend';
+import { Lexend_400Regular } from '@expo-google-fonts/lexend/400Regular';
+import { Lexend_500Medium } from '@expo-google-fonts/lexend/500Medium';
+import { Lexend_600SemiBold } from '@expo-google-fonts/lexend/600SemiBold';
+import { Lexend_700Bold } from '@expo-google-fonts/lexend/700Bold';
+import { useFonts } from '@expo-google-fonts/lexend/useFonts';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect, useReducer, type ReactNode } from 'react';
 
 import type { BootFailure, MigrationResult } from '@/core/db/configure-and-migrate';
 import { err } from '@/shared/domain/result';
+import { perfMark } from '@/shared/lib/perf-marks';
 import { BootErrorScreen } from '@/shared/ui';
 
 import { bootReducer, isBootSettled } from './boot/boot-machine';
+import { useEmergencyExport, type ExportEmergency } from './boot/use-emergency-export';
 import { useDependencies } from './dependencies-context';
 
 const LEXEND_FONTS = {
@@ -36,8 +36,19 @@ function runMigrationOnce(migrateDatabase: MigrateDatabase): Promise<MigrationRe
     return existing;
   }
   const started = Promise.resolve()
-    .then(migrateDatabase)
-    .catch((cause: unknown): MigrationResult => err({ kind: 'migration_failed', cause }));
+    .then(() => {
+      if (process.env.EXPO_PUBLIC_E2E === '1') {
+        perfMark('boot:migrate:start');
+      }
+      return migrateDatabase();
+    })
+    .catch((cause: unknown): MigrationResult => err({ kind: 'migration_failed', cause }))
+    .then((result) => {
+      if (process.env.EXPO_PUBLIC_E2E === '1') {
+        perfMark('boot:migrate:end');
+      }
+      return result;
+    });
   migrationRuns.set(migrateDatabase, started);
   return started;
 }
@@ -51,6 +62,8 @@ export interface MigrationGateProps {
   readonly migrateDatabase: MigrateDatabase;
   /** Tarea de arranque que corre una sola vez por proceso, después del primer render en `ready`. */
   readonly runAfterFirstRender: AfterFirstRender;
+  /** Exportación de emergencia (F8.8) que ofrece la pantalla de error; sin ella no hay acción. */
+  readonly exportEmergency?: ExportEmergency;
   readonly children: ReactNode;
 }
 
@@ -59,17 +72,30 @@ function causeOf(failure: BootFailure): unknown {
   return failure.kind === 'migration_failed' ? failure.cause : undefined;
 }
 
+interface BootFailureViewProps {
+  readonly failure: BootFailure;
+  readonly exportEmergency: ExportEmergency | undefined;
+}
+
+/** Pantalla de error de arranque con la acción de exportación de emergencia conectada. */
+function BootFailureView({ failure, exportEmergency }: BootFailureViewProps) {
+  const { logger } = useDependencies();
+  const emergencyExport = useEmergencyExport(failure.kind, exportEmergency, logger);
+  return <BootErrorScreen reason={failure.kind} emergencyExport={emergencyExport} />;
+}
+
 /**
  * Puerta de arranque (ADR-005, ADR-006, ADR-014). Mantiene el splash mientras carga las
  * fuentes Lexend y migra la base, dos condiciones independientes que resuelve `bootReducer`.
  * Con todo listo muestra los hijos; si la base falla o es más nueva que el código, muestra
- * la pantalla de error de `shared/ui`, que no ofrece ninguna acción de escritura, y nunca
- * monta los hijos. Con los hijos montados agenda `runAfterFirstRender` una sola vez por
+ * la pantalla de error de `shared/ui`, que no ofrece ninguna acción de escritura salvo la
+ * exportación de emergencia (copia cruda, nunca escribe en la base), y nunca monta los hijos. Con los hijos montados agenda `runAfterFirstRender` una sola vez por
  * proceso (efecto + `setTimeout(…, 0)`): no bloquea el render y un fallo solo se registra.
  */
 export function MigrationGate({
   migrateDatabase,
   runAfterFirstRender,
+  exportEmergency,
   children,
 }: MigrationGateProps) {
   const { logger } = useDependencies();
@@ -135,7 +161,7 @@ export function MigrationGate({
   }, [ready, runAfterFirstRender, logger]);
 
   if (state.phase === 'failed') {
-    return <BootErrorScreen reason={state.failure.kind} />;
+    return <BootFailureView failure={state.failure} exportEmergency={exportEmergency} />;
   }
   return state.phase === 'ready' ? children : null;
 }

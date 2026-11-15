@@ -186,7 +186,11 @@ describe('PhotoStrip', () => {
     await user.press(screen.getByRole('button', { name: 'Galería' }));
 
     expect(
-      (await screen.findAllByText('No se pudo abrir la galería. Inténtalo de nuevo.')).length,
+      (
+        await screen.findAllByText('No se pudo abrir la galería. Inténtalo de nuevo.', {
+          includeHiddenElements: true,
+        })
+      ).length,
     ).toBeGreaterThan(0);
   });
 
@@ -202,15 +206,22 @@ describe('PhotoStrip', () => {
     await renderWithProviders(<Harness initial={some(2)} />);
 
     expect(screen.queryAllByRole('image')).toHaveLength(0);
-    expect(screen.getByTestId(`photo-${testPhotoId(1)}`).props.accessible).toBe(false);
+    expect(
+      screen.getByTestId(`photo-${testPhotoId(1)}`, { includeHiddenElements: true }).props
+        .accessible,
+    ).toBe(false);
   });
 
   it('adds "no se puede mostrar" to the button label when the file is missing', async () => {
     await renderWithProviders(<Harness initial={some(2)} />);
 
-    void fireEvent(screen.getByTestId(`photo-${testPhotoId(2)}`), 'error', {
-      nativeEvent: { error: 'missing' },
-    });
+    void fireEvent(
+      screen.getByTestId(`photo-${testPhotoId(2)}`, { includeHiddenElements: true }),
+      'error',
+      {
+        nativeEvent: { error: 'missing' },
+      },
+    );
 
     expect(
       await screen.findByRole('button', { name: 'Foto 2 de 2, no se puede mostrar' }),
@@ -266,6 +277,26 @@ describe('PhotoStrip', () => {
     await waitFor(() => {
       expect(screen.getByText('2 de 6')).toBeOnTheScreen();
     });
+  });
+
+  it('opens the removal dialog only after the sheet is gone, never one over the other', async () => {
+    await renderWithProviders(<Harness initial={some(3)} />);
+
+    await user.press(screen.getByRole('button', { name: 'Foto 2 de 3' }));
+    expect(screen.getByRole('header', { name: /^Foto 2 de 3/ })).toBeOnTheScreen();
+    await user.press(screen.getByRole('button', { name: 'Quitar foto' }));
+
+    expect(await screen.findByText('¿Quitar esta foto?')).toBeOnTheScreen();
+    expect(screen.queryByRole('header', { name: /^Foto 2 de 3/ })).not.toBeOnTheScreen();
+  });
+
+  it('gives the thumbnails no fixed height, so "Portada" grows with the font', async () => {
+    await renderWithProviders(<Harness initial={some(2)} />);
+
+    const thumbnail = screen.getByRole('button', { name: 'Foto 1 de 2, portada' });
+
+    expect(thumbnail).toHaveProp('className', expect.not.stringContaining('h-25'));
+    expect(thumbnail).toHaveProp('className', expect.stringContaining('min-w-20'));
   });
 
   it('uses the other description for a photo added in this session', async () => {

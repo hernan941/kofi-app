@@ -4,7 +4,7 @@ import { useScheduleFrame } from './use-schedule-frame';
 
 describe('useScheduleFrame', () => {
   let nextHandle = 0;
-  let pending: Map<number, FrameRequestCallback>;
+  let pending: Map<number, (time: number) => void>;
 
   beforeEach(() => {
     nextHandle = 0;
@@ -15,7 +15,7 @@ describe('useScheduleFrame', () => {
       return nextHandle;
     });
     jest.spyOn(globalThis, 'cancelAnimationFrame').mockImplementation((handle) => {
-      pending.delete(handle);
+      if (handle !== undefined && handle !== null) pending.delete(handle);
     });
   });
 
@@ -23,9 +23,9 @@ describe('useScheduleFrame', () => {
     jest.restoreAllMocks();
   });
 
-  it('runs the work on the next frame', () => {
+  it('runs the work on the next frame', async () => {
     const work = jest.fn();
-    const { result } = renderHook(() => useScheduleFrame());
+    const { result } = await renderHook(() => useScheduleFrame());
 
     result.current(work);
     expect(work).not.toHaveBeenCalled();
@@ -36,12 +36,12 @@ describe('useScheduleFrame', () => {
     expect(work).toHaveBeenCalledTimes(1);
   });
 
-  it('cancels the frames that are still pending when it unmounts', () => {
+  it('cancels the frames that are still pending when it unmounts', async () => {
     const work = jest.fn();
-    const { result, unmount } = renderHook(() => useScheduleFrame());
+    const { result, unmount } = await renderHook(() => useScheduleFrame());
     result.current(work);
 
-    unmount();
+    await unmount();
 
     expect(pending.size).toBe(0);
     expect(work).not.toHaveBeenCalled();

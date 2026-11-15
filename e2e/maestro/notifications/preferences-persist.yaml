@@ -1,0 +1,16 @@
+appId: com.cuantovendi.local
+tags:
+  - notifications
+---
+# What was chosen is still there when the screen is opened again.
+- runFlow: ../_shared/launch-clean.yaml
+- tapOn: 'Ajustes'
+- tapOn: 'Recordatorios.*'
+- tapOn: 'Día y hora.*'
+- tapOn: 'Viernes'
+- tapOn: '15'
+- tapOn: 'Guardar'
+- assertVisible: 'Viernes a las 20:15'
+- tapOn: 'Volver'
+- tapOn: 'Recordatorios.*'
+- assertVisible: 'Viernes a las 20:15'

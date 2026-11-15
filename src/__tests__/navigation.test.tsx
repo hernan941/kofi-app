@@ -20,13 +20,6 @@ jest.mock('expo-splash-screen', () => ({
   preventAutoHideAsync: jest.fn(() => Promise.resolve()),
   hideAsync: jest.fn(() => Promise.resolve()),
 }));
-jest.mock('@expo-google-fonts/lexend', () => ({
-  useFonts: (): [boolean, null] => [true, null],
-  Lexend_400Regular: 'regular',
-  Lexend_500Medium: 'medium',
-  Lexend_600SemiBold: 'semibold',
-  Lexend_700Bold: 'bold',
-}));
 
 const HIDDEN = { includeHiddenElements: true } as const;
 
@@ -57,7 +50,7 @@ describe('navigation', () => {
     expect(screen.getByRole('button', { name: 'Calendario' })).not.toBeSelected();
     expect(isSeen('phosphor-react-native-house-fill')).toBe(true);
     expect(isSeen('phosphor-react-native-house-bold')).toBe(false);
-    expect(screen.getByRole('button', { name: 'Registrar venta' })).toBeOnTheScreen();
+    expect(await screen.findByRole('button', { name: 'Registrar venta' })).toBeOnTheScreen();
   });
 
   it('opens the sale registration from the "Registrar venta" button of Inicio', async () => {
@@ -112,6 +105,22 @@ describe('navigation', () => {
     expect(await screen.findByRole('button', { name: 'Inicio' })).toBeSelected();
     expect(screen).toHavePathname('/');
     expect(screen.queryByText('Diagnóstico de fechas')).not.toBeOnTheScreen();
+  });
+
+  it('does not reach the hidden E2E seed route without the E2E flag', async () => {
+    await renderRouter('src/app', { initialUrl: '/e2e/seed?fixture=basic' });
+
+    expect(await screen.findByRole('button', { name: 'Inicio' })).toBeSelected();
+    expect(screen).toHavePathname('/');
+    expect(screen.queryByText(/datos de prueba/i)).not.toBeOnTheScreen();
+  });
+
+  it('does not reach the hidden E2E perf route without the E2E flag', async () => {
+    await renderRouter('src/app', { initialUrl: '/e2e/perf' });
+
+    expect(await screen.findByRole('button', { name: 'Inicio' })).toBeSelected();
+    expect(screen).toHavePathname('/');
+    expect(screen.queryByText('Marcas de rendimiento')).not.toBeOnTheScreen();
   });
 
   it('sends E2E deep links to the home tab without the E2E flag', () => {

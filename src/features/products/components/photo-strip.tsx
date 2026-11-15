@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { AccessibilityInfo, Pressable, Text, View } from 'react-native';
 
 import type { ProductPhotoId } from '@/shared/domain';
@@ -61,6 +61,7 @@ function moveById(
 export function PhotoStrip({ photos, productName, imports, onChange, onRemove }: PhotoStripProps) {
   const [selectedId, setSelectedId] = useState<ProductPhotoId | null>(null);
   const [removing, setRemoving] = useState<PhotoFormValue | null>(null);
+  const [isRemoveDialogOpen, setIsRemoveDialogOpen] = useState(false);
   const [unavailable, setUnavailable] = useState<ReadonlySet<ProductPhotoId>>(new Set());
   const firstThumbnail = useRef<ViewHandle>(null);
   const galleryButton = useRef<ButtonHandle>(null);
@@ -73,6 +74,21 @@ export function PhotoStrip({ photos, productName, imports, onChange, onRemove }:
   const trimmedMessage = imports.trimmedTo === null ? null : selectionTrimmed(imports.trimmedTo);
   useAnnounceWhen(failureMessage ?? undefined);
   useAnnounceWhen(trimmedMessage ?? undefined);
+
+  useEffect(() => {
+    if (removing === null) return undefined;
+    const frame = requestAnimationFrame(() => {
+      setIsRemoveDialogOpen(true);
+    });
+    return () => {
+      cancelAnimationFrame(frame);
+    };
+  }, [removing]);
+
+  const closeRemoveDialog = () => {
+    setIsRemoveDialogOpen(false);
+    setRemoving(null);
+  };
 
   const focusAfterRemoval = () => {
     requestAnimationFrame(() => {
@@ -98,7 +114,7 @@ export function PhotoStrip({ photos, productName, imports, onChange, onRemove }:
   const confirmRemoval = () => {
     if (removing === null) return;
     onRemove(removing);
-    setRemoving(null);
+    closeRemoveDialog();
     setSelectedId(null);
     announce(photoRemoved(total - 1));
     focusAfterRemoval();
@@ -129,7 +145,7 @@ export function PhotoStrip({ photos, productName, imports, onChange, onRemove }:
               onPress={() => {
                 setSelectedId(photo.photoId);
               }}
-              className="h-25 w-20 gap-1"
+              className="min-w-20 gap-1"
             >
               <ProductPhoto
                 photoId={photo.photoId}
@@ -198,10 +214,10 @@ export function PhotoStrip({ photos, productName, imports, onChange, onRemove }:
           <Text className="flex-1 text-sm text-danger">{failureMessage}</Text>
         </View>
       )}
-      {selected === undefined ? null : (
+      {selected === undefined || removing !== null ? null : (
         <PhotoSheet
           mode="edit"
-          isOpen={removing === null}
+          isOpen
           photoId={selected.photoId}
           index={selectedIndex}
           total={total}
@@ -225,7 +241,7 @@ export function PhotoStrip({ photos, productName, imports, onChange, onRemove }:
         />
       )}
       <ConfirmDialog
-        isOpen={removing !== null}
+        isOpen={isRemoveDialogOpen}
         title={PHOTO_MESSAGES.removeDialogTitle}
         description={
           removing?.isNew === true ? PHOTO_MESSAGES.removeNew : PHOTO_MESSAGES.removeSaved
@@ -233,9 +249,7 @@ export function PhotoStrip({ photos, productName, imports, onChange, onRemove }:
         confirmLabel={PHOTO_MESSAGES.removeConfirm}
         isDestructive
         onConfirm={confirmRemoval}
-        onCancel={() => {
-          setRemoving(null);
-        }}
+        onCancel={closeRemoveDialog}
       />
       <ConfirmDialog
         isOpen={imports.isCameraDeniedOpen}

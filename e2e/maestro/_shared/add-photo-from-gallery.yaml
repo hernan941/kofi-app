@@ -6,7 +6,7 @@ appId: com.cuantovendi.local
 - waitForAnimationToEnd:
     timeout: 5000
 - tapOn:
-    point: '18%,22%'
+    point: '16%,34%'
 - tapOn:
     id: '.*button_add'
     optional: true

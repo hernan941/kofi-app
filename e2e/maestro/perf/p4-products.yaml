@@ -1,0 +1,16 @@
+appId: com.cuantovendi.local
+name: P4 abrir la lista de productos
+tags:
+  - perf
+---
+- runFlow: _seed-large.yaml
+- tapOn: 'Productos'
+- assertVisible: 'Producto 001.*'
+- scrollUntilVisible:
+    element: 'Producto 199.*'
+    direction: DOWN
+    timeout: 60000
+- runFlow:
+    file: _dump-marks.yaml
+    env:
+      FLOW: p4-products

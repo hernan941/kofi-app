@@ -1,0 +1,29 @@
+appId: com.cuantovendi.local
+name: P3 abrir el calendario y cambiar de mes
+tags:
+  - perf
+env:
+  MONTHS_BACK_TO_OCT_2026: 1
+  MONTHS_BACK_TO_2024: 25
+---
+- runFlow: _seed-large.yaml
+- tapOn: 'Calendario'
+- assertVisible: 'Vendiste en .*'
+- repeat:
+    times: ${MONTHS_BACK_TO_OCT_2026}
+    commands:
+      - tapOn: 'Mes anterior.*'
+      - assertVisible: 'Vendiste en .*'
+- tapOn: 'Mes siguiente.*'
+- assertVisible: 'Vendiste en .*'
+- tapOn: 'Mes anterior.*'
+- assertVisible: 'Vendiste en .*'
+- repeat:
+    times: ${MONTHS_BACK_TO_2024}
+    commands:
+      - tapOn: 'Mes anterior.*'
+- assertVisible: 'Vendiste en .*'
+- runFlow:
+    file: _dump-marks.yaml
+    env:
+      FLOW: p3-calendar

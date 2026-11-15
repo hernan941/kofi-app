@@ -1,12 +1,30 @@
-import { screen, userEvent } from '@testing-library/react-native';
+import { screen, userEvent, waitFor } from '@testing-library/react-native';
 
 import { createTestDependencies } from '@/core/testing/create-test-dependencies';
 import { renderWithProviders } from '@/core/testing/render-with-providers';
-import { productIdSchema } from '@/shared/domain';
+import { productIdSchema, type ProductId } from '@/shared/domain';
+import { clearPerfMarks, readPerfMarks } from '@/shared/lib/perf-marks';
 import { findGuiltPattern } from '@/shared/lib/testing/guilt-patterns';
 
 import { epoch, fixtureId, makeProduct, makeVersion } from '../domain/testing/product-fixtures';
+import { testPhotoId } from '../testing/in-memory-photo-storage';
 import { ProductsScreen } from './products-screen';
+
+const coverDiff = (id: ProductId) => ({
+  inserted: [
+    {
+      id: testPhotoId(1),
+      productId: id,
+      position: 0,
+      width: 100,
+      height: 50,
+      byteSize: 10,
+      sha256: 'e'.repeat(64),
+    },
+  ],
+  moved: [],
+  removed: [],
+});
 
 const user = userEvent.setup();
 
@@ -107,5 +125,37 @@ describe('ProductsScreen', () => {
 
     expect(await screen.findByText('Aquí vas a ver tus productos')).toBeOnTheScreen();
     expect(failing).toHaveBeenCalledTimes(2);
+  });
+});
+
+describe('ProductsScreen performance marks (P4.a)', () => {
+  afterEach(() => {
+    delete process.env.EXPO_PUBLIC_E2E;
+    clearPerfMarks();
+  });
+
+  it('marks products:ready when the rows are available', async () => {
+    process.env.EXPO_PUBLIC_E2E = '1';
+    const dependencies = createTestDependencies();
+    dependencies.products.saveSync(named('Taza', 1));
+    await setup(dependencies).view;
+
+    await waitFor(() => {
+      expect(readPerfMarks().map(({ name }) => name)).toEqual(['products:ready']);
+    });
+  });
+
+  it('shows the cover thumbnails only when some product has a photo (UX-F7)', async () => {
+    const dependencies = createTestDependencies();
+    const withPhoto = named('Álbum', 3);
+    await dependencies.products.save(withPhoto);
+    dependencies.products.savePhotosSync(withPhoto.id, coverDiff(withPhoto.id), epoch(6));
+    await dependencies.products.save(named('Taza', 2));
+    await setup(dependencies).view;
+
+    await screen.findByRole('button', { name: 'Álbum, 1.000 pesos' });
+    expect(
+      screen.getAllByLabelText('Foto del producto', { includeHiddenElements: true }),
+    ).toHaveLength(1);
   });
 });

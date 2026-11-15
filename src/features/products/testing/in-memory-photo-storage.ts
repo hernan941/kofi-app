@@ -156,6 +156,26 @@ export class InMemoryPhotoStorage implements PhotoStorage {
     this.partials.delete(id);
     return Promise.resolve();
   }
+
+  partialUriFor(id: ProductPhotoId): string {
+    return `file:///test/photos/${requirePhotoId(id)}.jpg.part`;
+  }
+
+  promotePartial(id: ProductPhotoId): Promise<void> {
+    try {
+      requirePhotoId(id);
+    } catch (error) {
+      return Promise.reject(error instanceof Error ? error : new Error(String(error)));
+    }
+    this.operations.push(`promotePartial:${id}`);
+    const modifiedAt = this.partials.get(id);
+    if (modifiedAt === undefined || this.files.has(id)) {
+      return Promise.reject(new Error(`Cannot promote ${id}`));
+    }
+    this.partials.delete(id);
+    this.files.set(id, modifiedAt);
+    return Promise.resolve();
+  }
 }
 
 function toInfos(source: ReadonlyMap<ProductPhotoId, EpochMs>): readonly PhotoFileInfo[] {

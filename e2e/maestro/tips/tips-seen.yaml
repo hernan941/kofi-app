@@ -1,0 +1,25 @@
+appId: com.cuantovendi.local
+tags:
+  - tips
+---
+# The tip shown after the first sale appears marked as seen in the "Consejos" section.
+- runFlow: ../_shared/launch-clean.yaml
+- runFlow:
+    file: ../_shared/create-product.yaml
+    env:
+      PRODUCT_NAME: 'Lámina Colibrí'
+      PRODUCT_PRICE: '15000'
+- runFlow:
+    file: ../_shared/register-sale.yaml
+    env:
+      PRODUCT_ROW: 'Lámina Colibrí.*'
+- assertVisible: '¿Para qué sirve saber cuánto te cuesta?'
+- tapOn: 'Cerrar consejo'
+- tapOn: 'Listo'
+- runFlow: ../_shared/dismiss-notification-intro.yaml
+- tapOn: 'Consejos'
+- assertVisible: 'Ideas breves para llevar tu negocio.*'
+- scrollUntilVisible:
+    element: '¿Para qué sirve saber cuánto te cuesta?, Costos, visto'
+- assertVisible: '¿Para qué sirve saber cuánto te cuesta?, Costos, visto'
+- assertNotVisible: 'Nuevo'

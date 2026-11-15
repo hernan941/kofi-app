@@ -10,7 +10,13 @@ export interface QuantityStepperProps {
   readonly label: string;
   /** Name read by the screen reader when the visible label is not enough, for example "Cantidad de Lámina Colibrí". */
   readonly accessibilityLabel?: string;
+  /** Label of the "remove one" button; name the product when there are several rows. */
+  readonly decrementLabel?: string;
+  /** Label of the "add one" button; name the product when there are several rows. */
+  readonly incrementLabel?: string;
   readonly value: number;
+  /** Value as spoken, for example "8 horas"; defaults to the number. */
+  readonly valueText?: string;
   readonly onChange: (value: number) => void;
   readonly min?: number;
   readonly max?: number;
@@ -29,12 +35,16 @@ function digitsOf(text: string): string {
  * between `min` and `max` is reported right away; on leaving the field, an empty, zero or
  * too small text goes back to the last valid value and one above `max` stays at `max`. The
  * buttons stop at `min` and `max` and say so with the disabled state. For the screen reader
- * the field is an adjustable control that responds to the swipe up and down gestures.
+ * the field is an adjustable control that responds to the swipe up and down gestures and reads
+ * its value as text (`valueText`), because a range without text is read as a percentage.
  */
 export function QuantityStepper({
   label,
   accessibilityLabel = label,
+  decrementLabel = 'Quitar uno',
+  incrementLabel = 'Agregar uno',
   value,
+  valueText = String(value),
   onChange,
   min = 1,
   max = 99,
@@ -78,7 +88,7 @@ export function QuantityStepper({
       <View className="flex-row items-center gap-2">
         <IconButton
           icon={MinusIcon}
-          accessibilityLabel="Quitar uno"
+          accessibilityLabel={decrementLabel}
           onPress={decrement}
           isDisabled={!canDecrement}
         />
@@ -91,14 +101,14 @@ export function QuantityStepper({
           selectTextOnFocus
           accessibilityRole="adjustable"
           accessibilityLabel={accessibilityLabel}
-          accessibilityValue={{ min, max, now: value }}
+          accessibilityValue={{ min, max, now: value, text: valueText }}
           accessibilityActions={ADJUSTABLE_ACTIONS}
           onAccessibilityAction={handleAction}
           className="bg-field-background min-h-12 min-w-16 rounded-field border-2 border-field-border px-3 text-center font-bold text-lg text-field-foreground"
         />
         <IconButton
           icon={PlusIcon}
-          accessibilityLabel="Agregar uno"
+          accessibilityLabel={incrementLabel}
           onPress={increment}
           isDisabled={!canIncrement}
         />

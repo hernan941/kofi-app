@@ -1,0 +1,29 @@
+appId: com.cuantovendi.local
+tags:
+  - tracking
+---
+- runFlow: ../_shared/launch-clean.yaml
+- runFlow:
+    file: ../_shared/seed.yaml
+    env:
+      FIXTURE: 'basic'
+- launchApp
+- runFlow:
+    file: ../_shared/register-sale.yaml
+    env:
+      PRODUCT_ROW: 'Cuaderno.*'
+- tapOn: 'Listo'
+- runFlow: ../_shared/dismiss-notification-intro.yaml
+- tapOn: 'Ver resumen de .*'
+- assertVisible: 'Resumen del mes'
+- assertVisible: 'Vendiste'
+- assertVisible: '1 venta registrada'
+- assertVisible: 'Lo que más vendiste'
+- assertVisible: 'Según el monto vendido.'
+- assertVisible: 'Mes anterior.*'
+- tapOn: 'Mes anterior.*'
+- assertVisible: 'Octubre'
+- assertVisible: '[0-9]+ ventas registradas'
+- assertVisible: 'Resumen del mes'
+- tapOn: 'Volver'
+- assertVisible: 'Esta semana'

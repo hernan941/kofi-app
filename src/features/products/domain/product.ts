@@ -83,14 +83,15 @@ export function hasSingleActiveVersion(product: Product): boolean {
 
 const ENYE_SORT_SUFFIX = '\uFFFF';
 
-function listSortKey(name: string): string {
+/** Clave de orden alfabético de la lista de productos (D-31); `ñ` queda después de `n`. */
+export function productListSortKey(name: string): string {
   return versionNameKey(name).replaceAll('ñ', `n${ENYE_SORT_SUFFIX}`);
 }
 
 /** Orden de la lista de productos (D-31): alfabético sin mayúsculas ni tildes, `ñ` después de `n`; luego `createdAt` e id. */
 export function compareProductsForList(a: Product, b: Product): number {
-  const keyA = listSortKey(a.name);
-  const keyB = listSortKey(b.name);
+  const keyA = productListSortKey(a.name);
+  const keyB = productListSortKey(b.name);
   if (keyA !== keyB) {
     return keyA < keyB ? -1 : 1;
   }

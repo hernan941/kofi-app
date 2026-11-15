@@ -6,6 +6,7 @@ import { seedNoSalesWeek, seedSale, seedSellableProduct } from '@/core/testing/s
 import { clp, fixtureId, makeProduct, makeVersion } from '@/features/sales/testing/sale-fixtures';
 import { epochMsSchema, saleRecordIdSchema } from '@/shared/domain';
 import { advanceClockAndTimers } from '@/shared/domain/testing/advance-clock-and-timers';
+import { clearPerfMarks, readPerfMarks } from '@/shared/lib/perf-marks';
 import { findGuiltPattern } from '@/shared/lib/testing/guilt-patterns';
 
 import { HomeScreen } from './home-screen';
@@ -52,11 +53,12 @@ describe('HomeScreen first use', () => {
   });
 
   it('shows the loading state instead of the empty state while loading', async () => {
-    await renderWithProviders(<HomeScreen {...props()} />);
+    const dependencies = createTestDependencies();
+    jest.spyOn(dependencies.sales, 'listBetween').mockReturnValue(new Promise(() => undefined));
+    await renderWithProviders(<HomeScreen {...props()} />, { dependencies });
 
     expect(screen.getByLabelText('Cargando tus ventas')).toBeOnTheScreen();
     expect(screen.queryByText('Aquí vas a ver cuánto vendes')).not.toBeOnTheScreen();
-    await screen.findByText('Aquí vas a ver cuánto vendes');
   });
 
   it('shows the streak under the empty state when a week was marked as no sales', async () => {
@@ -76,12 +78,14 @@ describe('HomeScreen with sales', () => {
     await renderWithProviders(<HomeScreen {...props()} />, { dependencies });
 
     expect(await screen.findByRole('header', { name: 'Inicio' })).toBeOnTheScreen();
-    expect(await screen.findByText('Esta semana')).toBeOnTheScreen();
-    expect(screen.getAllByLabelText('30.000 pesos')[0]).toHaveProp(
+    expect(
+      await screen.findByText('Esta semana', { includeHiddenElements: true }),
+    ).toBeOnTheScreen();
+    expect(screen.getAllByText('$30.000', { includeHiddenElements: true })[0]).toHaveProp(
       'className',
       expect.stringContaining('text-display'),
     );
-    expect(screen.getByText('En julio')).toBeOnTheScreen();
+    expect(screen.getByText('En julio', { includeHiddenElements: true })).toBeOnTheScreen();
     expect(
       screen.getByLabelText(
         'Esta semana vendiste 30.000 pesos. 30.000 pesos más que a esta altura de la semana pasada.',
@@ -93,7 +97,7 @@ describe('HomeScreen with sales', () => {
     const { dependencies } = withSales();
     await renderWithProviders(<HomeScreen {...props()} />, { dependencies });
 
-    await screen.findByText('Esta semana');
+    await screen.findByText('Esta semana', { includeHiddenElements: true });
 
     expect(screen.queryByText(/te quedaron aprox\./)).not.toBeOnTheScreen();
     expect(screen.queryByText(/consejo/i)).not.toBeOnTheScreen();
@@ -169,7 +173,7 @@ describe('HomeScreen with sales', () => {
     seedSale(dependencies, { product, soldOn: '2026-06-10' });
     await renderWithProviders(<HomeScreen {...props()} />, { dependencies });
 
-    await screen.findByText('Esta semana');
+    await screen.findByText('Esta semana', { includeHiddenElements: true });
 
     expect(screen.queryByText(/registrando/)).not.toBeOnTheScreen();
   });
@@ -182,16 +186,20 @@ describe('HomeScreen with sales', () => {
       seedSale(dependencies, { product, soldOn: '2026-06-29', n: 5 });
       dependencies.clock.set(epochMsSchema.parse(Date.parse('2026-07-05T23:59:00-04:00')));
       await renderWithProviders(<HomeScreen {...props()} />, { dependencies });
-      await screen.findByText('Esta semana');
+      await screen.findByText('Esta semana', { includeHiddenElements: true });
 
       await act(() => {
         advanceClockAndTimers(dependencies.clock, 2 * 60 * 1000);
       });
 
       await waitFor(() => {
-        expect(screen.getAllByLabelText('0 pesos').length).toBeGreaterThan(0);
+        expect(screen.getAllByText('$0', { includeHiddenElements: true }).length).toBeGreaterThan(
+          0,
+        );
       });
-      expect(screen.getByText(/^Semana tranquila por ahora\./)).toBeOnTheScreen();
+      expect(
+        screen.getByText(/^Semana tranquila por ahora\./, { includeHiddenElements: true }),
+      ).toBeOnTheScreen();
     } finally {
       jest.useRealTimers();
     }
@@ -213,7 +221,9 @@ describe('HomeScreen errors', () => {
 
     await user.press(screen.getByRole('button', { name: 'Reintentar' }));
 
-    expect(await screen.findByText('Esta semana')).toBeOnTheScreen();
+    expect(
+      await screen.findByText('Esta semana', { includeHiddenElements: true }),
+    ).toBeOnTheScreen();
     expect(listBetween).toHaveBeenCalledTimes(2);
   });
 
@@ -222,11 +232,39 @@ describe('HomeScreen errors', () => {
     jest.spyOn(dependencies.sales, 'listRecent').mockRejectedValueOnce(new Error('boom'));
     await renderWithProviders(<HomeScreen {...props()} />, { dependencies });
 
-    expect(await screen.findByText('Esta semana')).toBeOnTheScreen();
+    expect(
+      await screen.findByText('Esta semana', { includeHiddenElements: true }),
+    ).toBeOnTheScreen();
     expect(await screen.findByText('No se pudieron cargar tus últimas ventas.')).toBeOnTheScreen();
 
     await user.press(screen.getByRole('button', { name: 'Reintentar' }));
 
     expect(await screen.findByRole('button', { name: /^Lámina Colibrí, hoy,/ })).toBeOnTheScreen();
+  });
+});
+
+describe('HomeScreen performance marks (P1.b)', () => {
+  afterEach(() => {
+    delete process.env.EXPO_PUBLIC_E2E;
+    clearPerfMarks();
+  });
+
+  it('marks home:ready once the data is painted, only in the E2E build', async () => {
+    process.env.EXPO_PUBLIC_E2E = '1';
+    const { dependencies } = withSales();
+    await renderWithProviders(<HomeScreen {...props()} />, { dependencies });
+
+    await waitFor(() => {
+      expect(readPerfMarks().map(({ name }) => name)).toEqual(['home:ready']);
+    });
+  });
+
+  it('does not mark while loading', async () => {
+    process.env.EXPO_PUBLIC_E2E = '1';
+    const dependencies = createTestDependencies();
+    jest.spyOn(dependencies.sales, 'listBetween').mockReturnValue(new Promise(() => undefined));
+    await renderWithProviders(<HomeScreen {...props()} />, { dependencies });
+
+    expect(readPerfMarks()).toEqual([]);
   });
 });

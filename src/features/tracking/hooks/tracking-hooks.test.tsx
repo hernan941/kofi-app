@@ -219,7 +219,9 @@ describe('useLatestSales', () => {
     return (
       <Text>
         {status}|
-        {sales.map((view) => `${view.items[0]?.productName ?? '?'}:${view.total}`).join(',')}
+        {sales
+          .map((view) => `${view.items[0]?.productName ?? '?'}:${String(view.total)}`)
+          .join(',')}
       </Text>
     );
   }
@@ -294,6 +296,15 @@ describe('useMonthlySummary', () => {
     await mount(<MonthlyProbe target={month('2026-06')} />, dependencies);
 
     expect(await screen.findByText('ready|4000|Lámina:a')).toBeOnTheScreen();
+  });
+
+  it('does not mark as archived a top product that no longer exists', async () => {
+    const dependencies = createTestDependencies();
+    seedSale(dependencies, 1, '2026-06-10', 4000);
+
+    await mount(<MonthlyProbe target={month('2026-06')} />, dependencies);
+
+    expect(await screen.findByText('ready|4000|null:v')).toBeOnTheScreen();
   });
 });
 

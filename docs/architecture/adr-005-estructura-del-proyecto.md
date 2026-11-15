@@ -161,3 +161,4 @@ export interface DocumentPicker {
 
 ## Enmienda 2026-11-13
 El consejo posventa se compone en `src/app/sales/new.tsx` pasando `renderAfterSave(outcome)` con el componente `AfterSaleTip` de `tips`, en vez de navegar a una ruta `/tips/after-sale`. La composición sigue ocurriendo en `src/app/` y `sales` no depende de `tips` (ver `docs/architecture/tips.md`).
+- `tips` puede importar `loadStreak` desde el index público de `sales` (además de `sales/domain` y `products/domain`), como anticipa `docs/architecture/tips.md` §4.1. Aceptado en F6.7.

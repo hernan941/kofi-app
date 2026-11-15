@@ -1,0 +1,15 @@
+appId: com.cuantovendi.local
+name: P1 arranque en frío hasta Inicio interactivo
+tags:
+  - perf
+---
+- runFlow: _seed-large.yaml
+- stopApp
+- launchApp
+- assertVisible: 'Registrar venta'
+- tapOn: 'Registrar venta'
+- assertVisible: 'Registrar venta'
+- runFlow:
+    file: _dump-marks.yaml
+    env:
+      FLOW: p1-startup

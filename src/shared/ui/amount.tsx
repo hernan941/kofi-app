@@ -13,6 +13,8 @@ export type AmountVariant = 'display' | 'total' | 'list' | 'inline';
 export interface AmountProps {
   readonly value: Clp | SignedClp;
   readonly variant?: AmountVariant;
+  /** Set when a parent already carries the spoken label, so the amount is not a second stop. */
+  readonly isGrouped?: boolean;
 }
 
 const VARIANT_CLASSES: Readonly<Record<AmountVariant, string>> = {
@@ -29,14 +31,15 @@ const CAPPED_MAX_FONT_SCALE = 1.5;
  * The only way to show money in the app (design system 3.3, ADR-014). Formats CLP without
  * `Intl` (`$15.000`) and reads it as "15.000 pesos". The display and total variants shrink to
  * fit a single line and stop growing at 1.5 times the base size; the others follow the system
- * font size without limit. Amounts are never animated digit by digit.
+ * font size without limit. With `isGrouped`, inside a parent that already says the amount, it is
+ * plain text and not a second stop of the screen reader. Amounts are never animated digit by digit.
  */
-export function Amount({ value, variant = 'inline' }: AmountProps) {
+export function Amount({ value, variant = 'inline', isGrouped = false }: AmountProps) {
   const isSingleLine = SINGLE_LINE_VARIANTS.has(variant);
   return (
     <Text
-      accessible
-      accessibilityLabel={formatClpAccessible(value)}
+      accessible={!isGrouped}
+      accessibilityLabel={isGrouped ? undefined : formatClpAccessible(value)}
       className={VARIANT_CLASSES[variant]}
       numberOfLines={isSingleLine ? 1 : undefined}
       adjustsFontSizeToFit={isSingleLine}

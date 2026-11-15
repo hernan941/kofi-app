@@ -52,8 +52,8 @@ describe('bundled tip catalog', () => {
     for (const tip of BUNDLED_TIPS) {
       expect(tip.title.trim()).not.toBe('');
       expect(tip.body.trim()).not.toBe('');
-      expect(tip.title.length).toBeLessThanOrEqual(TIP_TITLE_MAX_LENGTH);
-      expect(tip.body.length).toBeLessThanOrEqual(TIP_BODY_MAX_LENGTH);
+      expect(Array.from(tip.title).length).toBeLessThanOrEqual(TIP_TITLE_MAX_LENGTH);
+      expect(Array.from(tip.body).length).toBeLessThanOrEqual(TIP_BODY_MAX_LENGTH);
     }
   });
 
@@ -61,6 +61,13 @@ describe('bundled tip catalog', () => {
     for (const tip of BUNDLED_TIPS) {
       expect(findGuiltPattern(tip.title)).toBeNull();
       expect(findGuiltPattern(tip.body)).toBeNull();
+    }
+  });
+
+  test('does not use tax words reserved for the tax scope (D-21)', () => {
+    const taxWords = /(?<![\p{L}])(impuestos?|boletas?|facturas?|IVA|SII)(?![\p{L}])/iu;
+    for (const tip of BUNDLED_TIPS) {
+      expect(`${tip.title} ${tip.body}`).not.toMatch(taxWords);
     }
   });
 

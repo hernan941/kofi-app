@@ -22,13 +22,6 @@ jest.mock('expo-splash-screen', () => ({
   preventAutoHideAsync: jest.fn(() => Promise.resolve()),
   hideAsync: jest.fn(() => Promise.resolve()),
 }));
-jest.mock('@expo-google-fonts/lexend', () => ({
-  useFonts: (): [boolean, null] => [true, null],
-  Lexend_400Regular: 'regular',
-  Lexend_500Medium: 'medium',
-  Lexend_600SemiBold: 'semibold',
-  Lexend_700Bold: 'bold',
-}));
 
 const user = userEvent.setup();
 
@@ -54,10 +47,12 @@ describe('sales routes', () => {
     expect(screen).toHavePathname('/sales/new');
     await user.press(screen.getByRole('button', { name: 'Guardar venta' }));
     expect(
-      await screen.findByRole('header', { name: '¡Registraste tu primera venta!' }),
+      await screen.findByRole('header', { name: /^¡Registraste tu primera venta!/ }),
     ).toBeOnTheScreen();
 
     await user.press(screen.getByRole('button', { name: 'Listo' }));
+    expect(screen).toHavePathname('/notifications/intro');
+    await user.press(await screen.findByRole('button', { name: 'Ahora no' }));
 
     expect(await screen.findByRole('button', { name: 'Registrar venta' })).toBeOnTheScreen();
     expect(screen).toHavePathname('/');
@@ -69,11 +64,11 @@ describe('sales routes', () => {
 
     await testRouter.push(`/sales/${id}`);
     expect(await screen.findByRole('button', { name: 'Editar venta' })).toBeOnTheScreen();
-    expect(screen.getAllByLabelText('15.000 pesos').length).toBeGreaterThan(0);
+    expect(screen.getByLabelText('Total: 15.000 pesos')).toBeOnTheScreen();
 
     await user.press(screen.getByRole('button', { name: 'Editar venta' }));
     expect(screen).toHavePathname(`/sales/${id}/edit`);
-    await user.press(await screen.findByRole('button', { name: 'Agregar uno' }));
+    await user.press(await screen.findByRole('button', { name: /^Agregar uno a la cantidad de/ }));
     await user.press(screen.getByRole('button', { name: 'Guardar cambios' }));
 
     expect(await screen.findByRole('button', { name: 'Editar venta' })).toBeOnTheScreen();
@@ -115,7 +110,7 @@ describe('sales routes', () => {
   it('goes to the start when the registration was opened without history', async () => {
     await renderRouter('src/app', { initialUrl: '/sales/new' });
     await user.press(await screen.findByRole('button', { name: 'Guardar venta' }));
-    expect(await screen.findByRole('header', { name: '¡Venta registrada!' })).toBeOnTheScreen();
+    expect(await screen.findByRole('header', { name: /^¡Venta registrada!/ })).toBeOnTheScreen();
 
     await user.press(screen.getByRole('button', { name: 'Listo' }));
 

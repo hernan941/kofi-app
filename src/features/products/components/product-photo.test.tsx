@@ -48,4 +48,24 @@ describe('ProductPhoto', () => {
     await screen.findByLabelText('Foto 1 de 3, no se puede mostrar');
     expect(dependencies.logger.entriesAt('warn')).toHaveLength(1);
   });
+
+  it('hides a decorative photo with the three attributes', async () => {
+    const { dependencies } = setup();
+    await renderWithProviders(
+      <ProductPhoto
+        photoId={testPhotoId(1)}
+        label="Foto 1 de 3"
+        isDecorative
+        testID="deco"
+        className="size-20"
+      />,
+      { dependencies },
+    );
+
+    const image = screen.getByTestId('deco', { includeHiddenElements: true });
+
+    expect(image).toHaveProp('accessible', false);
+    expect(image).toHaveProp('accessibilityElementsHidden', true);
+    expect(image).toHaveProp('importantForAccessibility', 'no-hide-descendants');
+  });
 });

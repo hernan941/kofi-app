@@ -11,6 +11,8 @@ export const DATABASE_NAME = 'cuantovendi.db';
 export interface AppDatabaseHandle {
   readonly raw: RawSqliteConnection;
   readonly db: AppDatabase;
+  /** Base de Expo; solo la usa la copia de la exportación de emergencia (`backupDatabaseAsync`). */
+  readonly native: SQLiteDatabase;
 }
 
 /** Adapta una base de `expo-sqlite` a la conexión mínima que usan los PRAGMA. */
@@ -31,5 +33,5 @@ export function openAppDatabase(): AppDatabaseHandle {
   const sqlite = openDatabaseSync(DATABASE_NAME);
   const raw = createExpoConnection(sqlite);
   configureConnection(raw);
-  return { raw, db: drizzle(sqlite, { schema }) };
+  return { raw, db: drizzle(sqlite, { schema }), native: sqlite };
 }

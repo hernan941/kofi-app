@@ -7,6 +7,7 @@ import * as icons from './icons';
 import { renderUi } from './testing/render-ui';
 
 const SALES_ICONS = [
+  ['BellIcon', 'bell'],
   ['CheckIcon', 'check'],
   ['CheckCircleIcon', 'check-circle'],
   ['ConfettiIcon', 'confetti'],
@@ -18,6 +19,11 @@ const SALES_ICONS = [
   ['WarningCircleIcon', 'warning-circle'],
   ['TrashIcon', 'trash'],
   ['FireIcon', 'fire'],
+  ['XIcon', 'x'],
+  ['ExportIcon', 'export'],
+  ['ClockCounterClockwiseIcon', 'clock-counter-clockwise'],
+  ['ShieldCheckIcon', 'shield-check'],
+  ['CircleIcon', 'circle'],
 ] as const;
 
 describe('icons', () => {

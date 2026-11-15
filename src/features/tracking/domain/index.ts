@@ -14,3 +14,19 @@ export type {
 export { approximateProfit, profitCoverage, versionIdsNeedingCurrentCost } from './profit';
 export type { ProfitSummary } from './profit';
 export { LATEST_SALES_LIMIT } from './latest-sales';
+export {
+  buildCalendarMonth,
+  calendarNavigationLimit,
+  dailyActivity,
+  intensityLevels,
+  weekFactsOf,
+} from './calendar';
+export type {
+  CalendarDay,
+  CalendarMonth,
+  CalendarWeek,
+  DayActivity,
+  IntensityLevel,
+} from './calendar';
+export { buildDayDetail } from './day-detail';
+export type { DayDetail } from './day-detail';

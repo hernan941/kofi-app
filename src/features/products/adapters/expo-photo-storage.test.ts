@@ -463,5 +463,9 @@ describePhotoStorageContract('Expo', () => {
       return SOURCE;
     },
     sourceExists: (uri) => mockState.entries.has(uri),
+    addPartial: (id) => {
+      mockState.directories.add(PHOTOS_DIR);
+      putFile(`${PHOTOS_DIR}/${id}.jpg.part`);
+    },
   };
 });

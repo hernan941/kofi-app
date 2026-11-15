@@ -1,4 +1,10 @@
-import { isoWeekday, localDateFromParts, localDateParts } from './arithmetic';
+import {
+  addDays,
+  isoWeekday,
+  localDateFromParts,
+  localDateParts,
+  type LocalDateRange,
+} from './arithmetic';
 import { daysInMonth, type LocalDate } from './local-date';
 import { monthRangeOf, type YearMonth } from './year-month';
 
@@ -28,4 +34,17 @@ export function monthGrid(month: YearMonth): readonly MonthGridRow[] {
     rows.push(cells.slice(index, index + DAYS_PER_WEEK));
   }
   return rows;
+}
+
+/**
+ * Rango cerrado que cubre las filas de {@link monthGrid}: del lunes de la primera fila al
+ * domingo de la última. Incluye los días de las semanas que se comparten con los meses
+ * vecinos, que hacen falta para saber el estado completo de esas semanas.
+ */
+export function monthGridRange(month: YearMonth): LocalDateRange {
+  const { start, end } = monthRangeOf(month);
+  return {
+    start: addDays(start, 1 - isoWeekday(start)),
+    end: addDays(end, DAYS_PER_WEEK - isoWeekday(end)),
+  };
 }

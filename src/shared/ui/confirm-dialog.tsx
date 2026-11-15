@@ -1,9 +1,11 @@
-import { Dialog } from 'heroui-native';
-import { View } from 'react-native';
+import { useRef, type ComponentRef } from 'react';
+import { AccessibilityInfo, Modal, Pressable, Text, View } from 'react-native';
+import { useReducedMotion } from 'react-native-reanimated';
 
 import { DeleteButton } from './delete-button';
 import { PrimaryButton } from './primary-button';
 import { SecondaryButton } from './secondary-button';
+import { spokenPesos } from './spoken-pesos';
 
 /** Props of {@link ConfirmDialog}. */
 export interface ConfirmDialogProps {
@@ -18,10 +20,14 @@ export interface ConfirmDialogProps {
 }
 
 /**
- * Confirmation before an important or destructive action, on top of the HeroUI `Dialog`.
- * The question is the title; the confirm button goes first, filled with `danger` and the
- * `Trash` icon when the action deletes something. Cancel, the backdrop and the Android
- * back button all call `onCancel`; the parent closes the dialog by changing `isOpen`.
+ * Confirmation before an important or destructive action, on the React Native `Modal` like
+ * `Sheet`: it is its own native window, so the screen reader stays inside it and the screen
+ * behind cannot be reached. When it shows, the focus goes to the question (a header). The
+ * question is the title; the confirm button goes first, filled with `danger` and the `Trash`
+ * icon when the action deletes something. Cancel, the backdrop and the Android back button
+ * all call `onCancel`; the parent closes the dialog by changing `isOpen`. Amounts written
+ * with `$` in the description are read as pesos. Never open it while a `Sheet` is still
+ * visible: two modal windows at once leave the focus in the one that is closing.
  */
 export function ConfirmDialog({
   isOpen,
@@ -33,27 +39,46 @@ export function ConfirmDialog({
   onConfirm,
   onCancel,
 }: ConfirmDialogProps) {
+  const isReducedMotion = useReducedMotion();
+  const question = useRef<ComponentRef<typeof Text>>(null);
+  const focusQuestion = () => {
+    if (question.current !== null) {
+      AccessibilityInfo.sendAccessibilityEvent(question.current, 'focus');
+    }
+  };
   return (
-    <Dialog
-      isOpen={isOpen}
-      onOpenChange={(open) => {
-        if (!open) onCancel();
-      }}
+    <Modal
+      testID="confirm-dialog-modal"
+      visible={isOpen}
+      transparent
+      animationType={isReducedMotion ? 'none' : 'fade'}
+      onRequestClose={onCancel}
+      onShow={focusQuestion}
+      statusBarTranslucent
     >
-      <Dialog.Portal className="px-4">
-        <Dialog.Overlay />
-        <Dialog.Content
-          isSwipeable={false}
-          className="gap-6 rounded-3xl border-2 border-border bg-overlay p-4 shadow-sticker"
-        >
+      <View accessibilityViewIsModal className="flex-1 items-center justify-center px-4">
+        <Pressable
+          testID="confirm-dialog-backdrop"
+          accessibilityRole="button"
+          accessibilityLabel="Cerrar"
+          accessibilityElementsHidden
+          importantForAccessibility="no-hide-descendants"
+          onPress={onCancel}
+          className="absolute inset-0 bg-backdrop"
+        />
+        <View className="w-full gap-6 rounded-3xl border-2 border-border bg-overlay p-4 shadow-sticker">
           <View className="gap-2">
-            <Dialog.Title className="font-semibold text-heading text-foreground">
+            <Text
+              ref={question}
+              accessibilityRole="header"
+              className="font-semibold text-heading text-foreground"
+            >
               {title}
-            </Dialog.Title>
+            </Text>
             {description === undefined ? null : (
-              <Dialog.Description className="text-base text-muted">
+              <Text accessibilityLabel={spokenPesos(description)} className="text-base text-muted">
                 {description}
-              </Dialog.Description>
+              </Text>
             )}
           </View>
           <View className="gap-3">
@@ -64,8 +89,8 @@ export function ConfirmDialog({
             )}
             <SecondaryButton label={cancelLabel} onPress={onCancel} />
           </View>
-        </Dialog.Content>
-      </Dialog.Portal>
-    </Dialog>
+        </View>
+      </View>
+    </Modal>
   );
 }

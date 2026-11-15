@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
-import { SafeAreaView } from 'react-native-safe-area-context';
+
+import { StyledSafeAreaView } from './styled-safe-area-view';
 
 /** Props of {@link Screen}. */
 export interface ScreenProps {
@@ -12,8 +13,8 @@ export interface ScreenProps {
  */
 export function Screen({ children }: ScreenProps) {
   return (
-    <SafeAreaView edges={['top']} className="flex-1 bg-background">
+    <StyledSafeAreaView edges={['top']} className="flex-1 bg-background">
       {children}
-    </SafeAreaView>
+    </StyledSafeAreaView>
   );
 }

@@ -11,9 +11,7 @@ tags:
 - tapOn: 'Lámina Colibrí'
 - tapOn: 'Archivar'
 - assertVisible: '¿Archivar Lámina Colibrí?'
-- tapOn:
-    text: 'Archivar'
-    index: 1
+- tapOn: 'Archivar'
 - assertVisible: 'Todavía no tienes productos|No tienes productos en tu lista'
 - tapOn: 'Ver archivados.*'
 - assertVisible: 'Lámina Colibrí'

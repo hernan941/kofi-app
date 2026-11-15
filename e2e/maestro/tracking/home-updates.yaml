@@ -1,0 +1,26 @@
+appId: com.cuantovendi.local
+tags:
+  - tracking
+---
+- runFlow: ../_shared/launch-clean.yaml
+- runFlow:
+    file: ../_shared/create-product.yaml
+    env:
+      PRODUCT_NAME: 'Lámina Colibrí'
+      PRODUCT_PRICE: '15000'
+- tapOn: 'Inicio'
+- assertVisible: 'Aquí vas a ver cuánto vendes'
+- runFlow:
+    file: ../_shared/register-sale.yaml
+    env:
+      PRODUCT_ROW: 'Lámina Colibrí.*'
+- tapOn: 'Listo'
+- runFlow: ../_shared/dismiss-notification-intro.yaml
+- assertVisible: 'Esta semana vendiste.*15.000 pesos.*'
+- assertVisible: 'Hoy'
+- runFlow:
+    file: ../_shared/register-sale.yaml
+    env:
+      PRODUCT_ROW: 'Lámina Colibrí.*'
+- tapOn: 'Listo'
+- assertVisible: 'Esta semana vendiste.*30.000 pesos.*'

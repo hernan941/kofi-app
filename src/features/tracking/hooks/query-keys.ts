@@ -8,6 +8,8 @@ export const trackingKeys = {
     ['tracking', 'sales-between', from, to] as const,
   latest: (limit: number) => ['tracking', 'latest', limit] as const,
   earliest: () => ['tracking', 'earliest'] as const,
+  calendar: (from: LocalDate, to: LocalDate) => ['tracking', 'calendar', from, to] as const,
+  weekFacts: (weekStart: LocalDate) => ['tracking', 'week-facts', weekStart] as const,
   streak: (weekStart: LocalDate) => ['tracking', 'streak', weekStart] as const,
 };
 

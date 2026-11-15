@@ -5,6 +5,8 @@ import {
   createTestDependencies,
   type TestDependencies,
 } from '@/core/testing/create-test-dependencies';
+import { findGuiltPattern } from '@/shared/lib/testing/guilt-patterns';
+import { clearPerfMarks, readPerfMarks } from '@/shared/lib/perf-marks';
 import { renderWithProviders } from '@/core/testing/render-with-providers';
 
 import {
@@ -64,9 +66,11 @@ describe('NewSaleScreen', () => {
     await register('Lámina Colibrí, 15.000 pesos');
 
     expect(
-      await screen.findByRole('header', { name: '¡Registraste tu primera venta!' }),
+      await screen.findByRole('header', { name: /^¡Registraste tu primera venta!/ }),
     ).toBeOnTheScreen();
-    expect(screen.getAllByLabelText('15.000 pesos').length).toBeGreaterThan(0);
+    expect(
+      screen.getByRole('header', { name: '¡Registraste tu primera venta! 15.000 pesos' }),
+    ).toBeOnTheScreen();
   });
 
   it('celebrates the second sale with the regular title', async () => {
@@ -76,7 +80,7 @@ describe('NewSaleScreen', () => {
 
     await register('Lámina Colibrí, 15.000 pesos');
 
-    expect(await screen.findByRole('header', { name: '¡Venta registrada!' })).toBeOnTheScreen();
+    expect(await screen.findByRole('header', { name: /^¡Venta registrada!/ })).toBeOnTheScreen();
   });
 
   it('saves the sale', async () => {
@@ -109,7 +113,7 @@ describe('NewSaleScreen', () => {
     const { handlers, view } = setup();
     await view;
     await register('Lámina Colibrí, 15.000 pesos');
-    await screen.findByRole('header', { name: '¡Registraste tu primera venta!' });
+    await screen.findByRole('header', { name: /^¡Registraste tu primera venta!/ });
 
     const [isBlocked, callback] = mockPrevent.calls.at(-1) ?? [false, () => undefined];
     expect(isBlocked).toBe(true);
@@ -205,8 +209,35 @@ describe('NewSaleScreen', () => {
     await register('Lámina Colibrí, 15.000 pesos');
 
     expect(
-      (await screen.findAllByText('No se pudo guardar la venta. Inténtalo de nuevo.')).length,
+      (
+        await screen.findAllByText('No se pudo guardar la venta. Inténtalo de nuevo.', {
+          includeHiddenElements: true,
+        })
+      ).length,
     ).toBeGreaterThan(0);
     expect(screen.getByLabelText('Total: 15.000 pesos')).toBeOnTheScreen();
+    expect(findGuiltPattern('No se pudo guardar la venta. Inténtalo de nuevo.')).toBeNull();
+  });
+});
+
+describe('NewSaleScreen performance marks (P2)', () => {
+  afterEach(() => {
+    delete process.env.EXPO_PUBLIC_E2E;
+    clearPerfMarks();
+  });
+
+  it('marks the form ready, the press on save and the visible celebration, in order', async () => {
+    process.env.EXPO_PUBLIC_E2E = '1';
+    const { view } = setup();
+    await view;
+
+    await register('Lámina Colibrí, 15.000 pesos');
+    await screen.findByRole('header', { name: /^¡Registraste tu primera venta!/ });
+
+    expect(readPerfMarks().map(({ name }) => name)).toEqual([
+      'sale-form:ready',
+      'sale:save:press',
+      'sale:celebration:visible',
+    ]);
   });
 });

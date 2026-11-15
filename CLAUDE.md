@@ -4,11 +4,12 @@ App móvil con Expo (React Native) + TypeScript. Las decisiones técnicas están
 
 ## Reglas
 
-- **Git**: nunca hacer commit ni push salvo que el usuario lo pida explícitamente. Los commits y PRs van **sin coautor ni líneas de atribución**. Los subagentes no tocan el estado de git.
+- **Git**: nunca hacer commit ni push salvo que el usuario lo pida explícitamente. Los commits y PRs van **sin coautor ni líneas de atribución**. Los subagentes no tocan el estado de git. Nunca se commitean archivos `.env` ni secretos (solo `.env.example`); revisar `git status` antes de cada commit.
 - **Decisiones**: el tiempo de desarrollo no es un criterio. Se decide por calidad, mantenibilidad, corrección, seguridad y UX.
 - **ADRs**: toda decisión técnica nueva se registra como ADR en `docs/architecture/` y se agrega al índice. Este archivo se mantiene mínimo: solo reglas de trabajo y punteros.
 - **TDD** obligatorio; los tests E2E/pesados se hacen al cierre de cada feature (ver ADR-002).
 - **Comentarios**: solo docstrings TSDoc, nunca inline (ver ADR-003).
+- **Archivos de configuración** (`app.json`, `package.json`, `jest.config.js`): no revertir cambios que no hiciste tú; si `expo start` o `expo install` los modifican, conservar los cambios y avisar.
 - **Idioma**: conversación, docs y commits en español; código en inglés; textos de UI en español.
 
 ## Orquestación
@@ -29,5 +30,6 @@ App móvil con Expo (React Native) + TypeScript. Las decisiones técnicas están
 - `npm run doctor`: `expo-doctor` + `expo install --check`.
 - `npm run db:generate`: migraciones de Drizzle.
 - `npm run android` / `npm run android:release` / `npm run e2e:build` / `npm run e2e:android`: builds locales y Maestro (requieren Android SDK).
+- `npm run licenses:generate` / `npm run licenses:check`: avisos de licencias de terceros. Después de `npx expo install` o de quitar una dependencia, ejecutar `licenses:generate`.
 - Verificación de cada tarea (V-BASE): `typecheck`, `lint`, `format:check` y `test` en verde.
 - Tests fuera de `src/app/` (todo archivo en `src/app/` es una ruta de Expo Router).

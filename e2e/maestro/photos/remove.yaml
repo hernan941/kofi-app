@@ -13,7 +13,7 @@ tags:
 - assertVisible: '¿Quitar esta foto?'
 - assertVisible: 'Se quita de este producto. Si la quieres de nuevo, vuelve a elegirla.'
 - tapOn: 'Cancelar'
-- assertVisible: '1 de 6'
+- assertVisible: 'Foto 1 de 1'
 - tapOn: 'Quitar foto'
 - tapOn: 'Quitar foto'
 - assertVisible: '0 de 6'

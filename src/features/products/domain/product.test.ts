@@ -7,6 +7,7 @@ import {
   compareProductsForList,
   createProduct,
   hasSingleActiveVersion,
+  productListSortKey,
   unarchiveProduct,
   updateProduct,
 } from './product';
@@ -294,5 +295,17 @@ describe('tolerant readers', () => {
       .sort(compareProductsForList)
       .map((p) => p.name);
     expect(names).toEqual(['Árbol', 'arbol', 'nube', 'Ñandú', 'zeta']);
+  });
+});
+
+describe('productListSortKey', () => {
+  test('orders names without case or accents and puts ñ after n', () => {
+    const names = ['Ñandú', 'nube', 'Árbol', 'zorro', 'Nuez'];
+    const sorted = [...names].sort((a, b) => {
+      const keyA = productListSortKey(a);
+      const keyB = productListSortKey(b);
+      return keyA < keyB ? -1 : keyA > keyB ? 1 : 0;
+    });
+    expect(sorted).toEqual(['Árbol', 'nube', 'Nuez', 'Ñandú', 'zorro']);
   });
 });

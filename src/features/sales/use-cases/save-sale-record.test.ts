@@ -80,7 +80,7 @@ describe('saveSaleRecord', () => {
     expect(context.emitted).toEqual([new Set(['sale_records', 'sale_items', 'no_sales_weeks'])]);
   });
 
-  it('writes nothing and keeps the mark when an item write fails', async () => {
+  it('writes nothing and keeps the mark when removing the mark fails after the items were written', async () => {
     markWeek(THIS_MONDAY);
     const failing = {
       ...context.deps,
@@ -94,6 +94,26 @@ describe('saveSaleRecord', () => {
     };
 
     await expect(saveSaleRecord(failing, createCommand(TODAY, 2))).rejects.toThrow('boom');
+
+    expect(await context.sales.listBetween(TODAY, TODAY)).toEqual([]);
+    expect(await context.noSalesWeeks.listBetween(THIS_MONDAY, THIS_MONDAY)).toHaveLength(1);
+    expect(context.emitted).toEqual([]);
+  });
+
+  it('writes nothing and keeps the mark when saving the items fails after writing them', async () => {
+    markWeek(THIS_MONDAY);
+    const failing = {
+      ...context.deps,
+      sales: {
+        ...context.sales,
+        saveSync: (...args: Parameters<typeof context.sales.saveSync>) => {
+          context.sales.saveSync(...args);
+          throw new Error('boom');
+        },
+      },
+    };
+
+    await expect(saveSaleRecord(failing, createCommand(TODAY, 3))).rejects.toThrow('boom');
 
     expect(await context.sales.listBetween(TODAY, TODAY)).toEqual([]);
     expect(await context.noSalesWeeks.listBetween(THIS_MONDAY, THIS_MONDAY)).toHaveLength(1);

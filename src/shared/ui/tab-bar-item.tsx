@@ -25,17 +25,20 @@ export function TabBarIcon({ icon, focused }: TabBarIconProps) {
   );
 }
 
+const TAB_LABEL_MAX_FONT_SCALE = 1.3;
+const TAB_LABEL_MAX_LINES = 2;
+
 /**
  * Label of a tab (design system 6.9): `text-xs`, always visible, `font-semibold` and `accent`
  * when active, `font-medium` and `muted` when not. It grows with the system font size up to
- * 1.5 times (section 7).
+ * 1.3 times (section 7) and may use two lines, so a label like "Calendario" is never cut.
  */
 export function TabBarLabel({ label, focused }: TabBarLabelProps) {
   return (
     <Text
-      maxFontSizeMultiplier={1.5}
-      numberOfLines={1}
-      className={`text-xs ${focused ? 'font-semibold text-accent' : 'font-medium text-muted'}`}
+      maxFontSizeMultiplier={TAB_LABEL_MAX_FONT_SCALE}
+      numberOfLines={TAB_LABEL_MAX_LINES}
+      className={`text-center text-xs ${focused ? 'font-semibold text-accent' : 'font-medium text-muted'}`}
     >
       {label}
     </Text>

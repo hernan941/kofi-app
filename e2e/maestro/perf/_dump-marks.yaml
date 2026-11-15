@@ -1,0 +1,8 @@
+appId: com.cuantovendi.local
+---
+- openLink: cuantovendi://e2e/perf
+- assertVisible: 'Marcas de rendimiento'
+- copyTextFrom:
+    id: 'perf-marks'
+- evalScript: ${console.log('PERFMARKS_BEGIN ' + FLOW + '\n' + maestro.copiedText + '\nPERFMARKS_END')}
+- takeScreenshot: perf-marks-${FLOW}

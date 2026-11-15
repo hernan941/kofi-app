@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState, type ComponentRef, type ReactNode } from 'react';
 import { AccessibilityInfo, ScrollView, Text, View } from 'react-native';
 import Animated, { Keyframe, useReducedMotion } from 'react-native-reanimated';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { formatClpAccessible, isoWeekStart, type Clp, type LocalDate } from '@/shared/domain';
 import {
@@ -11,9 +10,9 @@ import {
   InfoIcon,
   InlineNotice,
   PrimaryButton,
-  announce,
   formatDateLabel,
   type ButtonHandle,
+  StyledSafeAreaView,
 } from '@/shared/ui';
 
 import { useScheduleFrame } from '@/shared/lib/use-schedule-frame';
@@ -54,13 +53,24 @@ function clearedNoticeText(clearedWeek: LocalDate, today: LocalDate): string {
   return `Como vendiste ${which}, quitamos la marca de "no vendí".`;
 }
 
+/** Foco de accesibilidad en un elemento, en el siguiente cuadro, cuando ya está dibujado. */
+function focusElement(
+  scheduleFrame: ReturnType<typeof useScheduleFrame>,
+  element: Parameters<typeof AccessibilityInfo.sendAccessibilityEvent>[0] | null,
+) {
+  scheduleFrame(() => {
+    if (element !== null) AccessibilityInfo.sendAccessibilityEvent(element, 'focus');
+  });
+}
+
 /**
  * Confirmación que celebra (D-36, UX-S9): ícono de confeti, título (el de la primera venta es
  * propio), el total en grande, el resumen, una frase y, si se quitó una marca de "no vendí",
  * el aviso suave de D-02. Deja un lugar reservado (`renderAfterSave`) para el consejo de F6 y
  * un único camino de salida, "Listo", para que el consejo y el pedido de permiso nunca se
- * salten. Al aparecer anuncia la venta y lleva el foco al título. El ícono entra con un
- * fundido y escala suaves, salvo que el sistema pida reducir el movimiento.
+ * salten. Al aparecer lleva el foco al título, que dice también el total. El ícono entra con un
+ * fundido y escala suaves, salvo que el sistema pida reducir el movimiento. No anuncia aparte: el foco va al título, que
+ * ya incluye el total ("¡Venta registrada! 45.000 pesos"), así se oye una sola vez.
  */
 export function SaleSavedCelebration({
   outcome,
@@ -74,25 +84,16 @@ export function SaleSavedCelebration({
   const title = useRef<ComponentRef<typeof Text>>(null);
   const [doneButton, setDoneButton] = useState<ButtonHandle | null>(null);
   const { isFirstSale, clearedNoSalesWeek } = outcome;
+  const titleText = isFirstSale ? '¡Registraste tu primera venta!' : '¡Venta registrada!';
 
   const scheduleFrame = useScheduleFrame();
-  const focusElement = (
-    element: Parameters<typeof AccessibilityInfo.sendAccessibilityEvent>[0] | null,
-  ) => {
-    scheduleFrame(() => {
-      if (element !== null) AccessibilityInfo.sendAccessibilityEvent(element, 'focus');
-    });
-  };
-
   useEffect(() => {
-    const lead = isFirstSale ? 'Registraste tu primera venta' : 'Venta registrada';
-    announce(`${lead}. Total: ${formatClpAccessible(total)}.`);
-    focusElement(title.current);
-  }, [isFirstSale, total]);
+    focusElement(scheduleFrame, title.current);
+  }, [scheduleFrame]);
 
   const controls: AfterSaveControls = {
     focusDone: () => {
-      focusElement(doneButton);
+      focusElement(scheduleFrame, doneButton);
     },
   };
 
@@ -105,11 +106,14 @@ export function SaleSavedCelebration({
         <Text
           ref={title}
           accessibilityRole="header"
+          accessibilityLabel={`${titleText} ${formatClpAccessible(total)}`}
           className="text-center font-semibold text-title text-foreground"
         >
-          {isFirstSale ? '¡Registraste tu primera venta!' : '¡Venta registrada!'}
+          {titleText}
         </Text>
-        <Amount value={total} variant="display" />
+        <View accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+          <Amount value={total} variant="display" />
+        </View>
         <Text className="text-center text-base text-muted">
           {summaryText(outcome.soldOn, today, productCount)}
         </Text>
@@ -123,9 +127,9 @@ export function SaleSavedCelebration({
         )}
         {renderAfterSave?.(outcome, controls)}
       </ScrollView>
-      <SafeAreaView edges={['bottom']} className="px-4 pt-2 pb-4">
+      <StyledSafeAreaView edges={['bottom']} className="px-4 pt-2 pb-4">
         <PrimaryButton ref={setDoneButton} label="Listo" onPress={onDone} />
-      </SafeAreaView>
+      </StyledSafeAreaView>
     </View>
   );
 }

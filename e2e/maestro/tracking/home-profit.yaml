@@ -1,0 +1,43 @@
+appId: com.cuantovendi.local
+tags:
+  - tracking
+---
+- runFlow: ../_shared/launch-clean.yaml
+- runFlow:
+    file: ../_shared/create-product.yaml
+    env:
+      PRODUCT_NAME: 'Lámina Colibrí'
+      PRODUCT_PRICE: '15000'
+- runFlow:
+    file: ../_shared/create-product.yaml
+    env:
+      PRODUCT_NAME: 'Taza Pájaro'
+      PRODUCT_PRICE: '8000'
+- runFlow:
+    file: ../_shared/register-sale.yaml
+    env:
+      PRODUCT_ROW: 'Lámina Colibrí.*'
+- tapOn: 'Listo'
+- runFlow: ../_shared/dismiss-notification-intro.yaml
+- assertVisible: 'Esta semana'
+- assertNotVisible: '.*te quedaron aprox..*'
+- tapOn: 'Productos'
+- tapOn: 'Lámina Colibrí'
+- tapOn: 'Editar producto'
+- scrollUntilVisible:
+    element: 'Agregar costo'
+- tapOn: 'Agregar costo'
+- inputText: '3000'
+- pressKey: Enter
+- scrollUntilVisible:
+    element: 'Guardar'
+- tapOn: 'Guardar'
+- assertVisible: 'Cambios guardados'
+- tapOn: 'Volver'
+- tapOn: 'Inicio'
+- assertVisible: 'Este mes te quedaron aprox. .*12.000.*'
+- tapOn: 'Registrar venta'
+- tapOn: 'Taza Pájaro.*'
+- tapOn: 'Guardar venta'
+- tapOn: 'Listo'
+- assertVisible: 'Este mes, de lo que tiene costo cargado, te quedaron aprox. .*12.000.*'

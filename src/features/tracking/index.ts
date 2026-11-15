@@ -1,6 +1,10 @@
 export { CalendarScreen } from './screens/calendar-screen';
+export { DayDetailScreen } from './screens/day-detail-screen';
+export { StreakBadge } from './components/streak-badge';
 export { HomeScreen } from './screens/home-screen';
 export { MonthlySummaryScreen } from './screens/monthly-summary-screen';
+export type { CalendarScreenProps } from './screens/calendar-screen';
+export type { DayDetailScreenProps } from './screens/day-detail-screen';
 export type { HomeScreenProps } from './screens/home-screen';
 export type { MonthlySummaryScreenProps } from './screens/monthly-summary-screen';
 export { TRACKING_QUERY_DEPENDENCIES, trackingCostKeys, trackingKeys } from './hooks/query-keys';

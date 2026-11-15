@@ -1,5 +1,5 @@
 import type { Icon as PhosphorIcon } from 'phosphor-react-native';
-import { Text, View } from 'react-native';
+import { ScrollView, Text, View } from 'react-native';
 
 import { Icon } from './icon';
 import { PrimaryButton } from './primary-button';
@@ -23,7 +23,7 @@ export interface EmptyStateProps {
 /**
  * What a screen shows when there is nothing yet (design system 6.7): a duotone icon, a
  * positive title, one sentence that says what to do and the main action below. The tone
- * never blames the person.
+ * never blames the person. It scrolls, so with the largest font the buttons stay reachable.
  */
 export function EmptyState({
   icon,
@@ -33,7 +33,10 @@ export function EmptyState({
   secondaryAction,
 }: EmptyStateProps) {
   return (
-    <View className="items-center gap-4 px-4 pt-12">
+    <ScrollView
+      testID="state-scroll"
+      contentContainerClassName="items-center gap-4 px-4 pt-12 pb-4"
+    >
       <Icon icon={icon} size="xl" weight="duotone" color="muted" />
       <View className="items-center gap-2">
         <Text
@@ -54,6 +57,6 @@ export function EmptyState({
           )}
         </View>
       )}
-    </View>
+    </ScrollView>
   );
 }

@@ -80,7 +80,7 @@ const TOO_MANY_ITEMS: SaleErrorCode = 'too_many_items';
 const itemRowSchema = z
   .object({
     itemId: z.string().nullable(),
-    productId: z.string(),
+    productId: z.custom<ProductId>((value) => productIdSchema.safeParse(value).success),
     productVersionId: z.string(),
     quantity: z.number(),
     priceText: z.string(),
@@ -103,7 +103,7 @@ const itemRowSchema = z
     }
     return {
       itemId: row.itemId === null ? null : saleItemIdSchema.parse(row.itemId),
-      productId: productIdSchema.parse(row.productId),
+      productId: row.productId,
       productVersionId: productVersionIdSchema.parse(row.productVersionId),
       quantity: quantity.data,
       unitPrice: price.data,

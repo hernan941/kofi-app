@@ -10,7 +10,7 @@ import { NoSalesSection } from './no-sales-section';
 const user = userEvent.setup();
 
 async function findVisibleText(text: string) {
-  const [visible] = await screen.findAllByText(text);
+  const [visible] = await screen.findAllByText(text, { includeHiddenElements: true });
   return visible;
 }
 

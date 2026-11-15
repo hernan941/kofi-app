@@ -14,9 +14,9 @@ import {
   ScreenHeader,
   formatDateLabel,
   useAppToast,
+  StyledSafeAreaView,
 } from '@/shared/ui';
 import { formatClp } from '@/shared/domain';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { SALE_ERROR_MESSAGES } from '../components/error-messages';
 import { SaleDetail } from '../components/sale-detail';
@@ -109,7 +109,7 @@ export function SaleDetailScreen({
           setIsConfirming(true);
         }}
       />
-      <SafeAreaView edges={['bottom']} className="px-4 pt-2 pb-4">
+      <StyledSafeAreaView edges={['bottom']} className="px-4 pt-2 pb-4">
         <PrimaryButton
           label="Editar venta"
           icon={PencilSimpleIcon}
@@ -117,7 +117,7 @@ export function SaleDetailScreen({
             onEdit(saleRecordId);
           }}
         />
-      </SafeAreaView>
+      </StyledSafeAreaView>
       <ConfirmDialog
         isOpen={isConfirming}
         title="¿Borrar esta venta?"

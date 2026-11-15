@@ -9,7 +9,6 @@ import {
   Text,
   View,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 import {
   productVersionIdSchema,
@@ -31,6 +30,7 @@ import {
   announce,
   type ButtonHandle,
   createSubmitHandler,
+  StyledSafeAreaView,
 } from '@/shared/ui';
 
 import {
@@ -315,14 +315,15 @@ export function ProductForm({
           )}
         </Card>
       </ScrollView>
-      <SafeAreaView edges={['bottom']} className="px-4 pt-2 pb-4">
+      <StyledSafeAreaView edges={['bottom']} className="px-4 pt-2 pb-4">
         <PrimaryButton
           label={isWaitingForPhotos ? PHOTO_MESSAGES.savingLabel : 'Guardar'}
+          accessibilityState={isWaitingForPhotos ? { busy: true } : undefined}
           onPress={() => {
             void submit();
           }}
         />
-      </SafeAreaView>
+      </StyledSafeAreaView>
       <ConfirmDialog
         isOpen={pendingRemoval !== null}
         title={pendingRemoval?.name ? `¿Quitar ${pendingRemoval.name}?` : '¿Quitar esta versión?'}
