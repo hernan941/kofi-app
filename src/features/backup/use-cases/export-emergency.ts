@@ -85,7 +85,7 @@ async function writeZip(
  * Exportación de emergencia (ADR-006, backup.md 4.5): vacía la carpeta de emergencia, comprueba
  * que haya espacio para el `info.json` y las fotos (la base se mide después, cuando ya existe su
  * copia), copia la base sin escribir en ella, la empaqueta con las fotos de `photos/` y
- * `info.json` en `cuantovendi-emergencia-AAAA-MM-DD.zip` dentro de esa carpeta, y la comparte.
+ * `info.json` en `kofi-emergencia-AAAA-MM-DD.zip` dentro de esa carpeta, y la comparte.
  * Borra las copias de la base al terminar, también si algo falla (no el ZIP, que la persona puede
  * estar guardando). No usa el snapshot ni `BackupDataV1` (el esquema puede ser desconocido) ni
  * toma el lock (en `failed` la recolección de huérfanos no corre). Las entradas no están en la

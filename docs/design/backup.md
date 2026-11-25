@@ -296,10 +296,10 @@ Los problemas de crear y exportar no van en un aviso que desaparece, sino en la 
 
 | Código | Título | Frase | Otro archivo |
 |---|---|---|---|
-| `not_a_backup` | "Este archivo no es un respaldo de cuantovendi" | "Elige el archivo que creaste con \"Crear respaldo\". Su nombre empieza con cuantovendi-respaldo." | Sí |
+| `not_a_backup` | "Este archivo no es un respaldo de Kofi" | "Elige el archivo que creaste con \"Crear respaldo\". Su nombre empieza con kofi-respaldo (o cuantovendi-respaldo, si lo hiciste antes)." | Sí |
 | `invalid_archive` | "No pudimos leer este respaldo" | "El archivo parece dañado o incompleto. Si lo bajaste de tu correo o de Drive, descárgalo de nuevo y vuelve a elegirlo." | Sí |
-| `invalid_archive` con `reason.code = 'too_large'` | "Este archivo es demasiado grande" | "Es más grande que cualquier respaldo de cuantovendi. Revisa que sea el archivo correcto." | Sí |
-| `newer_format` | "Este respaldo es de una versión más nueva de la app" | "Actualiza cuantovendi y vuelve a intentarlo." | No |
+| `invalid_archive` con `reason.code = 'too_large'` | "Este archivo es demasiado grande" | "Es más grande que cualquier respaldo de Kofi. Revisa que sea el archivo correcto." | Sí |
+| `newer_format` | "Este respaldo es de una versión más nueva de la app" | "Actualiza Kofi y vuelve a intentarlo." | No |
 | `entries_mismatch` | "Este respaldo está incompleto" | "Le faltan partes o tiene archivos que no son suyos. Prueba con otra copia del respaldo." | Sí |
 | `checksum_mismatch` | "Este respaldo cambió desde que se creó" | "Algunos datos no coinciden con los originales. Para cuidar tu información, no lo usamos. Prueba con otra copia del respaldo." | Sí |
 | `invalid_data` | "Este respaldo tiene datos que la app no reconoce" | "Prueba con otro respaldo. Si abriste el archivo en el computador y lo cambiaste, usa la copia original." | Sí |
@@ -309,7 +309,7 @@ Los problemas de crear y exportar no van en un aviso que desaparece, sino en la 
 | Inesperado (excepción) | "No pudimos terminar" | "Vuelve a intentarlo en un momento." | No |
 
 - `{espacio}` sale de `requiredBytes` (5.6).
-- **Copia de emergencia elegida para restaurar** (el nombre del archivo elegido empieza con `cuantovendi-emergencia`): en lugar del mensaje de `not_a_backup` o `invalid_archive`, título **"Esta es una copia de emergencia"** y frase **"Guarda tus datos tal como estaban, pero la app no puede restaurarla. Guárdala en un lugar seguro."** (pregunta 9.2).
+- **Copia de emergencia elegida para restaurar** (`prepareRestore` la detecta por su contenido: el `info.json` con `kind: "cuantovendi-emergency"`, sin importar el nombre del archivo, y devuelve `emergency_backup`): en lugar del mensaje de `not_a_backup` o `invalid_archive`, título **"Esta es una copia de emergencia"** y frase **"Guarda tus datos tal como estaban, pero la app no puede restaurarla. Guárdala en un lugar seguro."** (pregunta 9.2).
 - "Tus datos siguen como estaban." se agrega en la vista cuando el problema llega después de confirmar (3.9), así que no forma parte de cada mensaje.
 
 ### 5.4 Problemas al crear un respaldo o una planilla (`EXPORT_ERROR_MESSAGES`, por `ExportError['code']`)
@@ -403,7 +403,7 @@ Los de `docs/architecture/backup.md` (2.1), con estas precisiones:
 - Ningún texto de la sección 5 coincide con `GUILT_PATTERNS` ni contiene "ZIP", "CRC", "hash", "JSON", "SQL" ni "error" (sin distinguir mayúsculas).
 - `not_enough_space` con 350.000.000 bytes dice "350 MB"; con 1.200.000.001, "1,3 GB" (redondeo hacia arriba); con 10, "1 MB".
 - `formatBackupDate` con `FakeClock` en las tres zonas de ADR-015: hoy → "hoy, 15:42"; ayer → "ayer, 9:05"; otro día → "13 de noviembre de 2026, 15:42", incluido un respaldo creado a las 23:59 locales.
-- Un archivo elegido con nombre `cuantovendi-emergencia-2026-11-13.zip` que da `invalid_archive` muestra "Esta es una copia de emergencia".
+- Un archivo de emergencia (con `info.json` de emergencia, aunque se haya renombrado) da `emergency_backup` y muestra "Esta es una copia de emergencia".
 
 **Pantalla de respaldo (F8.7)**
 - Sin copia de seguridad no aparece la sección "Copia de seguridad"; con una, muestra "Copia del {fecha}" y "Restaurar esta copia".
@@ -422,7 +422,7 @@ Los de `docs/architecture/backup.md` (2.1), con estas precisiones:
 
 **Arranque (F8.8)**: en los tres motivos aparece la frase y el botón; `working` deshabilita el botón y muestra "Preparando la copia…"; `done` y `failed` muestran su `InlineNotice` y se anuncian; no hay ningún otro botón.
 
-**E2E (F8.10)**: los de F8.0 (5.7), buscando "Exportar ventas", "Exportar productos", "Crear respaldo", "Elegir un respaldo", "¿Restaurar este respaldo?", "Sí, reemplazar", "Listo, restauramos tu respaldo" y "Este archivo no es un respaldo de cuantovendi".
+**E2E (F8.10)**: los de F8.0 (5.7), buscando "Exportar ventas", "Exportar productos", "Crear respaldo", "Elegir un respaldo", "¿Restaurar este respaldo?", "Sí, reemplazar", "Listo, restauramos tu respaldo" y "Este archivo no es un respaldo de Kofi".
 
 **Manual**: con `large`, el progreso avanza sin saltos raros y la pantalla no queda congelada más de un par de segundos en "Aplicar los cambios"; con TalkBack, los anuncios no se superponen.
 
@@ -431,5 +431,5 @@ Los de `docs/architecture/backup.md` (2.1), con estas precisiones:
 ## 9. Preguntas abiertas
 
 1. **Mostrar también lo que hay ahora (para el usuario).** La vista previa podría decir "Hoy tienes 30 productos y 350 ventas" al lado de lo que trae el respaldo. Ayuda mucho a no restaurar un respaldo viejo por error. Recomiendo agregarlo, pero necesita que el architect sume los conteos actuales al `RestorePlan` (o una consulta aparte). **Por defecto**: no se muestra y la vista previa queda como en 3.5.
-2. **Reconocer la copia de emergencia (para el architect).** La UI distingue una copia de emergencia por el nombre del archivo elegido (5.3). Es simple, pero depende de que la persona no lo renombre. La alternativa es que `prepareRestore` detecte `info.json` con `kind: "cuantovendi-emergency"` y devuelva un código propio. **Por defecto**: el nombre del archivo, que hay que guardar en el estado `inspecting` del reducer.
+2. **Reconocer la copia de emergencia (para el architect).** **Resuelto**: `prepareRestore` detecta `info.json` con `kind: "cuantovendi-emergency"` y devuelve el código propio `emergency_backup`, así que no depende del nombre del archivo ni de que la persona lo renombre (5.3).
 3. **Pantalla encendida durante la restauración (para el architect).** Con muchas fotos, el teléfono puede apagar la pantalla a mitad de camino; la restauración sigue, pero la persona pierde de vista el progreso. Mantenerla encendida necesita `expo-keep-awake`, que no está entre las dependencias. **Por defecto**: no se agrega.

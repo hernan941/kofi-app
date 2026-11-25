@@ -14,8 +14,8 @@ const DATE = localDateSchema.parse('2026-11-13');
 
 describe('backup file names', () => {
   it('names the backup and the emergency copy after the local date', () => {
-    expect(backupFileName(DATE)).toBe('cuantovendi-respaldo-2026-11-13.zip');
-    expect(emergencyFileName(DATE)).toBe('cuantovendi-emergencia-2026-11-13.zip');
+    expect(backupFileName(DATE)).toBe('kofi-respaldo-2026-11-13.zip');
+    expect(emergencyFileName(DATE)).toBe('kofi-emergencia-2026-11-13.zip');
   });
 
   it('keeps the CSV names fixed', () => {
@@ -46,12 +46,14 @@ describe('backup file names', () => {
   });
 
   it.each([
+    ['kofi-respaldo-2026-11-13.zip', true],
     ['cuantovendi-respaldo-2026-11-13.zip', true],
+    ['cuantovendi-respaldo-2026-13-45.zip', false],
     ['ventas.csv', true],
     ['productos.csv', true],
     ['../ventas.csv', false],
-    ['cuantovendi-respaldo-2026-13-45.zip', false],
-    ['cuantovendi-respaldo-2026-11-13.zip.part', false],
+    ['kofi-respaldo-2026-13-45.zip', false],
+    ['kofi-respaldo-2026-11-13.zip.part', false],
     ['photos/a.jpg', false],
   ])('validates the export name %j', (name, expected) => {
     expect(isExportFileName(name)).toBe(expected);

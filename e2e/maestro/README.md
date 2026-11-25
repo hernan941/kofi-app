@@ -32,10 +32,10 @@ Flujos de extremo a extremo (ADR-002, ADR-013, ADR-016). Corren en Android, en l
 
 ## V-E2E-UPG (actualización)
 
-Se hace al cerrar toda feature que agregue una migración y en F10.5. Necesita el APK `e2e` del punto de control anterior en `builds/android/cuantovendi-<cp anterior>-e2e.apk` (ADR-016, sección 5).
+Se hace al cerrar toda feature que agregue una migración y en F10.5. Necesita el APK `e2e` del punto de control anterior: hoy, `builds/android/cuantovendi-b66135a-e2e.apk`; después, el del último punto de control (ADR-016, sección 5).
 
 1. `adb uninstall com.cuantovendi.local` (si estaba instalada).
-2. `adb install builds/android/cuantovendi-<cp anterior>-e2e.apk`.
+2. `adb install builds/android/cuantovendi-b66135a-e2e.apk`.
 3. Cargar los datos con el build anterior instalado: `maestro test e2e/maestro/foundations/upgrade-seed.yaml`. Crea por la UI (la semilla puede no existir en el build anterior) el producto "Lámina Colibrí" ($15.000), una venta de hoy, la marca "no vendí" de la semana pasada y el recordatorio en "Viernes a las 20:15" (distinto del valor por defecto). No borres los datos de la app después.
 4. Instalar el build nuevo encima, sin desinstalar: `adb install -r android/app/build/outputs/apk/release/app-release.apk` (el `e2e` recién compilado). Todos los builds comparten firma; si falla con `INSTALL_FAILED_UPDATE_INCOMPATIBLE`, la clave de la plantilla cambió.
 5. `maestro test e2e/maestro/foundations/upgrade-verify.yaml` el mismo día. Comprueba que la app abre sin la pantalla de error y que siguen el producto, la venta de hoy, la marca "no vendí" con la racha de 2 semanas y el recordatorio de los viernes a las 20:15. Cada feature con datos agrega aquí la verificación de los suyos, y su parte de carga en `upgrade-seed.yaml`.

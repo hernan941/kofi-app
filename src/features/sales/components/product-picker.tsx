@@ -192,13 +192,13 @@ function VirtualizedProductList({ products, showThumbnails, onSelect }: ProductP
     <ProductRow product={item} showThumbnails={showThumbnails} onSelect={onSelect} />
   );
   return (
-    <View className="gap-3">
+    <View className="shrink gap-3">
       {hasSearch ? <SearchField query={query} onChange={setQuery} /> : null}
       {matches.length === 0 ? (
         <NoMatches query={query} />
       ) : (
         <FlatList
-          className="max-h-96"
+          className="max-h-96 shrink"
           data={matches}
           renderItem={renderItem}
           keyExtractor={productKey}

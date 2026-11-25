@@ -20,8 +20,7 @@ export function PermissionStatus({ permission, onRequest, onOpenSettings }: Perm
     return (
       <Card title="Activa los avisos">
         <Text className="text-base text-foreground">
-          Para que te lleguen los recordatorios, cuantovendi necesita tu permiso para enviarte
-          avisos.
+          Para que te lleguen los recordatorios, Kofi necesita tu permiso para enviarte avisos.
         </Text>
         <PrimaryButton label="Activar recordatorios" onPress={onRequest} />
       </Card>
@@ -35,7 +34,7 @@ export function PermissionStatus({ permission, onRequest, onOpenSettings }: Perm
         </Text>
         <PrimaryButton
           label="Abrir ajustes"
-          accessibilityHint="Abre los ajustes de cuantovendi en tu teléfono"
+          accessibilityHint="Abre los ajustes de Kofi en tu teléfono"
           onPress={onOpenSettings}
         />
       </Card>

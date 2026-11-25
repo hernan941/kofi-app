@@ -1,4 +1,4 @@
-# Plan de implementación — cuantovendi v1
+# Plan de implementación — Kofi v1
 
 - **Estado**: Listo para revisión del usuario (punto de control CP0).
 - **Fecha**: 2026-11-13
@@ -65,7 +65,7 @@ Hoy existen `npm test`, `npm run typecheck`, `npm run lint` y `npm run format`. 
 | **V-DEPS** | `npx expo-doctor` · `npx expo install --check` | Toda tarea que agregue o cambie dependencias, y al cierre de cada fase. |
 | **V-DEV** | `npx expo start` (dev server) o, si un módulo nativo lo exige, `npx expo run:android` en el emulador o en el teléfono conectado | Para probar a mano y en los puntos de control. |
 | **V-E2E-A** (requiere entorno Android; hoy, pendiente de entorno) | Build **`e2e`** de Android generado **localmente** con el comando de ADR-016, instalado en el emulador o en el teléfono conectado · `maestro test e2e/maestro/<feature>` | Solo en la tarea E2E de cierre de cada feature (D-14). |
-| **V-E2E-UPG** (requiere entorno Android; hoy, pendiente de entorno) | E2E de **actualización**: instalar el build del último punto de control aprobado, cargar datos, instalar encima el build nuevo y verificar que los datos siguen ahí | Cierre de toda feature que agregue una migración, y en F10.5. |
+| **V-E2E-UPG** (requiere entorno Android; hoy, pendiente de entorno) | E2E de **actualización**: instalar el build base (el `e2e` del último punto de control guardado; hoy `builds/android/cuantovendi-b66135a-e2e.apk`, ADR-016, enmienda 2026-11-15), cargar datos, instalar encima el build nuevo y verificar que los datos siguen ahí | Cierre de toda feature que agregue una migración, y en F10.5. |
 | **V-AUDIT** | `npm audit` | Al cierre de cada fase y en el gate final. |
 
 **Entorno disponible hoy**: Node, Jest, typecheck, lint y el Expo dev server. **No hay** Android SDK, emulador ni Maestro, y no se instalan sin autorización del usuario. Todo lo que los necesita queda pendiente de entorno y no bloquea.
@@ -1386,7 +1386,7 @@ F7+F8 ──► F9 Ajustes ──► F10 Cierre (accesibilidad, rendimiento, gat
   - Lee una instantánea consistente.
   - Calcula el `sha256` de cada foto activa desde el disco; si no coincide con la fila, usa el del disco y registra una advertencia; si el archivo falta, exporta la fila como borrada lógicamente y sin archivo.
   - El manifiesto tiene los conteos (`activePhotos` = fotos con archivo) y los `sha256` correctos, y lista `data.json` y solo las fotos activas.
-  - El archivo se llama `cuantovendi-respaldo-AAAA-MM-DD.zip`, con la fecha local de `Clock`.
+  - El archivo se llama `kofi-respaldo-AAAA-MM-DD.zip`, con la fecha local de `Clock`.
   - Comprueba el espacio libre antes de escribir.
   - El temporal se borra al terminar o al próximo arranque.
 - **Depende de**: F8.4.
@@ -1549,7 +1549,8 @@ F7+F8 ──► F9 Ajustes ──► F10 Cierre (accesibilidad, rendimiento, gat
 
 - [~] F10.5
 - **Agente**: code-writer (a pedido del orquestador) + reviewer.
-- **Objetivo**: correr toda la suite de `e2e/maestro/` localmente en el build `e2e` de Android, más los E2E de instalación nueva y de **actualización desde el build de CP1** (V-E2E-UPG).
+- **Objetivo**: correr toda la suite de `e2e/maestro/` localmente en el build `e2e` de Android y el E2E de instalación nueva. `release-has-no-e2e.yaml` se corre aparte contra un build `release` limpio (ADR-016, enmienda 2026-11-15).
+- **V-E2E-UPG** *(ajustado en F10.5)*: no hay APK de CP1, y el build de `ef90f82` no sirve como base (tiene el error de `SafeAreaView` de ADR-019 y no permite cargar datos por la UI). Como la app nunca se instaló en el teléfono del usuario, no hay datos reales de versiones anteriores. La base pasa a ser el build `e2e` de `b66135a`, guardado en `builds/android/cuantovendi-b66135a-e2e.apk`, y el primer V-E2E-UPG se corre en la próxima feature que agregue una migración. La migración `0001` (incluida en `b66135a`) queda cubierta solo por su test de datos previos (DT-13).
 - **Aceptación**: se cumple DT-12.
 - **Depende de**: F10.1 a F10.4.
 
@@ -1785,3 +1786,6 @@ Quien cierra una tarea agrega aquí una fila (la más reciente al final). La col
 | 2026-11-15 | F10.7 (gate local, 1ª pasada) | reviewer | typecheck 0 · lint 0 · prettier ok · jest 324 suites / 3521 tests · test:tz ok · V-DB sin cambios · licenses ok (81) · doctor 20/20 · audit sin altas/críticas · `.hbc` 8.011.391 B · bundle sin textos E2E (26 buscados, UTF-8 y UTF-16) | 4 importantes (prebuild en scripts, `check-jpeg-metadata`, `upgrade-verify` sin datos, miniaturas UX-F7) en corrección. DT-10/11/13/16 cumplidos; el resto `[~]` pendiente del usuario. Íconos de lanzador y splash: fuera de alcance v1 (sección 10). Guía: `docs/v1-pendiente-usuario.md`. |
 | 2026-11-15 | F10.7 (gate local, cierre) / CP11 | code-writer + orquestador | typecheck 0 · lint 0 · prettier ok · jest 326 suites / 3548 tests · test:tz ok · licenses ok (81) | 4 importantes del gate cerrados: prebuild automático en `android`/`android:release`/`e2e:build` (con test); `tools/photos/check-jpeg-metadata.mjs` (11 tests); `upgrade-seed` + `upgrade-verify` con datos; miniaturas en Productos y Archivados. DT-14 cumplido. **v1 lista localmente; `[~]` pendiente de verificación en dispositivo por el usuario** (guía `docs/v1-pendiente-usuario.md`) y aprobación final CP12. |
 | 2026-11-15 | F10.5 (emulador) | code-writer | `[~]` maestro 38/38 flujos en `cuantovendi_api34` (+ `release-has-no-e2e` OK en release limpio) · 3 bugs de la app corregidos con test (SafeAreaView sin estilos en Android, `toSorted` ausente en Hermes, permiso de notificaciones nunca "undetermined" en Android) · flujos YAML ajustados a la UI real | V-E2E-UPG (actualización) no ejecutado: el build `ef90f82` tiene el bug de SafeAreaView (Productos en blanco) y no permite cargar datos por la UI. Pendiente del usuario: teléfono, TalkBack, notificaciones reales. |
+| 2026-11-15 | F10.5 (decisiones) | architect | Solo documentación | ADR-019 (`StyledSafeAreaView` y `withUniwind` para componentes de terceros) y ADR-020 (solo APIs de JS disponibles en Hermes), con sus reglas de lint especificadas para el code-writer. Enmiendas de ADR-011 (permiso de Android: `denied` solo si `!canAskAgain`), ADR-013 (reglas nuevas y entorno de Maestro) y ADR-016 (`release-has-no-e2e` solo contra un release limpio; base de V-E2E-UPG = `builds/android/cuantovendi-b66135a-e2e.apk`). |
+| 2026-11-17 | F10.5 (correcciones de la regresión) | code-writer | `[~]` pestañas en una línea (`TabBarLabel` con `adjustsFontSizeToFit`, `tabBarHeight`, `useTabBarStyle`), `FormLayout` con desplazamiento al campo con foco (`TextField`, `QuantityStepper`, `Sheet`, formularios de producto y venta), reglas de lint de ADR-019 (`SafeAreaView`) y ADR-020 (Hermes) con fixtures, base de V-E2E-UPG `b66135a` · typecheck 0 · lint 0 · prettier ok · jest y test:tz en verde | Pendiente en emulador o teléfono: ver "Calendario" en una línea en 320, 360 y 392 dp (letra al 100 % y al máximo, claro y oscuro) y el campo, su error y el botón fijo sobre el teclado en Android. Sin dependencias nuevas. |
+| 2026-11-17 | F10.5 (correcciones de la revisión) | code-writer | `[~]` I1 (`shrink` en el contenedor de la lista de la hoja de productos, con test), M1 (`FormLayout` olvida el campo desmontado y solo desplaza con teclado visible), M3/M4 (alto de la barra con inset y `hairlineWidth`), M5, M6 (ADR-019: `import * as` de `react-native`), M7 · M2: 10 corridas de `test:ui` sin fallos, flaky no reproducido (logs en el scratchpad) · typecheck 0 · lint 0 · prettier ok · jest y test:tz en verde | El flaky de la suite `ui` (1 de 13 corridas) sigue sin identificar. |

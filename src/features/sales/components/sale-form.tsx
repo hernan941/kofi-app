@@ -1,14 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useController, useFieldArray, useForm, useFormState, useWatch } from 'react-hook-form';
-import {
-  AccessibilityInfo,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  Text,
-  View,
-} from 'react-native';
+import { AccessibilityInfo, Text, View } from 'react-native';
 
 import { activeVersions, type Product, type ProductVersion } from '@/features/products/domain';
 import {
@@ -46,7 +39,7 @@ import {
   createSubmitHandler,
   useAnnounceWhen,
   type ButtonHandle,
-  StyledSafeAreaView,
+  FormLayout,
 } from '@/shared/ui';
 
 import {
@@ -290,215 +283,218 @@ export function SaleForm({
   const dateError = errors.soldOn?.message;
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      className="flex-1"
-    >
-      <ScrollView keyboardShouldPersistTaps="handled" contentContainerClassName="gap-6 px-4 pb-6">
+    <FormLayout
+      contentContainerClassName="gap-6 px-4 pb-6"
+      footer={
         <View className="gap-2">
-          <DateField
-            label="¿Cuándo vendiste?"
-            value={soldOn.field.value}
-            onChange={(next: LocalDate) => {
-              soldOn.field.onChange(next);
+          {hasRows ? (
+            <AccessibleGroup
+              label={`Total: ${formatClpAccessible(total)}`}
+              contentClassName="flex-row flex-wrap items-baseline justify-between gap-2"
+            >
+              <Text className="font-medium text-base text-foreground">Total</Text>
+              <Amount value={total} variant="total" />
+            </AccessibleGroup>
+          ) : null}
+          <PrimaryButton
+            label={mode === 'create' ? 'Guardar venta' : 'Guardar cambios'}
+            icon={CheckIcon}
+            onPress={submit}
+          />
+        </View>
+      }
+      overlays={
+        <>
+          <ProductPickerSheet
+            isOpen={picker !== null}
+            products={sellable}
+            initialProduct={picker?.product}
+            showThumbnails={showThumbnails}
+            onPick={pick}
+            onClose={() => {
+              setPicker(null);
             }}
+          />
+          <DatePickerSheet
+            isOpen={isCalendarOpen}
+            title="¿Qué día vendiste?"
+            value={soldOn.field.value}
             maxDate={today}
             today={today}
+            onSelect={(next) => {
+              soldOn.field.onChange(next);
+            }}
+            onClose={() => {
+              setIsCalendarOpen(false);
+            }}
           />
-          <View className="items-end">
-            <TextButton
-              label="Elegir otra fecha"
-              icon={CalendarBlankIcon}
-              onPress={() => {
-                setIsCalendarOpen(true);
-              }}
-            />
-          </View>
-          {dateError === undefined ? null : (
-            <View className="flex-row items-start gap-1">
-              <Icon icon={WarningCircleIcon} size="sm" color="danger" />
-              <Text className="flex-1 text-sm text-danger">
-                {describeSaleError({ type: 'custom', message: dateError })}
-              </Text>
-            </View>
-          )}
-          {mode === 'create' && isWeekMarked ? (
-            <InlineNotice message='Marcaste esa semana como "no vendí". Si guardas esta venta, esa marca se quita.' />
-          ) : null}
+          <ConfirmDialog
+            isOpen={isConfirmingLast}
+            title="¿Borrar esta venta?"
+            description="Si quitas el último producto, la venta se borra. No se puede deshacer."
+            confirmLabel="Borrar venta"
+            isDestructive
+            onConfirm={confirmRemoveLast}
+            onCancel={() => {
+              setIsConfirmingLast(false);
+            }}
+          />
+          <ConfirmDialog
+            isOpen={leave.isOpen}
+            title="¿Salir sin guardar?"
+            description={
+              mode === 'create'
+                ? 'La venta que estabas anotando no se guardará.'
+                : 'Los cambios que hiciste no se guardarán.'
+            }
+            confirmLabel="Salir sin guardar"
+            cancelLabel={mode === 'create' ? 'Seguir anotando' : 'Seguir editando'}
+            isDestructive
+            onConfirm={leave.confirm}
+            onCancel={leave.cancel}
+          />
+        </>
+      }
+    >
+      <View className="gap-2">
+        <DateField
+          label="¿Cuándo vendiste?"
+          value={soldOn.field.value}
+          onChange={(next: LocalDate) => {
+            soldOn.field.onChange(next);
+          }}
+          maxDate={today}
+          today={today}
+        />
+        <View className="items-end">
+          <TextButton
+            label="Elegir otra fecha"
+            icon={CalendarBlankIcon}
+            onPress={() => {
+              setIsCalendarOpen(true);
+            }}
+          />
         </View>
+        {dateError === undefined ? null : (
+          <View className="flex-row items-start gap-1">
+            <Icon icon={WarningCircleIcon} size="sm" color="danger" />
+            <Text className="flex-1 text-sm text-danger">
+              {describeSaleError({ type: 'custom', message: dateError })}
+            </Text>
+          </View>
+        )}
+        {mode === 'create' && isWeekMarked ? (
+          <InlineNotice message='Marcaste esa semana como "no vendí". Si guardas esta venta, esa marca se quita.' />
+        ) : null}
+      </View>
 
-        <View className="gap-3">
-          <Text accessibilityRole="header" className="font-semibold text-heading text-foreground">
-            ¿Qué vendiste?
-          </Text>
-          {hasRows ? (
-            <>
-              <Card>
-                {fields.map((field, index) => (
-                  <View key={field.id}>
-                    {index > 0 ? <ListSeparator /> : null}
-                    <SaleItemFields
-                      control={form.control}
-                      index={index}
-                      product={
-                        items[index] === undefined
-                          ? null
-                          : (knownProducts.get(items[index].productId) ?? null)
-                      }
-                      showThumbnail={showThumbnails}
-                      onChangeVersion={(rowIndex) => {
-                        const product = knownProducts.get(
-                          form.getValues(itemPath(rowIndex)).productId,
-                        );
-                        if (product) setPicker({ kind: 'change', product, index: rowIndex });
-                      }}
-                      onRemove={removeRow}
-                    />
-                  </View>
-                ))}
-              </Card>
-              {fields.length >= SALE_ITEMS_MAX ? (
-                <InlineNotice message={MAX_ROWS_NOTICE} />
-              ) : (
-                <View className="items-start">
-                  <TextButton
-                    ref={addButton}
-                    label="Agregar otro producto"
-                    icon={PlusIcon}
-                    onPress={() => {
-                      openProductSheet();
+      <View className="gap-3">
+        <Text accessibilityRole="header" className="font-semibold text-heading text-foreground">
+          ¿Qué vendiste?
+        </Text>
+        {hasRows ? (
+          <>
+            <Card>
+              {fields.map((field, index) => (
+                <View key={field.id}>
+                  {index > 0 ? <ListSeparator /> : null}
+                  <SaleItemFields
+                    control={form.control}
+                    index={index}
+                    product={
+                      items[index] === undefined
+                        ? null
+                        : (knownProducts.get(items[index].productId) ?? null)
+                    }
+                    showThumbnail={showThumbnails}
+                    onChangeVersion={(rowIndex) => {
+                      const product = knownProducts.get(
+                        form.getValues(itemPath(rowIndex)).productId,
+                      );
+                      if (product) setPicker({ kind: 'change', product, index: rowIndex });
                     }}
+                    onRemove={removeRow}
                   />
                 </View>
-              )}
-            </>
-          ) : (
-            <Card>
-              <ProductPicker
-                products={sellable}
-                showThumbnails={showThumbnails}
-                onSelect={(product) => {
-                  const [only, ...others] = activeVersions(product);
-                  if (only !== undefined && others.length === 0) addItem(product, only);
-                  else openProductSheet(product);
-                }}
-              />
+              ))}
             </Card>
-          )}
-          {rootError === undefined ? null : (
-            <View className="flex-row items-start gap-1">
-              <Icon icon={WarningCircleIcon} size="sm" color="danger" />
-              <Text className="flex-1 text-sm text-danger">
-                {describeSaleError({ type: 'custom', message: rootError })}
-              </Text>
-            </View>
-          )}
-        </View>
-
-        <View className="gap-3">
-          <View className="items-start">
-            <TextButton
-              label={detailsLabel(channel.field.value, note)}
-              icon={isDetailsOpen ? CaretUpIcon : CaretDownIcon}
-              accessibilityHint="Dónde vendiste y una nota"
-              accessibilityState={{ expanded: isDetailsOpen }}
-              onPress={() => {
-                setIsDetailsOpen((open) => !open);
+            {fields.length >= SALE_ITEMS_MAX ? (
+              <InlineNotice message={MAX_ROWS_NOTICE} />
+            ) : (
+              <View className="items-start">
+                <TextButton
+                  ref={addButton}
+                  label="Agregar otro producto"
+                  icon={PlusIcon}
+                  onPress={() => {
+                    openProductSheet();
+                  }}
+                />
+              </View>
+            )}
+          </>
+        ) : (
+          <Card>
+            <ProductPicker
+              products={sellable}
+              showThumbnails={showThumbnails}
+              onSelect={(product) => {
+                const [only, ...others] = activeVersions(product);
+                if (only !== undefined && others.length === 0) addItem(product, only);
+                else openProductSheet(product);
               }}
             />
+          </Card>
+        )}
+        {rootError === undefined ? null : (
+          <View className="flex-row items-start gap-1">
+            <Icon icon={WarningCircleIcon} size="sm" color="danger" />
+            <Text className="flex-1 text-sm text-danger">
+              {describeSaleError({ type: 'custom', message: rootError })}
+            </Text>
           </View>
-          {isDetailsOpen ? (
-            <View className="gap-4">
-              <ChipGroup
-                label="¿Dónde vendiste? (opcional)"
-                allowDeselect
-                options={SALE_CHANNELS.map((value) => ({
-                  value,
-                  label: SALE_CHANNEL_LABELS[value],
-                }))}
-                value={channel.field.value}
-                onChange={channel.field.onChange}
-              />
-              <FormTextField
-                control={form.control}
-                name="note"
-                label="Nota"
-                isOptional
-                placeholder="Por ejemplo, feria del parque o pedido de Ana"
-                multiline
-                maxLength={SALE_NOTE_MAX_LENGTH}
-                describeError={describeSaleError}
-              />
-            </View>
-          ) : null}
-        </View>
+        )}
+      </View>
 
-        {mode === 'create' && isUntouched ? <NoSalesSection /> : null}
-      </ScrollView>
-      <StyledSafeAreaView edges={['bottom']} className="gap-2 px-4 pt-2 pb-4">
-        {hasRows ? (
-          <AccessibleGroup
-            label={`Total: ${formatClpAccessible(total)}`}
-            contentClassName="flex-row flex-wrap items-baseline justify-between gap-2"
-          >
-            <Text className="font-medium text-base text-foreground">Total</Text>
-            <Amount value={total} variant="total" />
-          </AccessibleGroup>
+      <View className="gap-3">
+        <View className="items-start">
+          <TextButton
+            label={detailsLabel(channel.field.value, note)}
+            icon={isDetailsOpen ? CaretUpIcon : CaretDownIcon}
+            accessibilityHint="Dónde vendiste y una nota"
+            accessibilityState={{ expanded: isDetailsOpen }}
+            onPress={() => {
+              setIsDetailsOpen((open) => !open);
+            }}
+          />
+        </View>
+        {isDetailsOpen ? (
+          <View className="gap-4">
+            <ChipGroup
+              label="¿Dónde vendiste? (opcional)"
+              allowDeselect
+              options={SALE_CHANNELS.map((value) => ({
+                value,
+                label: SALE_CHANNEL_LABELS[value],
+              }))}
+              value={channel.field.value}
+              onChange={channel.field.onChange}
+            />
+            <FormTextField
+              control={form.control}
+              name="note"
+              label="Nota"
+              isOptional
+              placeholder="Por ejemplo, feria del parque o pedido de Ana"
+              multiline
+              maxLength={SALE_NOTE_MAX_LENGTH}
+              describeError={describeSaleError}
+            />
+          </View>
         ) : null}
-        <PrimaryButton
-          label={mode === 'create' ? 'Guardar venta' : 'Guardar cambios'}
-          icon={CheckIcon}
-          onPress={submit}
-        />
-      </StyledSafeAreaView>
-      <ProductPickerSheet
-        isOpen={picker !== null}
-        products={sellable}
-        initialProduct={picker?.product}
-        showThumbnails={showThumbnails}
-        onPick={pick}
-        onClose={() => {
-          setPicker(null);
-        }}
-      />
-      <DatePickerSheet
-        isOpen={isCalendarOpen}
-        title="¿Qué día vendiste?"
-        value={soldOn.field.value}
-        maxDate={today}
-        today={today}
-        onSelect={(next) => {
-          soldOn.field.onChange(next);
-        }}
-        onClose={() => {
-          setIsCalendarOpen(false);
-        }}
-      />
-      <ConfirmDialog
-        isOpen={isConfirmingLast}
-        title="¿Borrar esta venta?"
-        description="Si quitas el último producto, la venta se borra. No se puede deshacer."
-        confirmLabel="Borrar venta"
-        isDestructive
-        onConfirm={confirmRemoveLast}
-        onCancel={() => {
-          setIsConfirmingLast(false);
-        }}
-      />
-      <ConfirmDialog
-        isOpen={leave.isOpen}
-        title="¿Salir sin guardar?"
-        description={
-          mode === 'create'
-            ? 'La venta que estabas anotando no se guardará.'
-            : 'Los cambios que hiciste no se guardarán.'
-        }
-        confirmLabel="Salir sin guardar"
-        cancelLabel={mode === 'create' ? 'Seguir anotando' : 'Seguir editando'}
-        isDestructive
-        onConfirm={leave.confirm}
-        onCancel={leave.cancel}
-      />
-    </KeyboardAvoidingView>
+      </View>
+
+      {mode === 'create' && isUntouched ? <NoSalesSection /> : null}
+    </FormLayout>
   );
 }

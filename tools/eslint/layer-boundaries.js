@@ -52,6 +52,16 @@ const NETWORK_PATTERNS = [
     message: NETWORK_MESSAGE,
   },
 ];
+const UNSTYLED_COMPONENT_MESSAGE =
+  'Usa StyledSafeAreaView de @/shared/ui (ADR-019): Uniwind ignora className en SafeAreaView sin withUniwind.';
+const UNSTYLED_COMPONENT_PATTERNS = [
+  {
+    group: ['react-native-safe-area-context'],
+    importNames: ['SafeAreaView'],
+    message: UNSTYLED_COMPONENT_MESSAGE,
+  },
+  { group: ['react-native'], importNames: ['SafeAreaView'], message: UNSTYLED_COMPONENT_MESSAGE },
+];
 const EXPO_PACKAGES = ['expo', 'expo-*', 'expo-*/**'];
 
 /**
@@ -158,6 +168,8 @@ const PATH_ZONES = [
  * feature can be imported (ADR-005: only the composition root builds repositories).
  * @param {boolean} [categories.allowIcons] - Whether `phosphor-react-native` can be imported
  * (only `shared/ui` wraps icons with `Icon`).
+ * @param {boolean} [categories.allowSafeAreaView] - Whether `SafeAreaView` can be imported
+ * unwrapped (only the file that wraps it with `withUniwind`, ADR-019).
  * @returns {unknown[]} Rule options.
  */
 function restrictedImports({
@@ -167,6 +179,7 @@ function restrictedImports({
   allowDependencies,
   allowDrizzleRepositories,
   allowIcons,
+  allowSafeAreaView,
 }) {
   const deepImports = allowDrizzleRepositories
     ? DEEP_IMPORT_PATTERNS.map(({ group }, index) => ({
@@ -178,6 +191,7 @@ function restrictedImports({
     ...deepImports,
     { group: packages },
     ...NETWORK_PATTERNS,
+    ...(allowSafeAreaView ? [] : UNSTYLED_COMPONENT_PATTERNS),
     ...(allowIcons
       ? []
       : [{ group: ICON_PACKAGES, message: 'Use the Icon component from shared/ui.' }]),
@@ -247,6 +261,10 @@ const layerBoundaryConfigs = [
     packages: PERSISTENCE_PACKAGES,
     allowIcons: true,
   }),
+  block(
+    ['src/shared/ui/styled-safe-area-view.tsx', 'src/shared/ui/styled-safe-area-view.test.tsx'],
+    { packages: PERSISTENCE_PACKAGES, allowIcons: true, allowSafeAreaView: true },
+  ),
   block([`src/shared/domain/**/*.${SOURCE_EXTENSIONS}`], { packages: PURE_DOMAIN_PACKAGES }),
   block([`src/core/**/*.${SOURCE_EXTENSIONS}`], { packages: [] }),
   block([`src/core/dependencies/**/*.${SOURCE_EXTENSIONS}`], {

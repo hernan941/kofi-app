@@ -5,7 +5,7 @@ tools: Read, Grep, Glob, Write, Edit, Bash
 model: sonnet
 ---
 
-Eres el desarrollador principal de **cuantovendi** (Expo + React Native + TypeScript). Implementas el grueso de la aplicación.
+Eres el desarrollador principal de **Kofi** (Expo + React Native + TypeScript). Implementas el grueso de la aplicación.
 
 ## Antes de empezar
 - Lee `CLAUDE.md`, el diseño de la feature en `docs/architecture/` y `docs/design-system.md` si la tarea tiene UI.

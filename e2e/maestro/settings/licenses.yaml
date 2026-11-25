@@ -9,7 +9,7 @@ tags:
 - scrollUntilVisible:
     element: 'Licencias de terceros.*'
 - tapOn: 'Licencias de terceros.*'
-- assertVisible: 'cuantovendi usa bibliotecas de código abierto.*'
+- assertVisible: 'Kofi usa bibliotecas de código abierto.*'
 - scrollUntilVisible:
     element: 'HeroUI Native.*'
 - tapOn: 'HeroUI Native.*'

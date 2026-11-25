@@ -23,7 +23,7 @@ import { exportEmergency, type EmergencyExportDeps } from './export-emergency';
 
 const NOW = epochMsSchema.parse(Date.parse('2026-11-13T23:50:00Z'));
 const DIRECTORY = 'file:///fake/cache/emergency/';
-const ZIP_URI = `${DIRECTORY}cuantovendi-emergencia-2026-11-14.zip`;
+const ZIP_URI = `${DIRECTORY}kofi-emergencia-2026-11-14.zip`;
 const DB_URI = `${DIRECTORY}cuantovendi-1.db`;
 const DB_BYTES = Uint8Array.from({ length: 5000 }, (_, index) => (index * 11) % 253);
 const PHOTO_BYTES = Uint8Array.from({ length: 700 }, (_, index) => (index * 5) % 241);

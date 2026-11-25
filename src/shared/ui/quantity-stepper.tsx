@@ -3,6 +3,7 @@ import { PlusIcon } from 'phosphor-react-native/src/icons/Plus';
 import { useState } from 'react';
 import { Text, TextInput, View, type AccessibilityActionEvent } from 'react-native';
 
+import { useFieldFocusReporting } from './form-layout';
 import { IconButton } from './icon-button';
 
 /** Props of {@link QuantityStepper}. */
@@ -50,6 +51,7 @@ export function QuantityStepper({
   max = 99,
 }: QuantityStepperProps) {
   const [draft, setDraft] = useState<string | null>(null);
+  const { ref: fieldRef, notifyFocus, notifyBlur } = useFieldFocusReporting();
   const canDecrement = value > min;
   const canIncrement = value < max;
   const decrement = () => {
@@ -71,13 +73,14 @@ export function QuantityStepper({
     if (digits !== '' && typed >= min && typed <= max) onChange(typed);
   };
   const handleBlur = () => {
+    notifyBlur();
     const typed = Number(draft ?? '');
     setDraft(null);
     if (draft !== null && draft !== '' && typed > max) onChange(max);
   };
 
   return (
-    <View className="gap-2">
+    <View ref={fieldRef} collapsable={false} className="gap-2">
       <Text
         accessibilityElementsHidden
         importantForAccessibility="no-hide-descendants"
@@ -95,6 +98,7 @@ export function QuantityStepper({
         <TextInput
           value={draft ?? String(value)}
           onChangeText={handleChangeText}
+          onFocus={notifyFocus}
           onBlur={handleBlur}
           keyboardType="number-pad"
           inputMode="numeric"

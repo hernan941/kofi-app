@@ -1,4 +1,4 @@
-# Consejos de cuantovendi
+# Consejos de Kofi
 
 Contenido de la tarea F6.1 (`docs/plan-v1.md`). Son consejos breves para artistas que venden su arte. Están escritos en español neutro, con tuteo y en tono cercano, y no tratan temas tributarios ni legales (D-21).
 

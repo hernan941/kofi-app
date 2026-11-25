@@ -387,7 +387,7 @@ export function collectOrphanPhotos(deps: PhotoFileDeps): Promise<OrphanCollecti
   "expo-image-picker",
   {
     "photosPermission": false,
-    "cameraPermission": "cuantovendi usa la cámara solo cuando eliges tomar una foto de tu producto.",
+    "cameraPermission": "Kofi usa la cámara solo cuando eliges tomar una foto de tu producto.",
     "microphonePermission": false
   }
 ]

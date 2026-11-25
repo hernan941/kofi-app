@@ -28,7 +28,7 @@ import { exportBackup, type ExportBackupDeps } from './export-backup';
 
 const NOW = epochMsSchema.parse(Date.parse('2026-11-13T23:50:00Z'));
 const PHOTO_BYTES = Uint8Array.from({ length: 300 }, (_, index) => (index * 3) % 251);
-const TARGET = 'file:///fake/cache/backups/cuantovendi-respaldo-2026-11-14.zip';
+const TARGET = 'file:///fake/cache/backups/kofi-respaldo-2026-11-14.zip';
 
 const calendar: LocalCalendar = {
   localDateOf: () => localDateSchema.parse('2026-11-14'),
@@ -93,7 +93,7 @@ describe('exportBackup', () => {
 
     expect(result).toEqual({
       ok: true,
-      value: { fileName: 'cuantovendi-respaldo-2026-11-14.zip' },
+      value: { fileName: 'kofi-respaldo-2026-11-14.zip' },
     });
     expect(io.created).toEqual([TARGET]);
     expect(sharer.shared).toEqual([

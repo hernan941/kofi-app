@@ -1,1 +1,1 @@
-Este archivo no es un respaldo de cuantovendi: es solo texto de prueba para el flujo restore-invalid.
+Este archivo no es un respaldo de Kofi: es solo texto de prueba para el flujo restore-invalid.

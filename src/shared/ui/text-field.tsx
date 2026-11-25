@@ -16,6 +16,7 @@ import {
 } from 'react-native';
 
 import { useAnnounceWhen } from './announce';
+import { useFieldFocusReporting } from './form-layout';
 import { Icon } from './icon';
 
 /** Props of {@link TextField}; the remaining `TextInput` props pass through. */
@@ -89,16 +90,19 @@ export function TextField({
   ...inputProps
 }: TextFieldProps) {
   const [isFocused, setIsFocused] = useState(false);
+  const { ref: fieldRef, notifyFocus, notifyBlur } = useFieldFocusReporting();
   const isInvalid = Boolean(error);
   const fullLabel = isOptional ? `${label} (opcional)` : label;
   useAnnounceWhen(error, canAnnounceError);
 
   const handleFocus = (event: NativeSyntheticEvent<TargetedEvent>) => {
     setIsFocused(true);
+    notifyFocus();
     onFocus?.(event);
   };
   const handleBlur = (event: NativeSyntheticEvent<TargetedEvent>) => {
     setIsFocused(false);
+    notifyBlur();
     onBlur?.(event);
   };
 
@@ -118,35 +122,37 @@ export function TextField({
   } as const;
 
   return (
-    <HeroTextField isInvalid={isInvalid} isDisabled={isDisabled} className="gap-2">
-      <Text
-        accessibilityElementsHidden
-        importantForAccessibility="no-hide-descendants"
-        className="font-medium text-sm text-foreground"
-      >
-        {fullLabel}
-      </Text>
-      {prefix === undefined ? (
-        <Input {...sharedInputProps} />
-      ) : (
-        <InputGroup>
-          <InputGroup.Prefix isDecorative>
-            <Text className="font-medium text-base text-muted">{prefix}</Text>
-          </InputGroup.Prefix>
-          <InputGroup.Input {...sharedInputProps} />
-        </InputGroup>
-      )}
-      <FieldError>
-        <View className="flex-row items-start gap-1">
-          <View className="pt-0.5">
-            <Icon icon={WarningCircleIcon} size="sm" color="danger" />
+    <View ref={fieldRef} collapsable={false}>
+      <HeroTextField isInvalid={isInvalid} isDisabled={isDisabled} className="gap-2">
+        <Text
+          accessibilityElementsHidden
+          importantForAccessibility="no-hide-descendants"
+          className="font-medium text-sm text-foreground"
+        >
+          {fullLabel}
+        </Text>
+        {prefix === undefined ? (
+          <Input {...sharedInputProps} />
+        ) : (
+          <InputGroup>
+            <InputGroup.Prefix isDecorative>
+              <Text className="font-medium text-base text-muted">{prefix}</Text>
+            </InputGroup.Prefix>
+            <InputGroup.Input {...sharedInputProps} />
+          </InputGroup>
+        )}
+        <FieldError>
+          <View className="flex-row items-start gap-1">
+            <View className="pt-0.5">
+              <Icon icon={WarningCircleIcon} size="sm" color="danger" />
+            </View>
+            <Text className="flex-1 text-sm text-danger">{error}</Text>
           </View>
-          <Text className="flex-1 text-sm text-danger">{error}</Text>
-        </View>
-      </FieldError>
-      {helper !== undefined && !isInvalid ? (
-        <Text className="text-sm text-muted">{helper}</Text>
-      ) : null}
-    </HeroTextField>
+        </FieldError>
+        {helper !== undefined && !isInvalid ? (
+          <Text className="text-sm text-muted">{helper}</Text>
+        ) : null}
+      </HeroTextField>
+    </View>
   );
 }

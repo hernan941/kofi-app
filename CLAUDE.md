@@ -1,4 +1,4 @@
-# cuantovendi
+# Kofi
 
 App móvil con Expo (React Native) + TypeScript. Las decisiones técnicas están en `docs/architecture/` (ADRs): leerlas antes de trabajar.
 

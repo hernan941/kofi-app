@@ -208,3 +208,13 @@ Agregados aceptados por el orquestador (no cambian la decisión), detallados en 
 
 ## Enmienda 2026-11-14 (F7.9)
 D-13 se cumple siempre: la reconciliación persiste en `notification_preferences.last_weekly_fire_at` el instante del recordatorio semanal de la semana en curso que planifica. Si ese instante ya pasó y cae en la semana en curso, y el nuevo instante todavía no llega (la persona cambió el día a mitad de semana), el plan no programa otro aviso para esa semana y deja solo el respaldo desde la próxima. Detalle en `docs/architecture/notifications.md`, 6.1 punto 9.
+
+## Enmienda 2026-11-15 (F10.5)
+En el emulador (Android 14), el adaptador devolvía `denied` aunque nunca se hubiera preguntado, y la UI trataba el permiso como bloqueado. En Android, `expo-notifications` no informa `undetermined`: un permiso no concedido vuelve como `status: denied`, y solo `canAskAgain` distingue "todavía se puede mostrar el diálogo del sistema" de "bloqueado, solo se cambia en los ajustes del teléfono".
+
+Decisión: el adaptador (`toPermission` en `src/features/notifications/adapters/expo-notification-scheduler.ts`) convierte la respuesta así, en este orden:
+1. `granted`, o en iOS el estado `PROVISIONAL` o `EPHEMERAL` → `'granted'`.
+2. `status === DENIED` y `!canAskAgain` → `'denied'`.
+3. Cualquier otro caso, incluido `denied` con `canAskAgain: true` → `'undetermined'`.
+
+No cambia la política de permisos: solo se pide desde una acción del usuario y nunca se insiste. Con `undetermined`, la UI ofrece "Activar", y el diálogo del sistema aparece de verdad. Cuando Android deja de mostrarlo (`canAskAgain: false`), el estado pasa a `denied` y Ajustes ofrece `Linking.openSettings()`. Los tres casos tienen test en el adaptador, con `jest.mock('expo-notifications')`. El diálogo real se verifica en el teléfono (F10.6).

@@ -42,6 +42,15 @@ describe('app.json local plugins and iOS settings', () => {
     expect(expo.plugins).toContain('./plugins/with-no-device-transfer');
   });
 
+  it('shows the product name Kofi to the user', () => {
+    expect(expo.name).toBe('Kofi');
+  });
+
+  it('keeps the internal identifiers stable so existing data survives', () => {
+    expect(expo.slug).toBe('cuantovendi');
+    expect(expo.scheme).toBe('cuantovendi');
+  });
+
   it('has a bundle identifier for iOS', () => {
     expect(expo.ios.bundleIdentifier).toBe('com.cuantovendi.local');
   });

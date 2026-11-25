@@ -4,6 +4,10 @@ import { AccessibilityInfo, Text } from 'react-native';
 import { Sheet } from './sheet';
 import { renderUi } from './testing/render-ui';
 
+jest.mock('react-native/Libraries/Components/Keyboard/KeyboardAvoidingView', () =>
+  jest.requireActual<object>('./testing/exposed-keyboard-avoiding-view'),
+);
+
 const user = userEvent.setup();
 
 describe('Sheet', () => {
@@ -87,5 +91,15 @@ describe('Sheet', () => {
 
     expect(spy.mock.calls).toHaveLength(1);
     expect(spy.mock.calls[0]?.[1]).toBe('focus');
+  });
+
+  it('lifts the sheet with the keyboard', async () => {
+    await renderUi(
+      <Sheet isOpen title="Elige la versión" onClose={jest.fn()}>
+        <Text>Print A4</Text>
+      </Sheet>,
+    );
+
+    expect(screen.getByTestId('sheet-keyboard')).toHaveProp('behavior', 'padding');
   });
 });

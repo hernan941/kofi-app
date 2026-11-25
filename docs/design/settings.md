@@ -16,7 +16,7 @@
 | UX-S3 | **La nota de privacidad va sin tarjeta**, como texto bajo su encabezado. | Es para leer, no para tocar. Sin tarjeta, la pantalla queda con dos tarjetas con sombra (el máximo es tres, sistema de diseño 4.4), y la nota no parece un botón. |
 | UX-S4 | **La nota de privacidad dice también cuándo salen los datos y qué pasa al cambiar de teléfono.** | "Tus datos viven en tu teléfono" es tranquilizador, pero tiene una consecuencia: si se borra la app, se van con ella. Decirlo con calma, junto con qué hacer (crear un respaldo), protege más que asustar después. Compartir un respaldo o una planilla es la única forma en que algo sale del teléfono, y la frase lo reconoce para ser exacta. |
 | UX-S5 | **La copia de seguridad (D-22) solo se menciona en el resumen de "Respaldo y planillas".** Para restaurarla, se entra a Respaldo, donde está su sección (UX-B11). | Restaurar es el flujo más delicado de la app y ya tiene vista previa, confirmación y progreso en F8. Un segundo camino desde Ajustes sería una segunda implementación de lo mismo. |
-| UX-S6 | **Si la versión no se conoce, la fila de Acerca de muestra solo "cuantovendi"**, sin la línea de versión. | Una palabra técnica como "unknown" no le sirve a nadie. Es un caso que no debería ocurrir en un build real. |
+| UX-S6 | **Si la versión no se conoce, la fila de Acerca de muestra solo "Kofi"**, sin la línea de versión. | Una palabra técnica como "unknown" no le sirve a nadie. Es un caso que no debería ocurrir en un build real. |
 | UX-S7 | **Las licencias van en una lista alfabética que se ve como una sola tarjeta** (igual que la lista de productos), con una frase de introducción arriba. Cada fila abre el texto completo en otra pantalla. | Son unas 80 entradas y textos de hasta 11 KB. Desplegarlos en la lista la haría larguísima e incómoda con TalkBack. La forma de tarjeta única ya la usa Productos, así que la app se ve igual en todas sus listas. |
 | UX-S8 | **El orden alfabético ignora la "@" inicial** de los nombres de paquete (`@tanstack/react-query` se ordena en la T). | Para la persona, la "@" no es una letra. Sin esta regla, unas 30 entradas se amontonarían al principio y HeroUI Native quedaría lejos de donde se lo busca. |
 | UX-S9 | **En el detalle, el texto legal es seleccionable párrafo por párrafo** y se muestra en `text-sm` `foreground`. No hay botón "Copiar". | Seleccionar sirve para copiar un aviso. Un botón de copiar pide `expo-clipboard`, que no está entre las dependencias, para algo que casi nadie va a usar. El `text-sm` reduce el desplazamiento del texto más largo sin bajar el contraste (14.6:1 y 15.7:1 sobre el fondo, en claro y oscuro). |
@@ -58,12 +58,12 @@ Los textos entre comillas son **exactos** (tabla completa en la sección 5).
 2. **Privacidad** (`SettingsSection` sin tarjeta, `gap-3`):
    - Encabezado `text-heading` `foreground`, rol `header`: **"Privacidad"**.
    - `PrivacyNote`: dos párrafos, `gap-2`, que se leen como **un solo elemento**:
-     - `text-base` `foreground`: **"Tus datos viven en tu teléfono. cuantovendi no tiene cuentas y no envía nada a internet. Tus datos solo salen del teléfono cuando tú compartes un respaldo o una planilla."**
+     - `text-base` `foreground`: **"Tus datos viven en tu teléfono. Kofi no tiene cuentas y no envía nada a internet. Tus datos solo salen del teléfono cuando tú compartes un respaldo o una planilla."**
      - `text-base` `muted`: **"Si borras la app o cambias de teléfono, tus datos no se pasan solos. Para llevarlos contigo, crea un respaldo."**
 3. **Acerca de** (`SettingsSection` con tarjeta, `gap-3`):
    - Encabezado `text-heading`, rol `header`: **"Acerca de"**.
    - `Card` sin título, con:
-     1. `ListRow` **sin toque** **"cuantovendi"**, `subtitle` **"Versión {versión}"** ("Versión 1.0.0"). Sin la línea si la versión es `'unknown'` o está vacía (UX-S6).
+     1. `ListRow` **sin toque** **"Kofi"**, `subtitle` **"Versión {versión}"** ("Versión 1.0.0"). Sin la línea si la versión es `'unknown'` o está vacía (UX-S6).
      2. `ListSeparator`.
      3. `ListRow` tocable **"Licencias de terceros"**, `subtitle` **"Bibliotecas de código abierto que usa la app"**, `trailing` `CaretRight`, pista **"Abre la lista de licencias"**. Llama a `onOpenLicenses`.
 
@@ -77,7 +77,7 @@ Los textos entre comillas son **exactos** (tabla completa en la sección 5).
 
 `Screen` con `ScreenHeader` (volver, título **"Licencias de terceros"**). Debajo, una `FlatList` con `px-4` y `pb-8`:
 
-1. **Introducción** (`ListHeaderComponent`, `pb-4`), `text-base` `muted`: **"cuantovendi usa bibliotecas de código abierto. Aquí están sus licencias, en orden alfabético. Toca una para leer el texto completo."**
+1. **Introducción** (`ListHeaderComponent`, `pb-4`), `text-base` `muted`: **"Kofi usa bibliotecas de código abierto. Aquí están sus licencias, en orden alfabético. Toca una para leer el texto completo."**
 2. **Filas** (`LicenseRow`), en el orden de `sortNotices` (UX-S8). Se ven como una sola tarjeta: fondo `surface`, bordes laterales de 2 px `border`, la primera fila con `rounded-t-3xl border-t-2` y la última con `rounded-b-3xl border-b-2`, separadas por `ListSeparator` dentro de la tarjeta (el mismo recurso de `product-list.tsx`, ver 6.2). Sin sombra, porque la tarjeta es más alta que la pantalla.
    - `title`: `displayName` ("HeroUI Native", "Lexend", "Phosphor Icons", "@tanstack/react-query").
    - `subtitle`: **"Versión {versión} · {licencia}"** ("Versión 1.0.11 · Apache 2.0"). `{licencia}` son los nombres legibles de 5.5 de cada texto del aviso, unidos con " y " ("MIT y SIL Open Font License 1.1" en Lexend).
@@ -121,7 +121,7 @@ Ajustes **nunca muestra un estado de carga ni de problema de pantalla completa**
 | Hay copia de seguridad | La frase con la fecha (5.3). |
 | Instalación nueva (sin datos, sin permiso decidido) | Recordatorios: "Los avisos están sin activar". Respaldo: la frase sin copia. Todo lo demás igual. |
 | Volviendo de Recordatorios o de Respaldo con cambios | Los subtítulos ya muestran el estado nuevo. |
-| Versión desconocida | "cuantovendi" sin la línea de versión. |
+| Versión desconocida | "Kofi" sin la línea de versión. |
 
 ### 4.2 Licencias
 
@@ -152,14 +152,14 @@ Español neutro con tuteo y sin culpa: ninguno coincide con `GUILT_PATTERNS` (ve
 | Fila de recordatorios | "Recordatorios" · pista "Cambia el día, la hora o apaga los avisos" |
 | Fila de respaldo | "Respaldo y planillas" · pista "Crea un respaldo, exporta planillas o vuelve a una copia" |
 | Encabezado de privacidad | "Privacidad" |
-| Nota de privacidad, párrafo 1 | "Tus datos viven en tu teléfono. cuantovendi no tiene cuentas y no envía nada a internet. Tus datos solo salen del teléfono cuando tú compartes un respaldo o una planilla." |
+| Nota de privacidad, párrafo 1 | "Tus datos viven en tu teléfono. Kofi no tiene cuentas y no envía nada a internet. Tus datos solo salen del teléfono cuando tú compartes un respaldo o una planilla." |
 | Nota de privacidad, párrafo 2 | "Si borras la app o cambias de teléfono, tus datos no se pasan solos. Para llevarlos contigo, crea un respaldo." |
 | Encabezado de Acerca de | "Acerca de" |
-| Nombre | "cuantovendi" |
+| Nombre | "Kofi" |
 | Versión | "Versión {versión}" ("Versión 1.0.0") |
 | Fila de licencias | "Licencias de terceros" · "Bibliotecas de código abierto que usa la app" · pista "Abre la lista de licencias" |
 
-- **"cuantovendi" va siempre en minúscula**, también al empezar una frase, como en F7 y F8.
+- **"Kofi" se escribe siempre con mayúscula inicial** (ADR-021); reemplaza la regla anterior de escribir "cuantovendi" en minúscula.
 - **D-09** (respaldo sin contraseña) no se repite en la nota: ya está junto a "Crear respaldo" (F8.1, 3.1), que es donde la persona decide dónde guardarlo.
 
 ### 5.2 Resumen de Recordatorios (`reminderSummaryText`, en `features/notifications`)
@@ -193,7 +193,7 @@ Español neutro con tuteo y sin culpa: ninguno coincide con `GUILT_PATTERNS` (ve
 | Clave sugerida | Texto |
 |---|---|
 | Título de la lista | "Licencias de terceros" |
-| Introducción | "cuantovendi usa bibliotecas de código abierto. Aquí están sus licencias, en orden alfabético. Toca una para leer el texto completo." |
+| Introducción | "Kofi usa bibliotecas de código abierto. Aquí están sus licencias, en orden alfabético. Toca una para leer el texto completo." |
 | Subtítulo de una fila | "Versión {versión} · {licencia}" |
 | Etiqueta de una fila | "{nombre}, versión {versión}, {licencia}" |
 | Pista de una fila | "Abre el texto completo de la licencia" |
@@ -261,7 +261,7 @@ Los de `docs/architecture/settings.md` (2.1), con estas precisiones:
 
 ## 7. Accesibilidad
 
-- **Orden de lectura de Ajustes**: "Ajustes" (encabezado) → "Recordatorios, {resumen}" → "Respaldo y planillas, {resumen}" → "Privacidad" (encabezado) → la nota → "Acerca de" (encabezado) → "cuantovendi, Versión 1.0.0" → "Licencias de terceros, Bibliotecas de código abierto que usa la app". Las filas tocables tienen rol `button` y su pista. Con la navegación por encabezados, se salta a Privacidad y a Acerca de.
+- **Orden de lectura de Ajustes**: "Ajustes" (encabezado) → "Recordatorios, {resumen}" → "Respaldo y planillas, {resumen}" → "Privacidad" (encabezado) → la nota → "Acerca de" (encabezado) → "Kofi, Versión 1.0.0" → "Licencias de terceros, Bibliotecas de código abierto que usa la app". Las filas tocables tienen rol `button` y su pista. Con la navegación por encabezados, se salta a Privacidad y a Acerca de.
 - **Orden de lectura de la lista**: título → introducción → las filas, cada una un solo botón con su etiqueta de 5.4.
 - **Orden de lectura del detalle**: título (el nombre) → datos del paquete (un elemento) → encabezado de parte (si hay) → cada párrafo. Los encabezados de parte permiten saltar del código a la fuente en Lexend.
 - **Texto seleccionable**: `selectable` en cada párrafo del detalle. TalkBack y VoiceOver siguen leyéndolos como texto normal.
@@ -293,7 +293,7 @@ Los de `docs/architecture/settings.md` (2.1), con estas precisiones:
 - Sin copia, "Respaldo y planillas" muestra "Guarda tus datos o expórtalos en planillas"; con `FakeBackupFiles` con una copia de hoy a las 15:42 (con `FakeClock`), "Tienes una copia de seguridad de hoy, 15:42".
 - Si la lectura de la copia falla, se ve la frase sin copia y la fila se puede tocar.
 - Se ven los dos párrafos de la nota de privacidad, como un solo elemento accesible.
-- "cuantovendi" con "Versión 1.0.0-test"; con `appVersion: 'unknown'`, "cuantovendi" sin ninguna línea que empiece con "Versión" y sin "unknown" en pantalla.
+- "Kofi" con "Versión 1.0.0-test"; con `appVersion: 'unknown'`, "Kofi" sin ninguna línea que empiece con "Versión" y sin "unknown" en pantalla.
 - Hay exactamente tres `button` y cada uno llama a su callback; cada uno tiene la pista de 5.1.
 
 **Lista (`licenses-screen.test.tsx`)**

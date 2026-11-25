@@ -39,7 +39,7 @@ describe('PermissionStatus', () => {
     expect(screen.getByText('Activa los avisos')).toBeOnTheScreen();
     expect(
       screen.getByText(
-        'Para que te lleguen los recordatorios, cuantovendi necesita tu permiso para enviarte avisos.',
+        'Para que te lleguen los recordatorios, Kofi necesita tu permiso para enviarte avisos.',
       ),
     ).toBeOnTheScreen();
     await user.press(screen.getByRole('button', { name: 'Activar recordatorios' }));
@@ -59,7 +59,7 @@ describe('PermissionStatus', () => {
       ),
     ).toBeOnTheScreen();
     const button = screen.getByRole('button', { name: 'Abrir ajustes' });
-    expect(button.props.accessibilityHint).toBe('Abre los ajustes de cuantovendi en tu teléfono');
+    expect(button.props.accessibilityHint).toBe('Abre los ajustes de Kofi en tu teléfono');
     await user.press(button);
 
     expect(onOpenSettings).toHaveBeenCalledTimes(1);

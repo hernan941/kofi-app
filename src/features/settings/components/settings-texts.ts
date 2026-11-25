@@ -16,13 +16,13 @@ export const SETTINGS_TEXTS = {
   privacy: {
     heading: 'Privacidad',
     first:
-      'Tus datos viven en tu teléfono. cuantovendi no tiene cuentas y no envía nada a internet. Tus datos solo salen del teléfono cuando tú compartes un respaldo o una planilla.',
+      'Tus datos viven en tu teléfono. Kofi no tiene cuentas y no envía nada a internet. Tus datos solo salen del teléfono cuando tú compartes un respaldo o una planilla.',
     second:
       'Si borras la app o cambias de teléfono, tus datos no se pasan solos. Para llevarlos contigo, crea un respaldo.',
   },
   about: {
     heading: 'Acerca de',
-    name: 'cuantovendi',
+    name: 'Kofi',
     licensesTitle: 'Licencias de terceros',
     licensesSubtitle: 'Bibliotecas de código abierto que usa la app',
     licensesHint: 'Abre la lista de licencias',
@@ -33,7 +33,7 @@ export const SETTINGS_TEXTS = {
 export const LICENSES_TEXTS = {
   title: 'Licencias de terceros',
   introduction:
-    'cuantovendi usa bibliotecas de código abierto. Aquí están sus licencias, en orden alfabético. Toca una para leer el texto completo.',
+    'Kofi usa bibliotecas de código abierto. Aquí están sus licencias, en orden alfabético. Toca una para leer el texto completo.',
   rowHint: 'Abre el texto completo de la licencia',
 } as const;
 

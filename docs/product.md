@@ -1,4 +1,4 @@
-# cuantovendi — visión de producto
+# Kofi — visión de producto
 
 ## Qué es
 Un **acompañante de negocio** para el pequeño emprendedor, en especial **artistas que venden su arte**. Funciona como una app de seguimiento periódico (al estilo de un seguidor del ciclo menstrual, pero aplicado al negocio): registrar con constancia, recibir recordatorios, ver el propio ritmo y aprender algo en el camino.
@@ -112,7 +112,7 @@ Un registro agrupa lo vendido en una misma ocasión (por ejemplo, una feria comp
 | D-42 | Consejos: contexto "racha" desde 3 semanas; prioridad sin-costos > primera-venta > venta-feria > racha > sin-canal; un consejo cuenta como visto al mostrarse; un consejo en cada venta nueva (rotando); sin fuentes en la app; "no vendí" y editar no muestran consejo. |
 | D-43 | Notificaciones: canal de importancia normal (suena, sin ventana emergente); el resumen de un mes sin ventas llega igual; "Ahora no" en el permiso no se guarda y la opción queda en Ajustes; cambiar la hora con permiso denegado se guarda y se aplica al concederlo. |
 | D-44 | Respaldo: la copia de seguridad se puede restaurar desde Ajustes; CSV `ventas.csv` y `productos.csv`, sin costo en el de ventas, "Archivado: Sí/No"; exportar sin datos está permitido; tras restaurar, mensaje de éxito con "Ir al inicio". |
-| D-45 | Ícono de notificación: silueta de recibo (Receipt, fill) hasta tener logo propio. Hora del recordatorio con minutos de a 15. La vista previa de restauración muestra también los datos actuales de la app. La pantalla no se mantiene encendida durante la restauración (sin `expo-keep-awake`). |
+| D-45 | Ícono de notificación: silueta de recibo (Receipt, fill) hasta tener logo propio. Resuelto: ahora es el gato de Kofi (`kofi-glyph`, design-system 8.1). Hora del recordatorio con minutos de a 15. La vista previa de restauración muestra también los datos actuales de la app. La pantalla no se mantiene encendida durante la restauración (sin `expo-keep-awake`). |
 | D-46 | Ajustes es una pantalla índice: Recordatorios (con resumen del estado), Respaldo y planillas (menciona la copia de seguridad si existe), Privacidad (nota fija: los datos viven en el teléfono y no se envían a internet) y Acerca de (nombre, versión y licencias de terceros en lista alfabética con detalle aparte, sin enlaces externos). |
 | D-23 | Todo es local: sin publicación, cuentas de tiendas, EAS, reporte de errores externo ni servicios en la nube. No se asume iPhone ni cuenta de EAS; iOS se verifica en el futuro. |
 | D-24 | Sin ganchos de git (husky o lint-staged). |

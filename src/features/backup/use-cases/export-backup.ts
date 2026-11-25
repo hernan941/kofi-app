@@ -41,7 +41,7 @@ async function writeBackup(
 /**
  * Exporta el respaldo (ADR-012, backup.md 4.1): comprueba que haya menú de compartir, toma el
  * lock `backup_export`, junta los contenidos, comprueba el espacio libre y escribe
- * `cuantovendi-respaldo-AAAA-MM-DD.zip` (fecha local de `Clock`) en la caché. Libera el lock
+ * `kofi-respaldo-AAAA-MM-DD.zip` (fecha local de `Clock`) en la caché. Libera el lock
  * siempre (también si algo falla) y recién entonces comparte el archivo. El ZIP no se borra al
  * volver del menú: lo barre la limpieza del próximo arranque.
  */

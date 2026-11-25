@@ -1,14 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Fragment, useEffect, useRef, useState } from 'react';
 import { useFieldArray, useForm, useFormState, useWatch } from 'react-hook-form';
-import {
-  AccessibilityInfo,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  Text,
-  View,
-} from 'react-native';
+import { AccessibilityInfo, Text, View } from 'react-native';
 
 import {
   productVersionIdSchema,
@@ -30,7 +23,7 @@ import {
   announce,
   type ButtonHandle,
   createSubmitHandler,
-  StyledSafeAreaView,
+  FormLayout,
 } from '@/shared/ui';
 
 import {
@@ -237,85 +230,9 @@ export function ProductForm({
       : versionIdsWithSales.has(pendingRemoval.versionId);
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      className="flex-1"
-    >
-      <ScrollView keyboardShouldPersistTaps="handled" contentContainerClassName="gap-4 px-4 pb-6">
-        {notice === undefined ? null : <InlineNotice message={notice} />}
-        <FormTextField
-          control={form.control}
-          name="name"
-          label="Nombre"
-          placeholder="Por ejemplo, Lámina Colibrí"
-          maxLength={PRODUCT_NAME_MAX_LENGTH}
-          autoCapitalize="sentences"
-          returnKeyType="next"
-          describeError={describeProductError}
-        />
-        <FormTextField
-          control={form.control}
-          name="description"
-          label="Descripción"
-          isOptional
-          placeholder="Técnica, tamaño, materiales…"
-          multiline
-          maxLength={PRODUCT_DESCRIPTION_MAX_LENGTH}
-          describeError={describeProductError}
-        />
-        <PhotoStrip
-          photos={photos}
-          productName={productName}
-          imports={imports}
-          onChange={(next) => {
-            form.setValue('photos', [...next], { shouldDirty: true });
-          }}
-          onRemove={(removed) => {
-            form.setValue(
-              'photos',
-              form.getValues('photos').filter((photo) => photo.photoId !== removed.photoId),
-              { shouldDirty: true },
-            );
-            if (removed.isNew) {
-              void removePhotoFiles([removed.photoId]);
-            }
-          }}
-        />
-        <Card title={isMultiple ? 'Versiones' : undefined}>
-          {isMultiple ? (
-            <Text className="text-sm text-muted">Cada versión tiene su propio precio.</Text>
-          ) : null}
-          <View className="gap-6">
-            {fields.map((field, index) => (
-              <Fragment key={field.id}>
-                {index > 0 ? <ListSeparator /> : null}
-                <VersionFields
-                  control={form.control}
-                  setFocus={form.setFocus}
-                  index={index}
-                  isMultiple={isMultiple}
-                  onRemove={removeVersion}
-                />
-              </Fragment>
-            ))}
-          </View>
-          <View className="items-start">
-            <TextButton
-              ref={addButton}
-              label={isMultiple ? 'Agregar otra versión' : 'Agregar otra opción'}
-              icon={PlusIcon}
-              accessibilityHint={isMultiple ? undefined : 'Por ejemplo, otro tamaño o el original'}
-              onPress={addVersion}
-            />
-          </View>
-          {isMultiple ? null : (
-            <Text className="text-sm text-muted">
-              Por ejemplo, Print A4 y Print A3, o enmarcado. Cada una con su precio.
-            </Text>
-          )}
-        </Card>
-      </ScrollView>
-      <StyledSafeAreaView edges={['bottom']} className="px-4 pt-2 pb-4">
+    <FormLayout
+      contentContainerClassName="gap-4 px-4 pb-6"
+      footer={
         <PrimaryButton
           label={isWaitingForPhotos ? PHOTO_MESSAGES.savingLabel : 'Guardar'}
           accessibilityState={isWaitingForPhotos ? { busy: true } : undefined}
@@ -323,28 +240,107 @@ export function ProductForm({
             void submit();
           }}
         />
-      </StyledSafeAreaView>
-      <ConfirmDialog
-        isOpen={pendingRemoval !== null}
-        title={pendingRemoval?.name ? `¿Quitar ${pendingRemoval.name}?` : '¿Quitar esta versión?'}
-        description={removalDescription(hasSales)}
-        confirmLabel="Quitar"
-        isDestructive={hasSales !== true}
-        onConfirm={confirmRemoval}
-        onCancel={() => {
-          setPendingRemoval(null);
+      }
+      overlays={
+        <>
+          <ConfirmDialog
+            isOpen={pendingRemoval !== null}
+            title={
+              pendingRemoval?.name ? `¿Quitar ${pendingRemoval.name}?` : '¿Quitar esta versión?'
+            }
+            description={removalDescription(hasSales)}
+            confirmLabel="Quitar"
+            isDestructive={hasSales !== true}
+            onConfirm={confirmRemoval}
+            onCancel={() => {
+              setPendingRemoval(null);
+            }}
+          />
+          <ConfirmDialog
+            isOpen={leave.isOpen}
+            title="¿Salir sin guardar?"
+            description="Los cambios que hiciste no se guardarán."
+            confirmLabel="Salir sin guardar"
+            cancelLabel="Seguir editando"
+            isDestructive
+            onConfirm={leave.confirm}
+            onCancel={leave.cancel}
+          />
+        </>
+      }
+    >
+      {notice === undefined ? null : <InlineNotice message={notice} />}
+      <FormTextField
+        control={form.control}
+        name="name"
+        label="Nombre"
+        placeholder="Por ejemplo, Lámina Colibrí"
+        maxLength={PRODUCT_NAME_MAX_LENGTH}
+        autoCapitalize="sentences"
+        returnKeyType="next"
+        describeError={describeProductError}
+      />
+      <FormTextField
+        control={form.control}
+        name="description"
+        label="Descripción"
+        isOptional
+        placeholder="Técnica, tamaño, materiales…"
+        multiline
+        maxLength={PRODUCT_DESCRIPTION_MAX_LENGTH}
+        describeError={describeProductError}
+      />
+      <PhotoStrip
+        photos={photos}
+        productName={productName}
+        imports={imports}
+        onChange={(next) => {
+          form.setValue('photos', [...next], { shouldDirty: true });
+        }}
+        onRemove={(removed) => {
+          form.setValue(
+            'photos',
+            form.getValues('photos').filter((photo) => photo.photoId !== removed.photoId),
+            { shouldDirty: true },
+          );
+          if (removed.isNew) {
+            void removePhotoFiles([removed.photoId]);
+          }
         }}
       />
-      <ConfirmDialog
-        isOpen={leave.isOpen}
-        title="¿Salir sin guardar?"
-        description="Los cambios que hiciste no se guardarán."
-        confirmLabel="Salir sin guardar"
-        cancelLabel="Seguir editando"
-        isDestructive
-        onConfirm={leave.confirm}
-        onCancel={leave.cancel}
-      />
-    </KeyboardAvoidingView>
+      <Card title={isMultiple ? 'Versiones' : undefined}>
+        {isMultiple ? (
+          <Text className="text-sm text-muted">Cada versión tiene su propio precio.</Text>
+        ) : null}
+        <View className="gap-6">
+          {fields.map((field, index) => (
+            <Fragment key={field.id}>
+              {index > 0 ? <ListSeparator /> : null}
+              <VersionFields
+                control={form.control}
+                setFocus={form.setFocus}
+                index={index}
+                isMultiple={isMultiple}
+                onRemove={removeVersion}
+              />
+            </Fragment>
+          ))}
+        </View>
+        <View className="items-start">
+          <TextButton
+            ref={addButton}
+            label={isMultiple ? 'Agregar otra versión' : 'Agregar otra opción'}
+            icon={PlusIcon}
+            accessibilityHint={isMultiple ? undefined : 'Por ejemplo, otro tamaño o el original'}
+            onPress={addVersion}
+          />
+        </View>
+        {isMultiple ? null : (
+          <Text className="text-sm text-muted">
+            Por ejemplo, Print A4 y Print A3, o enmarcado. Cada una con su precio.
+          </Text>
+        )}
+      </Card>
+    </FormLayout>
   );
 }

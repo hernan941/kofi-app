@@ -7,6 +7,7 @@ import {
   createTestDependencies,
   type TestDependencies,
 } from '@/core/testing/create-test-dependencies';
+import { holdCalls } from '@/core/testing/hold-calls';
 import { renderWithProviders } from '@/core/testing/render-with-providers';
 import { epochMsSchema, type LocalDate, type SaleRecordId } from '@/shared/domain';
 import { advanceClockAndTimers } from '@/shared/domain/testing/advance-clock-and-timers';
@@ -201,9 +202,11 @@ describe('useSaleRecord', () => {
   it('loads the record', async () => {
     const dependencies = createTestDependencies();
     seedRecord(dependencies, 1, '2026-07-01');
+    const release = holdCalls(dependencies.sales, 'findById');
     await mount(<Detail id={recordId(1)} />, dependencies);
 
     expect(screen.getByText('cargando')).toBeOnTheScreen();
+    release();
     expect(await screen.findByText('2026-07-01')).toBeOnTheScreen();
   });
 

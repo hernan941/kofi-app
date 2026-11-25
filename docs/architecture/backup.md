@@ -617,7 +617,7 @@ export interface ExportBackupDeps extends BackupContentsDeps {
 
 /**
  * `acquire('backup_export')` → contenidos → espacio → ZIP en
- * `backups/cuantovendi-respaldo-AAAA-MM-DD.zip` → liberar el lock (`finally`) → compartir
+ * `backups/kofi-respaldo-AAAA-MM-DD.zip` → liberar el lock (`finally`) → compartir
  * (`application/zip`, UTI `public.zip-archive`).
  */
 export function exportBackup(
@@ -787,10 +787,10 @@ Se compara con `archiveIo.availableDiskSpace()` **una vez**, antes del respaldo 
 
 | Qué | Dónde | Nombre |
 |---|---|---|
-| Respaldo para compartir | `Paths.cache/backups/` | `cuantovendi-respaldo-AAAA-MM-DD.zip` (fecha local de `Clock` + `LocalCalendar`) |
+| Respaldo para compartir | `Paths.cache/backups/` | `kofi-respaldo-AAAA-MM-DD.zip` (fecha local de `Clock` + `LocalCalendar`) |
 | CSV | `Paths.cache/backups/` | `ventas.csv`, `productos.csv` (6.2, punto 2) |
 | Respaldo de seguridad | `Paths.document/safety/` | `cuantovendi-seguridad-<epochMs de 13 dígitos>.zip` (`.part` mientras se escribe) |
-| Emergencia | `Paths.cache/emergency/` | `cuantovendi-<epochMs>.db`, `cuantovendi-emergencia-AAAA-MM-DD.zip` |
+| Emergencia | `Paths.cache/emergency/` | `cuantovendi-<epochMs>.db`, `kofi-emergencia-AAAA-MM-DD.zip` |
 | Fotos restauradas | `Paths.document/photos/` | `<id>.jpg.part` → `<id>.jpg`, con el id validado de la fila (nunca el nombre de la entrada del ZIP) |
 | Copia del selector | `Paths.cache/DocumentPicker/` (verificado en Android; F8.4 confirma iOS) | La que pone el selector |
 
@@ -1038,7 +1038,7 @@ Mientras dura `restoring`, la pantalla impide salir (F8.1 define cómo). `useExp
   - `sha256` del disco distinto de la fila → usa el del disco y registra una advertencia sin datos del negocio;
   - archivo faltante → la fila sale borrada lógicamente y sin archivo;
   - el manifiesto tiene los conteos (`activePhotos` = fotos con archivo) y los `sha256` correctos, y lista `data.json` y solo las fotos activas;
-  - nombre `cuantovendi-respaldo-AAAA-MM-DD.zip` con la fecha local de `FakeClock` (cerca de la medianoche en las tres zonas);
+  - nombre `kofi-respaldo-AAAA-MM-DD.zip` con la fecha local de `FakeClock` (cerca de la medianoche en las tres zonas);
   - sin espacio → `not_enough_space` sin escribir nada;
   - por encima de los límites → `too_large`;
   - sin menú de compartir → `sharing_unavailable`;

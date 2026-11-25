@@ -3,6 +3,7 @@ import { act, screen, userEvent } from '@testing-library/react-native';
 import { DataChangesBridge } from '@/core/providers/query/data-changes-bridge';
 import { QUERY_DEPENDENCIES } from '@/core/providers/query/query-dependencies';
 import { createTestDependencies } from '@/core/testing/create-test-dependencies';
+import { holdCalls } from '@/core/testing/hold-calls';
 import { renderWithProviders } from '@/core/testing/render-with-providers';
 import { productIdSchema } from '@/shared/domain';
 
@@ -18,9 +19,10 @@ import { ProductDetailScreen } from './product-detail-screen';
 
 const user = userEvent.setup();
 
-async function setup(product: Product | null) {
+async function setup(product: Product | null, holdLoading = false) {
   const dependencies = createTestDependencies();
   if (product) await dependencies.products.save(product);
+  const release = holdLoading ? holdCalls(dependencies.products, 'findById') : () => undefined;
   const handlers = { onBack: jest.fn(), onEdit: jest.fn(), onArchived: jest.fn() };
   await renderWithProviders(
     <>
@@ -29,7 +31,7 @@ async function setup(product: Product | null) {
     </>,
     { dependencies },
   );
-  return { ...handlers, dependencies };
+  return { ...handlers, dependencies, release };
 }
 
 const active = makeProduct([makeVersion(0, { name: null })], { name: 'Lámina Colibrí' });
@@ -155,9 +157,10 @@ describe('ProductDetailScreen of an archived product', () => {
 
 describe('ProductDetailScreen states', () => {
   it('shows the loading state', async () => {
-    await setup(active);
+    const { release } = await setup(active, true);
 
     expect(screen.getByRole('progressbar', { name: 'Cargando producto' })).toBeOnTheScreen();
+    release();
     await screen.findByRole('header', { name: 'Lámina Colibrí' });
   });
 

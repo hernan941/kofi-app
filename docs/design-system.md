@@ -1,6 +1,6 @@
 # Sistema de diseño — Bruma
 
-Este documento es la **fuente de verdad** visual de cuantovendi. Todo color, tamaño, espacio, borde o sombra de la app sale de aquí, nunca de valores escritos a mano (`.claude/rules/react-native/coding-style.md`). La base técnica es HeroUI Native + Uniwind (ADR-004). La fuente y los íconos están en ADR-014 (Propuesto).
+Este documento es la **fuente de verdad** visual de Kofi. Todo color, tamaño, espacio, borde o sombra de la app sale de aquí, nunca de valores escritos a mano (`.claude/rules/react-native/coding-style.md`). La base técnica es HeroUI Native + Uniwind (ADR-004). La fuente y los íconos están en ADR-014 (Propuesto).
 
 ---
 
@@ -437,7 +437,7 @@ Todos viven en `shared/ui` (ADR-005), se construyen sobre HeroUI Native y tienen
 
 - La pestaña activa usa el ícono en peso `fill` y la etiqueta en `font-semibold`, ambos en `accent`.
 - La inactiva usa el ícono en peso `bold` y la etiqueta en `font-medium`, en `muted`.
-- Las etiquetas son `text-xs`, siempre visibles, con `accessibilityState={{ selected }}`. Con letra grande ocupan hasta dos líneas y crecen hasta 1,3× (ver la tabla de excepciones en 7).
+- Las etiquetas son `text-xs`, siempre visibles, en **una línea** y con `accessibilityState={{ selected }}`. Crecen con la letra del sistema hasta 1,3× y, si no entran, se achican para caber (`adjustsFontSizeToFit`). La barra calcula su alto con la letra del sistema (`useTabBarStyle`).
 
 ### 6.10 Implementación en `shared/ui` (F0.13)
 
@@ -449,6 +449,7 @@ Todo se importa desde `@/shared/ui`. Decisiones tomadas al construirlos:
 - **Campo de monto**: agrupa los miles al escribir. Si se pega un texto ambiguo (`1.5`, `15,5`), lo deja tal cual para que la validación explique cómo escribirlo, en vez de adivinar.
 - **Fecha** (`DateField`): avanza y retrocede de a un día ("Día anterior" / "Día siguiente") y nunca pasa de `maxDate`. La mayoría de las ventas son de hoy o de pocos días atrás, y no hay un selector de calendario nativo entre las dependencias. Si hace falta saltar semanas, se evalúa un calendario en una hoja.
 - **Hoja inferior** (`Sheet`): usa el `Modal` de React Native, porque el `BottomSheet` de HeroUI necesita `@gorhom/bottom-sheet`, que no está en el proyecto. Se desliza, salvo si el sistema pide reducir el movimiento.
+- **Formularios con teclado** (`FormLayout`): toda pantalla con campos de texto usa `FormLayout`; los campos se hacen visibles solos al recibir el foco.
 - **Grupo de chips** (`ChipGroup`): se lee como un grupo de opciones (`radiogroup`), con cada chip como `radio` y el estado `checked`. Un `Chip` suelto es un botón con `selected`.
 - **Toast** (`useAppToast`): HeroUI dibuja cada toast dos veces (la visible y una copia transparente para medir el alto). La auditoría F10.1 confirmó que, así, el aviso se podía leer varias veces. Por eso todo el toast se oculta al lector y el aviso llega solo por `announce()` (ver 7).
 - **Diálogo de confirmación** (`ConfirmDialog`): desde F10.1 se dibuja sobre el `Modal` de React Native, no sobre el `Dialog` de HeroUI, para que en Android retenga el foco (ver 7).
@@ -470,7 +471,7 @@ Todo se importa desde `@/shared/ui`. Decisiones tomadas al construirlos:
   | Dónde | Límite | Por qué |
   |---|---|---|
   | Monto principal y total del pie (`Amount`, variantes `display` y `total`) | `maxFontSizeMultiplier={1.5}`, una línea, `adjustsFontSizeToFit` | A 44 pt, un monto más grande no cabe en una línea. La etiqueta "45.000 pesos" no cambia. |
-  | Etiquetas de pestañas (`TabBarLabel`) | `maxFontSizeMultiplier={1.3}`, **hasta dos líneas** (`numberOfLines={2}`) | Con cinco pestañas en 360 de ancho, cada una tiene unos 72. A 1,5× y en una línea, "Calendario" se cortaba. Con dos líneas y 1,3×, la barra crece un poco en alto y nada se corta. **Decisión del orquestador (F10.1, M8), pendiente de confirmar en el teléfono.** |
+  | Etiquetas de pestañas (`TabBarLabel`) | `maxFontSizeMultiplier={1.3}`, una línea, `adjustsFontSizeToFit` | Con cinco pestañas, cada una tiene entre 62 y 76 de ancho útil (320–392 dp). 'Calendario' mide 72 a 13 pt: con dos líneas Android partía la palabra ('Calendari/o'). En una línea que se achica, nunca se parte ni se corta. Los lectores de pantalla leen el texto completo, y en iOS lo muestra el visor de contenido grande. Reemplaza la decisión F10.1 M8 (regresión E2E, 2026-11-15). |
   | Número del día en el calendario de la pestaña (`CalendarDayCell`) | `maxFontSizeMultiplier={2}` | A 3×, el número no cabe en 1/7 del ancho. La etiqueta accesible lleva la fecha completa y lo vendido, y el detalle del día crece sin límite (`docs/design/tracking-calendar.md`). |
   | Número del día en la hoja de fecha (`DatePickerSheet`) | `maxFontSizeMultiplier={2}`, celdas `flex-1` con alto mínimo de 48 (sin tamaño fijo) | El mismo motivo que el calendario: siete columnas en 328 de ancho útil. La etiqueta accesible dice el día completo ("Hoy, sábado 14 de noviembre"). Corrige el hallazgo M5 de `docs/design/accessibility-audit.md`. |
 - **Lector de pantalla:**
@@ -499,6 +500,15 @@ Todo se importa desde `@/shared/ui`. Decisiones tomadas al construirlos:
   - Éxito `CheckCircle`, Error `WarningCircle`, Información `Info`;
   - Dónde vendiste: `Storefront`; Exportar `Export`; Foto `Camera` / `Image`; Ajustes `Gear`; Recordatorio `Bell`.
 - **Accesibilidad:** un ícono que acompaña a un texto es decorativo y se oculta al lector de pantalla. Un ícono solo dentro de un botón necesita la etiqueta en el botón.
+
+### 8.1 Marca: el gato de Kofi
+
+- **Figura:** cara frontal de un gato tuxedo, plana y simétrica: cabeza oscura, franja y hocico claros, mirada serena y nariz ciruela. Sin boca ni accesorios: Kofi es un asistente, no una caricatura.
+- **Colores:** cabeza y pupilas `#171D21`, hocico y ojos `#E7EFF3`, nariz `#743A59` (único acento), fondo `#D5E3EA` (13:1 con la cabeza).
+- **Sobre fondo oscuro:** siempre con contorno sticker `#D5E3EA` (`splash-icon-dark.png`) o dentro de su fondo claro.
+- **Un solo color:** `kofi-glyph.svg`, con ojos y hocico calados. Se usa en la notificación y en el ícono temático de Android.
+- **Usos prohibidos:** cabeza oscura sobre ciruela o sobre oscuro sin contorno; sonrisa, sombrero, monóculo, monedas u otros accesorios; degradados, brillos o sombras; deformar, inclinar, recortar las orejas o cambiar los colores; usar la versión a color por debajo de 24 dp (ahí va el glifo).
+- **Generación:** las fuentes son `assets/brand/kofi-mark.svg` y `assets/brand/kofi-glyph.svg`. `python3 tools/assets/generate-brand-assets.py` (Pillow y Chromium) genera todos los PNG y la capa de `assets/expo.icon`, y comprueba la zona segura adaptable. Los PNG no se editan a mano.
 
 ---
 

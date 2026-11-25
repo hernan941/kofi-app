@@ -51,8 +51,8 @@ export function restoreProblemMessage(problem: RestoreProblem): RestoreProblemMe
   switch (problem.code) {
     case 'not_a_backup':
       return fileProblem(
-        'Este archivo no es un respaldo de cuantovendi',
-        'Elige el archivo que creaste con "Crear respaldo". Su nombre empieza con cuantovendi-respaldo.',
+        'Este archivo no es un respaldo de Kofi',
+        'Elige el archivo que creaste con "Crear respaldo". Su nombre empieza con kofi-respaldo (o cuantovendi-respaldo, si lo hiciste antes).',
       );
     case 'emergency_backup':
       return fileProblem(
@@ -63,7 +63,7 @@ export function restoreProblemMessage(problem: RestoreProblem): RestoreProblemMe
       return problem.reason === 'too_large'
         ? fileProblem(
             'Este archivo es demasiado grande',
-            'Es más grande que cualquier respaldo de cuantovendi. Revisa que sea el archivo correcto.',
+            'Es más grande que cualquier respaldo de Kofi. Revisa que sea el archivo correcto.',
           )
         : fileProblem(
             'No pudimos leer este respaldo',
@@ -72,7 +72,7 @@ export function restoreProblemMessage(problem: RestoreProblem): RestoreProblemMe
     case 'newer_format':
       return ownProblem(
         'Este respaldo es de una versión más nueva de la app',
-        'Actualiza cuantovendi y vuelve a intentarlo.',
+        'Actualiza Kofi y vuelve a intentarlo.',
       );
     case 'entries_mismatch':
       return fileProblem(

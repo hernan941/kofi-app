@@ -22,7 +22,7 @@ export const PHOTO_MESSAGES = {
   removeConfirm: 'Quitar foto',
   cameraDeniedTitle: 'La cámara no tiene permiso',
   cameraDeniedDescription:
-    'Para tomar fotos desde cuantovendi, permite el uso de la cámara en los ajustes del teléfono. Mientras tanto, puedes elegir fotos de la galería.',
+    'Para tomar fotos desde Kofi, permite el uso de la cámara en los ajustes del teléfono. Mientras tanto, puedes elegir fotos de la galería.',
   cameraDeniedConfirm: 'Abrir ajustes',
   cameraDeniedCancel: 'Ahora no',
   libraryFailed: 'No se pudo abrir la galería. Inténtalo de nuevo.',

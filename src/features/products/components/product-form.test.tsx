@@ -1,4 +1,4 @@
-import { screen, userEvent, waitFor } from '@testing-library/react-native';
+import { screen, userEvent, waitFor, within } from '@testing-library/react-native';
 import { AccessibilityInfo } from 'react-native';
 
 import { ok, productIdSchema } from '@/shared/domain';
@@ -40,6 +40,17 @@ async function pressRemove(index: number): Promise<void> {
   }
   await user.press(button);
 }
+
+describe('ProductForm layout', () => {
+  it('is drawn inside the form layout with the save button in the fixed footer', async () => {
+    await renderWithProviders(setup().element);
+
+    expect(screen.getByTestId('form-layout')).toBeOnTheScreen();
+    expect(
+      within(screen.getByTestId('form-layout-footer')).getByRole('button', { name: 'Guardar' }),
+    ).toBeOnTheScreen();
+  });
+});
 
 describe('ProductForm with a single version', () => {
   it('never says "versión"', async () => {

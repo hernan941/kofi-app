@@ -70,7 +70,7 @@ describe('RestoreFailure', () => {
     );
 
     expect(
-      screen.getByRole('header', { name: 'Este archivo no es un respaldo de cuantovendi' }),
+      screen.getByRole('header', { name: 'Este archivo no es un respaldo de Kofi' }),
     ).toBeOnTheScreen();
     expect(screen.queryByText('Tus datos siguen como estaban.')).not.toBeOnTheScreen();
 

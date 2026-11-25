@@ -1,9 +1,14 @@
-import { screen, userEvent } from '@testing-library/react-native';
+import { fireEvent, screen, userEvent } from '@testing-library/react-native';
 import { useState } from 'react';
 import { AccessibilityInfo } from 'react-native';
 
 import { renderUi } from './testing/render-ui';
 import { TextField } from './text-field';
+
+/** Waits for React to apply an event (in RNTL 14 `fireEvent` returns a promise). */
+async function settle(pending: Promise<unknown>) {
+  await pending;
+}
 
 const user = userEvent.setup();
 
@@ -106,5 +111,25 @@ describe('TextField', () => {
 
     expect(screen.getByText('Completa este campo')).toBeOnTheScreen();
     expect(spy).not.toHaveBeenCalled();
+  });
+
+  it('still calls onFocus and onBlur outside a form layout', async () => {
+    const onFocus = jest.fn();
+    const onBlur = jest.fn();
+    await renderUi(
+      <TextField
+        label="Nombre"
+        value=""
+        onChangeText={jest.fn()}
+        onFocus={onFocus}
+        onBlur={onBlur}
+      />,
+    );
+
+    await settle(fireEvent(screen.getByLabelText('Nombre'), 'focus'));
+    await settle(fireEvent(screen.getByLabelText('Nombre'), 'blur'));
+
+    expect(onFocus).toHaveBeenCalledTimes(1);
+    expect(onBlur).toHaveBeenCalledTimes(1);
   });
 });

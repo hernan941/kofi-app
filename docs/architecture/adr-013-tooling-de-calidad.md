@@ -106,3 +106,13 @@ La regla de red de `src/**` (fuera de los tests) se endurece: además de `no-res
 
 ## Enmienda 2026-11-14 (F10.4)
 La regla de red de `src/**` suma, en `@typescript-eslint/no-restricted-imports` (dentro de `tools/eslint/layer-boundaries.js`, para todas las capas porque esa regla se reemplaza por bloque): `expo/fetch`, `expo-network`, `expo-web-browser`, `expo-file-system/legacy` y los nombres `UploadTask` y `DownloadTask` de `expo-file-system`. `no-restricted-properties` prohíbe `File.downloadFileAsync`, y `no-restricted-syntax` los métodos de instancia `upload`, `createUploadTask` y `createDownloadTask` (no se pueden distinguir por tipo). Cada caso tiene su fixture en `tools/eslint/layer-boundaries.test.js`. Los tests de los plugins de `plugins/` corren en el proyecto `node` de Jest.
+
+## Enmienda 2026-11-15 (F10.5)
+1. **Reglas de lint nuevas** por hallazgos de la regresión E2E, que ni el typecheck ni Jest detectaban:
+   - Import directo de `SafeAreaView` (de `react-native-safe-area-context` o de `react-native`) prohibido fuera de `src/shared/ui/styled-safe-area-view.tsx` y su test, en `tools/eslint/layer-boundaries.js` ([ADR-019](adr-019-uniwind-componentes-de-terceros.md)).
+   - `toSorted`, `toReversed`, `toSpliced` y `with` prohibidos con `no-restricted-properties` en `src/**` fuera de los tests ([ADR-020](adr-020-apis-de-js-en-hermes.md)).
+2. **Entorno de Maestro** (el detalle operativo está en [`e2e/maestro/README.md`](../../e2e/maestro/README.md), sección "Entorno de ejecución y trampas conocidas"):
+   - El emulador de referencia es el AVD `cuantovendi_api34` (Android 14, x86_64), que puede correr sin ventana.
+   - Antes de correr la suite, las animaciones del sistema van en 0 (`window_animation_scale`, `transition_animation_scale` y `animator_duration_scale`).
+   - Maestro concede todos los permisos al lanzar la app. Para que aparezca la pantalla explicativa de avisos, el subflujo compartido `e2e/maestro/_shared/launch-clean.yaml` (y todo flujo de notificaciones que lance la app por su cuenta) declara `permissions: { notifications: unset }` en `launchApp`.
+   - `release-has-no-e2e.yaml` se corre aparte, solo contra un build `release` limpio ([ADR-016](adr-016-plataformas-y-builds-locales.md), enmienda 2026-11-15). En el build `e2e` falla por diseño.

@@ -116,7 +116,7 @@ Nota para F2.5: `Sheet` y `ConfirmDialog` son dos `Modal`. Si al probar en Andro
 `ConfirmDialog` no destructivo:
 
 - Título: "La cámara no tiene permiso"
-- Descripción: "Para tomar fotos desde cuantovendi, permite el uso de la cámara en los ajustes del teléfono. Mientras tanto, puedes elegir fotos de la galería."
+- Descripción: "Para tomar fotos desde Kofi, permite el uso de la cámara en los ajustes del teléfono. Mientras tanto, puedes elegir fotos de la galería."
 - Confirmar: "Abrir ajustes" (llama a `Linking.openSettings()`). Cancelar: "Ahora no".
 - Al volver de los ajustes no se reintenta solo: la persona toca "Cámara" otra vez. Así nunca se abre la cámara sin que la pida.
 

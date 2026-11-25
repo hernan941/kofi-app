@@ -1,4 +1,4 @@
-import { fireEvent, screen, userEvent, waitFor } from '@testing-library/react-native';
+import { fireEvent, screen, userEvent, waitFor, within } from '@testing-library/react-native';
 import { AccessibilityInfo } from 'react-native';
 
 import { createTestDependencies } from '@/core/testing/create-test-dependencies';
@@ -88,6 +88,18 @@ function renderForm(overrides: Partial<SaleFormProps> = {}, sellable: Product[] 
 }
 
 describe('SaleForm', () => {
+  describe('layout', () => {
+    it('is drawn inside the form layout with the total and the save button in the fixed footer', async () => {
+      await renderForm().view;
+      await user.press(screen.getByRole('button', { name: 'Taza, 1.000 pesos' }));
+
+      const footer = within(screen.getByTestId('form-layout-footer'));
+      expect(screen.getByTestId('form-layout')).toBeOnTheScreen();
+      expect(footer.getByLabelText(/^Total:/)).toBeOnTheScreen();
+      expect(footer.getByRole('button', { name: 'Guardar venta' })).toBeOnTheScreen();
+    });
+  });
+
   describe('date', () => {
     it('starts today, with the list of products in view and no way to pick tomorrow', async () => {
       await renderForm().view;

@@ -14,6 +14,9 @@ const LOGGER_FILE = 'src/shared/lib/logger.ts';
 const NETWORK_GLOBALS = ['fetch', 'XMLHttpRequest', 'WebSocket'];
 const GLOBAL_OBJECTS = ['globalThis', 'global', 'window', 'self'];
 const GLOBAL_OBJECT_NAMES = GLOBAL_OBJECTS.join('|');
+const HERMES_MISSING_METHODS = ['toSorted', 'toReversed', 'toSpliced', 'with'];
+const HERMES_MESSAGE =
+  'Hermes no implementa este método (ADR-020): usa la versión mutable sobre una copia, por ejemplo [...items].sort(compare).';
 const NETWORK_MESSAGE =
   'La app no envía datos a internet (D-23): la nota de privacidad de Ajustes dejaría de ser cierta.';
 const NETWORK_SYNTAX = [
@@ -127,6 +130,7 @@ module.exports = defineConfig([
         ),
         { object: 'Linking', property: 'openURL', message: NETWORK_MESSAGE },
         { object: 'File', property: 'downloadFileAsync', message: NETWORK_MESSAGE },
+        ...HERMES_MISSING_METHODS.map((property) => ({ property, message: HERMES_MESSAGE })),
       ],
       'no-restricted-syntax': ['error', ...NETWORK_SYNTAX],
       'import/no-extraneous-dependencies': ['error', { devDependencies: false }],

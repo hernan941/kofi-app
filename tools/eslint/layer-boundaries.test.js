@@ -348,9 +348,81 @@ const VIOLATIONS = [
     code: "import * as Network from 'expo-network';\n\nexport const value = Network;\n",
     rule: IMPORTS_RULE,
   },
+  {
+    name: 'SafeAreaView imported by name from react-native-safe-area-context',
+    path: 'src/shared/ui/raw-safe-area-view.tsx',
+    code: "import { SafeAreaView } from 'react-native-safe-area-context';\n\nexport const view = SafeAreaView;\n",
+    rule: IMPORTS_RULE,
+  },
+  {
+    name: 'SafeAreaView imported by name from react-native',
+    path: 'src/features/products/components/rn-safe-area-view.tsx',
+    code: "import { SafeAreaView } from 'react-native';\n\nexport const view = SafeAreaView;\n",
+    rule: IMPORTS_RULE,
+  },
+  {
+    name: 'any namespace import of react-native',
+    path: 'src/shared/lib/namespace-react-native.ts',
+    code: "import * as ReactNative from 'react-native';\n\nexport const platform = ReactNative.Platform;\n",
+    rule: IMPORTS_RULE,
+  },
+  {
+    name: 'SafeAreaView reached through a namespace import',
+    path: 'src/shared/ui/namespace-safe-area-view.tsx',
+    code: "import * as SafeArea from 'react-native-safe-area-context';\n\nexport const view = SafeArea.SafeAreaView;\n",
+    rule: IMPORTS_RULE,
+  },
+  {
+    name: 'Array.prototype.toSorted in the app',
+    path: 'src/shared/lib/hermes-toSorted.ts',
+    code: '/** Copies. */\nexport function copy(items: number[]) {\n  return items.toSorted();\n}\n',
+    rule: PROPERTIES_RULE,
+  },
+  {
+    name: 'Array.prototype.toReversed in the app',
+    path: 'src/shared/lib/hermes-toReversed.ts',
+    code: '/** Copies. */\nexport function copy(items: number[]) {\n  return items.toReversed();\n}\n',
+    rule: PROPERTIES_RULE,
+  },
+  {
+    name: 'Array.prototype.toSpliced in the app',
+    path: 'src/shared/lib/hermes-toSpliced.ts',
+    code: '/** Copies. */\nexport function copy(items: number[]) {\n  return items.toSpliced(0, 1);\n}\n',
+    rule: PROPERTIES_RULE,
+  },
+  {
+    name: 'Array.prototype.with in the app',
+    path: 'src/shared/lib/hermes-with.ts',
+    code: '/** Copies. */\nexport function copy(items: number[]) {\n  return items.with(0, 1);\n}\n',
+    rule: PROPERTIES_RULE,
+  },
 ];
 
 const ALLOWED = [
+  {
+    name: 'the styled safe area view importing SafeAreaView',
+    path: 'src/shared/ui/styled-safe-area-view.tsx',
+    code: "import { SafeAreaView } from 'react-native-safe-area-context';\n\nexport const StyledView = SafeAreaView;\n",
+    rules: [IMPORTS_RULE],
+  },
+  {
+    name: 'SafeAreaProvider and useSafeAreaInsets',
+    path: 'src/shared/ui/safe-area-hooks.tsx',
+    code: "import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';\n\nexport const provider = SafeAreaProvider;\nexport const insets = useSafeAreaInsets;\n",
+    rules: [IMPORTS_RULE],
+  },
+  {
+    name: 'a sorted copy made with a mutable method',
+    path: 'src/shared/lib/hermes-copy-sort.ts',
+    code: '/** Sorts. */\nexport function sorted(items: number[]) {\n  return [...items].sort();\n}\n',
+    rules: [PROPERTIES_RULE],
+  },
+  {
+    name: 'toSorted in a test',
+    path: 'src/shared/lib/hermes-in-test.test.ts',
+    code: 'export const sorted = (items: number[]) => items.toSorted();\n',
+    rules: [PROPERTIES_RULE],
+  },
   {
     name: 'Linking.openSettings',
     path: 'src/shared/lib/open-settings.ts',

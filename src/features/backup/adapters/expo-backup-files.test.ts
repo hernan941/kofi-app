@@ -29,9 +29,9 @@ describe('createExpoBackupFiles', () => {
 
   describe('exportTarget', () => {
     it('returns the path under cache/backups and creates the folder', () => {
-      const uri = files.exportTarget('cuantovendi-respaldo-2026-11-13.zip');
+      const uri = files.exportTarget('kofi-respaldo-2026-11-13.zip');
 
-      expect(uri).toBe(`${CACHE}/backups/cuantovendi-respaldo-2026-11-13.zip`);
+      expect(uri).toBe(`${CACHE}/backups/kofi-respaldo-2026-11-13.zip`);
       expect(fakeFileSystem.directories.has(`${CACHE}/backups/`)).toBe(true);
     });
 
@@ -43,7 +43,7 @@ describe('createExpoBackupFiles', () => {
       expect(fakeFileSystem.read(uri)).toBeUndefined();
     });
 
-    it.each(['../ventas.csv', 'otro.zip', 'cuantovendi-respaldo-2026-11-13.zip.part', ''])(
+    it.each(['../ventas.csv', 'otro.zip', 'kofi-respaldo-2026-11-13.zip.part', ''])(
       'rejects the name %j',
       (name) => {
         expect(() => files.exportTarget(name)).toThrow();
@@ -118,7 +118,7 @@ describe('createExpoBackupFiles', () => {
   describe('clearEmergencyDirectory', () => {
     it('deletes every file of cache/emergency and nothing else', () => {
       fakeFileSystem.put(`${CACHE}/emergency/cuantovendi-1.db`, 'a');
-      fakeFileSystem.put(`${CACHE}/emergency/cuantovendi-emergencia-2026-11-14.zip`, 'b');
+      fakeFileSystem.put(`${CACHE}/emergency/kofi-emergencia-2026-11-14.zip`, 'b');
       fakeFileSystem.put(`${CACHE}/backups/keep.zip`, 'c');
 
       files.clearEmergencyDirectory();

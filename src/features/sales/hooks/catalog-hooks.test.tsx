@@ -5,6 +5,7 @@ import {
   createTestDependencies,
   type TestDependencies,
 } from '@/core/testing/create-test-dependencies';
+import { holdCalls } from '@/core/testing/hold-calls';
 import { renderWithProviders } from '@/core/testing/render-with-providers';
 import { saleRecordIdSchema, type ProductId, type SaleRecordId } from '@/shared/domain';
 
@@ -75,9 +76,11 @@ describe('useSellableProducts', () => {
       makeProduct(2, [makeVersion(2, { productN: 2 })], { name: 'Álbum' }),
     );
 
+    const release = holdCalls(dependencies.products, 'listActive');
     await renderWithProviders(<Sellable />, { dependencies });
 
     expect(screen.getByText('cargando')).toBeOnTheScreen();
+    release();
     expect(await screen.findByText('sellable:Álbum,Taza')).toBeOnTheScreen();
   });
 
@@ -131,9 +134,12 @@ describe('useSaleRecordView', () => {
     const dependencies = createTestDependencies();
     seedCatalog(dependencies);
 
+    const release = holdCalls(dependencies.sales, 'findById');
     await renderWithProviders(<View id={recordId(1)} />, { dependencies });
 
     expect(screen.getByText('status:pending')).toBeOnTheScreen();
+    release();
+    expect(await screen.findByText('status:not_found')).toBeOnTheScreen();
   });
 
   it('is not_found for an unknown id', async () => {

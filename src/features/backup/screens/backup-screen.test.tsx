@@ -193,7 +193,7 @@ describe('BackupScreen', () => {
     await user.press(screen.getByRole('button', { name: 'Elegir un respaldo' }));
 
     expect(
-      await screen.findByRole('header', { name: 'Este archivo no es un respaldo de cuantovendi' }),
+      await screen.findByRole('header', { name: 'Este archivo no es un respaldo de Kofi' }),
     ).toBeOnTheScreen();
     expect(screen.getByRole('button', { name: 'Elegir otro archivo' })).toBeOnTheScreen();
     const footerButton = screen.getAllByRole('button', { name: 'Volver' }).at(-1);

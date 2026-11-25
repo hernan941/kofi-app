@@ -1,5 +1,4 @@
 import { Tabs } from 'expo-router';
-import { useThemeColor } from 'heroui-native';
 
 import { perfMark } from '@/shared/lib/perf-marks';
 import {
@@ -10,11 +9,12 @@ import {
   PackageIcon,
   TabBarIcon,
   TabBarLabel,
+  useTabBarStyle,
 } from '@/shared/ui';
 
 /** Tab bar layout (design system 6.9): five tabs with always-visible labels. */
 export default function TabsLayout() {
-  const [surface, border] = useThemeColor(['surface', 'border']);
+  const tabBarStyle = useTabBarStyle();
   return (
     <Tabs
       screenListeners={({ route }) => ({
@@ -26,7 +26,7 @@ export default function TabsLayout() {
       })}
       screenOptions={{
         headerShown: false,
-        tabBarStyle: { backgroundColor: surface, borderTopColor: border },
+        tabBarStyle,
       }}
     >
       <Tabs.Screen

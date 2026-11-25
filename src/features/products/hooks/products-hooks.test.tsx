@@ -9,6 +9,7 @@ import {
   createTestDependencies,
   type TestDependencies,
 } from '@/core/testing/create-test-dependencies';
+import { holdCalls } from '@/core/testing/hold-calls';
 import { renderWithProviders } from '@/core/testing/render-with-providers';
 import { productIdSchema, type Clp } from '@/shared/domain';
 
@@ -68,9 +69,12 @@ const named = (name: string, n: number): Product => {
 
 describe('useActiveProducts', () => {
   it('shows the loading state first and then the empty state', async () => {
-    await mount(<ActiveList />, createTestDependencies());
+    const dependencies = createTestDependencies();
+    const release = holdCalls(dependencies.products, 'listActive');
+    await mount(<ActiveList />, dependencies);
 
     expect(screen.getByText('cargando')).toBeOnTheScreen();
+    release();
     expect(await screen.findByText('vacío')).toBeOnTheScreen();
   });
 

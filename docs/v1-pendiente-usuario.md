@@ -284,10 +284,10 @@ Registra los resultados con el formato de la sección 7 del documento.
 5. **Textos y decisiones de diseño que el orquestador tomó por defecto y que conviene que veas en el teléfono**:
    - "Agregar otra opción" cuando el producto tiene una sola versión, con su ejemplo debajo (`docs/design/products.md`, UX-P4);
    - la intensidad del calendario con 1 a 3 puntos (`docs/design/tracking-calendar.md` 9.1);
-   - minutos del recordatorio de a 15 y el ícono de recibo en las notificaciones (D-45);
+   - minutos del recordatorio de a 15 y el ícono de las notificaciones, ahora el gato de Kofi (D-45);
    - largo máximo de los consejos: 50 caracteres de título y 240 de cuerpo (`docs/design/tips.md` 9.1);
    - la vista previa de la restauración muestra también los datos actuales, y la pantalla no se mantiene encendida mientras restaura (D-45);
-   - el identificador `com.cuantovendi.local`, el ícono y el splash de la plantilla (provisionales hasta una publicación, sección 10 del plan).
+   - el identificador `com.cuantovendi.local` (provisional hasta una publicación, sección 10 del plan). El ícono y el splash ya son el gato de Kofi (`docs/design-system.md` 8.1).
 6. **Contenido de los consejos (CP7a)**: lee los 30 consejos y sus fuentes en `docs/content/consejos.md`. Una fuente (un PDF de BancoEstado) no se pudo abrir; cada consejo que la cita tiene otra fuente. Aprueba el contenido o marca qué cambiar.
 
 ---

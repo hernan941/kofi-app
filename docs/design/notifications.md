@@ -20,7 +20,7 @@
 | UX-N8 | **Si el semanal está apagado, la fila "Día y hora" se esconde.** La preferencia guardada se mantiene. | Un control que no hace nada confunde. Al volver a encender, aparece con el día y la hora que tenía. |
 | UX-N9 | **Ajustes explica D-13 en una línea**: si la persona no abre la app, el aviso sigue llegando con un mensaje general, y nunca llega más de uno por semana. | Así nadie se sorprende con un aviso "genérico" ni cree que la app falla. |
 | UX-N10 | **Los textos de los avisos son cortos**: título de 40 caracteres o menos y cuerpo de 60 o menos. El título se entiende solo. | Android muestra el aviso plegado: el título y una línea del cuerpo (unos 40 a 45 caracteres en un teléfono de 360). Lo importante tiene que estar en el título. |
-| UX-N11 | **El ícono monocromo actual no sirve** para la barra de estado. Hace falta un `notification-icon.png` propio (sección 3.6). | `android-icon-monochrome.png` es el logo de la plantilla de Expo, no el de cuantovendi, y su figura ocupa solo el 45 % del lienzo: a 24 dp se vería de unos 11 dp. |
+| UX-N11 | **El ícono monocromo que había no servía** para la barra de estado. Hacía falta un `notification-icon.png` propio (sección 3.6). | `android-icon-monochrome.png` era el logo de la plantilla de Expo, no el de la app, y su figura ocupaba solo el 45 % del lienzo: a 24 dp se habría visto de unos 11 dp. |
 
 ---
 
@@ -110,8 +110,8 @@ Los textos entre comillas son **exactos** (tabla completa en la sección 5). `{d
 | Permiso | Qué se ve |
 |---|---|
 | Leyendo (`undefined`) | Nada. Evita que una tarjeta aparezca y desaparezca en el primer instante. |
-| Sin decidir (`undetermined`) | `Card` con título **"Activa los avisos"** y el texto **"Para que te lleguen los recordatorios, cuantovendi necesita tu permiso para enviarte avisos."** Debajo, `PrimaryButton` **"Activar recordatorios"**, que pide el permiso directo (diálogo del sistema). |
-| Denegado (`denied`) | `Card` con título **"Los avisos están apagados"** y el texto **"Están desactivados en los ajustes de tu teléfono. Si quieres recibirlos, actívalos ahí."** Debajo, `PrimaryButton` **"Abrir ajustes"** con la pista **"Abre los ajustes de cuantovendi en tu teléfono"** (`Linking.openSettings()`). La app no vuelve a pedir el permiso. |
+| Sin decidir (`undetermined`) | `Card` con título **"Activa los avisos"** y el texto **"Para que te lleguen los recordatorios, Kofi necesita tu permiso para enviarte avisos."** Debajo, `PrimaryButton` **"Activar recordatorios"**, que pide el permiso directo (diálogo del sistema). |
+| Denegado (`denied`) | `Card` con título **"Los avisos están apagados"** y el texto **"Están desactivados en los ajustes de tu teléfono. Si quieres recibirlos, actívalos ahí."** Debajo, `PrimaryButton` **"Abrir ajustes"** con la pista **"Abre los ajustes de Kofi en tu teléfono"** (`Linking.openSettings()`). La app no vuelve a pedir el permiso. |
 | Concedido (`granted`) | `InlineNotice` con `CheckCircle`: **"Los avisos están activados en tu teléfono."** Sin tarjeta ni botón. |
 
 - Resultado de "Activar recordatorios" en esta pantalla: concedido → se anuncia **"Recordatorios activados"** y la tarjeta pasa a la línea de "concedido"; denegado → la tarjeta pasa a "Los avisos están apagados", sin mensaje extra.
@@ -138,10 +138,10 @@ Al final de la pantalla, con un encabezado `text-heading` **"Pruebas de avisos"*
 
 ### 3.6 Ícono de la notificación en Android (respuesta a F7.0, 6.1 punto 7)
 
-**`assets/images/android-icon-monochrome.png` no sirve.** Lo revisé:
-- es el **logo de la plantilla de Expo** (la "A"), igual que `icon.png`; no es un ícono de cuantovendi;
-- mide 432 × 432 y su figura ocupa solo unos 196 × 176 px (el 45 % del lienzo), porque está pensado para la zona segura del ícono adaptable del lanzador. Como ícono de notificación (24 dp), la figura quedaría de unos 11 dp;
-- es gris (`#7D7D7D`) sobre transparente. Android solo usa el canal alfa de los íconos de notificación, así que el gris no es el problema, pero la guía pide blanco.
+**`assets/images/android-icon-monochrome.png` no servía** (era el de la plantilla; hoy es el gato de Kofi). Lo revisé:
+- era el **logo de la plantilla de Expo** (la "A"), igual que `icon.png`; no era un ícono de la app;
+- medía 432 × 432 y su figura ocupaba solo unos 196 × 176 px (el 45 % del lienzo), porque estaba pensado para la zona segura del ícono adaptable del lanzador. Como ícono de notificación (24 dp), la figura habría quedado de unos 11 dp;
+- era gris (`#7D7D7D`) sobre transparente. Android solo usa el canal alfa de los íconos de notificación, así que el gris no es el problema, pero la guía pide blanco.
 
 **Qué hace falta**: un archivo nuevo, `assets/images/notification-icon.png`, que F7.4 pasa al plugin como `"icon"`:
 
@@ -154,8 +154,8 @@ Al final de la pantalla, con un encabezado `text-heading` **"Pruebas de avisos"*
 | Forma | Silueta plana, sin texto ni detalles finos |
 
 - **`"color"` del plugin**: `#743A59` (el acento claro). Android lo usa para teñir el ícono y el nombre de la app en el aviso. Sobre el fondo blanco de la cortina de avisos tiene más de 9:1 de contraste.
-- **Figura**: mientras cuantovendi no tenga logo propio, propongo la silueta del ícono `Receipt` de Phosphor en peso `fill` (es el de "Ventas" en la app y la licencia MIT permite usarlo; la nota de licencia de Phosphor ya viaja con la dependencia). Cuando exista el logo, se cambia este archivo y el ícono monocromo del lanzador a la vez. Ver la pregunta 9.1.
-- El ícono del lanzador (`icon.png`, `android-icon-*.png` y `adaptiveIcon.backgroundColor` `#E6F4FE`) también es el de la plantilla. No es parte de F7, pero conviene resolverlo antes de F10.
+- **Figura**: la silueta del gato tuxedo de Kofi, con ojos y hocico calados (`assets/brand/kofi-glyph.svg`). Reemplaza al recibo de Phosphor que se usó antes de tener marca. La genera `tools/assets/generate-brand-assets.py`, junto con el ícono monocromo del lanzador (`docs/design-system.md` 8.1).
+- El ícono del lanzador ya es el de Kofi. Lo dicho arriba sobre `android-icon-monochrome.png` describe el archivo de la plantilla, que ya se reemplazó; sigue sin servir para la barra de estado, porque respeta la zona segura adaptable y su figura quedaría pequeña.
 
 ---
 
@@ -224,9 +224,9 @@ Español neutro con tuteo y sin culpa. No se usan "todavía no", "deberías", "d
 | Intro: nota | "Nunca te llega más de un recordatorio por semana." |
 | Intro: botones | "Activar recordatorios" · "Ahora no" |
 | Título de la pantalla | "Recordatorios" |
-| Permiso sin decidir | "Activa los avisos" · "Para que te lleguen los recordatorios, cuantovendi necesita tu permiso para enviarte avisos." · "Activar recordatorios" |
+| Permiso sin decidir | "Activa los avisos" · "Para que te lleguen los recordatorios, Kofi necesita tu permiso para enviarte avisos." · "Activar recordatorios" |
 | Permiso denegado | "Los avisos están apagados" · "Están desactivados en los ajustes de tu teléfono. Si quieres recibirlos, actívalos ahí." · "Abrir ajustes" |
-| Pista de "Abrir ajustes" | "Abre los ajustes de cuantovendi en tu teléfono" |
+| Pista de "Abrir ajustes" | "Abre los ajustes de Kofi en tu teléfono" |
 | Permiso concedido | "Los avisos están activados en tu teléfono." |
 | Nota sin permiso | "Lo que elijas aquí se guarda y empieza a funcionar cuando actives los avisos." |
 | Semanal | "Recordatorio semanal" · "Un aviso por semana para anotar tus ventas." |
@@ -347,6 +347,6 @@ Los de `docs/architecture/notifications.md` (2.1), con estas precisiones:
 
 ## 9. Preguntas abiertas
 
-1. **Figura del ícono de notificación (para el usuario).** Recomiendo usar por ahora la silueta del recibo (`Receipt`, el ícono de "Ventas" de la app) en `notification-icon.png`. La alternativa es esperar a tener el logo de cuantovendi y derivar el ícono de ahí, lo que deja F7.4 sin ícono propio (Android mostraría un cuadrado gris). Con el recibo, cambiarlo después es reemplazar un archivo.
-2. **Quién dibuja el PNG (para el orquestador).** En este entorno no hay herramientas para convertir el SVG de Phosphor a PNG. El archivo se puede generar en F7.4 (por ejemplo, con un script de Node y `react-native-svg` fuera de la app, o exportando el SVG desde la web de Phosphor), siguiendo la tabla de 3.6. No hay que agregar dependencias a la app.
+1. **Figura del ícono de notificación.** Resuelta: se usa la silueta del gato de Kofi (sección 3.6).
+2. **Quién dibuja el PNG.** Resuelta: lo genera `tools/assets/generate-brand-assets.py` desde el SVG, sin dependencias nuevas en la app.
 3. **Minutos de a 15 (para el usuario).** Recomiendo ofrecer solo 00, 15, 30 y 45: alcanza para un recordatorio y la hoja queda simple. Si alguien necesita, por ejemplo, 20:10, la alternativa es un campo de minutos libre como el de la hora, con un control más que escribir.

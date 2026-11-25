@@ -48,3 +48,20 @@ builds/
 
 # generated E2E fixtures (npm run e2e:fixtures); basic.zip is versioned
 /e2e/fixtures/large.zip
+
+# credentials (defense in depth)
+*.keystore
+google-services.json
+GoogleService-Info.plist
+credentials.json
+service-account*.json
+.claude/settings.local.json
+
+# local output
+*.apk
+*.aab
+*.log
+*.db
+*.db-shm
+*.db-wal
+coverage/

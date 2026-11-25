@@ -1,6 +1,7 @@
 import { screen, userEvent, waitFor } from '@testing-library/react-native';
 
 import { createTestDependencies } from '@/core/testing/create-test-dependencies';
+import { holdCalls } from '@/core/testing/hold-calls';
 import { renderWithProviders } from '@/core/testing/render-with-providers';
 import { productIdSchema, type ProductId } from '@/shared/domain';
 import { clearPerfMarks, readPerfMarks } from '@/shared/lib/perf-marks';
@@ -49,10 +50,14 @@ function setup(dependencies = createTestDependencies()) {
 
 describe('ProductsScreen', () => {
   it('shows the header and the loading state first', async () => {
-    await setup().view;
+    const dependencies = createTestDependencies();
+    const release = holdCalls(dependencies.products, 'listActive');
+    await setup(dependencies).view;
 
     expect(screen.getByRole('header', { name: 'Productos' })).toBeOnTheScreen();
     expect(screen.getByRole('progressbar', { name: 'Cargando productos' })).toBeOnTheScreen();
+    release();
+    expect(await screen.findByText('Aquí vas a ver tus productos')).toBeOnTheScreen();
   });
 
   it('invites to create the first product when the list is empty', async () => {

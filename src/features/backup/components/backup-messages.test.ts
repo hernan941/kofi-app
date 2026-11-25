@@ -73,9 +73,12 @@ describe('restoreProblemMessage', () => {
 
   it('tells a file that is not a backup how to find the right one', () => {
     expect(restoreProblemMessage({ code: 'not_a_backup' })).toMatchObject({
-      title: 'Este archivo no es un respaldo de cuantovendi',
+      title: 'Este archivo no es un respaldo de Kofi',
       offersAnotherFile: true,
     });
+    expect(restoreProblemMessage({ code: 'not_a_backup' }).message).toEqual(
+      expect.stringMatching(/kofi-respaldo.*cuantovendi-respaldo/),
+    );
   });
 
   it('tells an oversized file apart from a damaged one', () => {

@@ -88,7 +88,7 @@ Los textos entre comillas son **exactos** (tabla completa en la sección 5). Los
 4. **"Esta semana no vendí"** (3.5): solo si la persona todavía no agregó, quitó ni cambió productos (los ítems siguen como empezaron, vacíos o con el precargado). Con `pt-2`, al final del contenido.
 5. Relleno inferior suficiente para que el pie fijo no tape nada.
 
-**Pie fijo** (sobre el teclado cuando está abierto, respetando el área segura; fondo `background`, `px-4 pt-2 pb-4`, `gap-2`):
+**Pie fijo** (sobre el teclado cuando está abierto, con `FormLayout` (ver `docs/design/tab-bar-and-keyboard.md`), respetando el área segura; fondo `background`, `px-4 pt-2 pb-4`, `gap-2`):
 
 1. **Total** (solo con al menos un producto elegido): fila `flex-row justify-between items-baseline` con "Total" en `text-base font-medium` `foreground` y `Amount` en la variante nueva `total` (6.2), en acento: es el monto principal de esta pantalla. Etiqueta accesible del bloque: "Total: 45.000 pesos". Lo calcula `formTotal(items)` (ignora precios todavía no válidos). Con letra grande, el monto pasa debajo de "Total".
 2. `PrimaryButton` **"Guardar venta"**, ícono `Check`. Nunca deshabilitado (`createSubmitHandler`): sin productos o con errores, marca los campos, lleva el foco al primero y anuncia "Revisa los campos marcados". Un segundo toque mientras guarda no envía otra vez; la etiqueta no cambia.

@@ -5,18 +5,18 @@ export const SALES_CSV_FILE_NAME = 'ventas.csv';
 /** Nombre fijo del CSV de productos. */
 export const PRODUCTS_CSV_FILE_NAME = 'productos.csv';
 
-const BACKUP_PATTERN = /^cuantovendi-respaldo-(\d{4}-\d{2}-\d{2})\.zip$/;
+const BACKUP_PATTERN = /^(?:kofi|cuantovendi)-respaldo-(\d{4}-\d{2}-\d{2})\.zip$/;
 const SAFETY_PATTERN = /^cuantovendi-seguridad-(\d{13})\.zip$/;
 const SAFETY_DIGITS = 13;
 
-/** `cuantovendi-respaldo-AAAA-MM-DD.zip`, con la fecha local de quien exporta. */
+/** `kofi-respaldo-AAAA-MM-DD.zip`, con la fecha local de quien exporta. */
 export function backupFileName(date: LocalDate): string {
-  return `cuantovendi-respaldo-${date}.zip`;
+  return `kofi-respaldo-${date}.zip`;
 }
 
-/** `cuantovendi-emergencia-AAAA-MM-DD.zip`, con la fecha local de quien exporta. */
+/** `kofi-emergencia-AAAA-MM-DD.zip`, con la fecha local de quien exporta. */
 export function emergencyFileName(date: LocalDate): string {
-  return `cuantovendi-emergencia-${date}.zip`;
+  return `kofi-emergencia-${date}.zip`;
 }
 
 /** `cuantovendi-seguridad-<epochMs de 13 dígitos>.zip`. */
@@ -31,7 +31,10 @@ export function parseSafetyFileName(name: string): EpochMs | null {
   return match !== null && parsed.success ? parsed.data : null;
 }
 
-/** Indica si el nombre es uno de los que genera la exportación (respaldo con fecha válida o CSV). */
+/**
+ * Indica si el nombre es uno de los que genera la exportación (respaldo con fecha válida o CSV).
+ * Acepta también el prefijo anterior `cuantovendi-respaldo-`, de cuando la app tenía otro nombre.
+ */
 export function isExportFileName(name: string): boolean {
   if (name === SALES_CSV_FILE_NAME || name === PRODUCTS_CSV_FILE_NAME) {
     return true;

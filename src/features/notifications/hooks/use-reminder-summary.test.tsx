@@ -2,6 +2,7 @@ import { act, screen, waitFor } from '@testing-library/react-native';
 import { Text } from 'react-native';
 
 import { createTestDependencies } from '@/core/testing/create-test-dependencies';
+import { holdCalls } from '@/core/testing/hold-calls';
 import { renderWithProviders } from '@/core/testing/render-with-providers';
 
 import { reminderSummaryText } from '../components/notification-texts';
@@ -29,9 +30,11 @@ describe('useReminderSummary', () => {
   it('starts loading and then describes the stored preferences and permission', async () => {
     const dependencies = createTestDependencies();
     dependencies.notifications.setPermission('granted');
+    const release = holdCalls(dependencies.preferences, 'get');
     await renderWithProviders(<SummaryProbe />, { dependencies });
 
     expect(screen.getByText('resumen: cargando')).toBeOnTheScreen();
+    release();
     expect(
       await screen.findByText('resumen: Domingos a las 20:00 y resumen del mes'),
     ).toBeOnTheScreen();

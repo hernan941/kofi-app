@@ -404,7 +404,7 @@ El mensaje de error dice qué hacer: "Las dependencias de producción cambiaron:
    - El designer fija los textos.
 2. **¿La copia de seguridad (D-22) tiene una fila propia en Ajustes o se ve dentro de Respaldo?** **Por defecto**: dentro de Respaldo, como ya diseñó F8.1 (UX-B11). Ajustes solo la menciona en el resumen. Alternativa: una fila "Copia de seguridad" que abra `/settings/backup` en esa sección.
 3. **¿Qué dice "Acerca de"?**
-   - **Por defecto**: nombre "cuantovendi" y "Versión 1.0.0". Si la versión no está disponible, se omite la línea.
+   - **Por defecto**: nombre "Kofi" y "Versión 1.0.0". Si la versión no está disponible, se omite la línea.
    - Sin número de build ni versión del esquema o del formato de respaldo, que no le dicen nada a la persona.
    - Sin contacto, correo ni formulario de comentarios (D-23).
 4. **¿El texto de cada licencia en una pantalla aparte o desplegado en la lista?** **Por defecto**: pantalla aparte (`/settings/licenses/[id]`). Con 80 entradas y textos de hasta 11 KB, desplegarlos hace la lista larga e incómoda con TalkBack. El designer puede elegir otra cosa: este diseño la soporta cambiando solo las pantallas.
@@ -412,7 +412,7 @@ El mensaje de error dice qué hacer: "Las dependencias de producción cambiaron:
 6. **¿La lista destaca HeroUI Native, Lexend y Phosphor arriba?** **Por defecto**: no. Una sola lista alfabética, con una frase de introducción. Los tres se encuentran por nombre y se verifican en los tests y en el E2E.
 7. **Nota de privacidad: ¿se protege con una regla de lint?** La nota dice que los datos viven en el teléfono. Hoy no hay ningún `fetch`, `XMLHttpRequest`, `WebSocket` ni `Linking.openURL` en `src/` (verificado).
    - **Por defecto**: sí. `no-restricted-globals` para esos tres en `src/**`, como enmienda de ADR-013, para que un cambio futuro no deje la nota en falso sin que nadie lo note.
-   - Texto de la nota, **por defecto**: "Tus datos viven en tu teléfono. cuantovendi no tiene cuentas ni envía tus datos a internet. Para guardarlos en otro lugar, crea un respaldo." (D-09: el respaldo no tiene contraseña. El designer decide si lo dice ahí o solo en Respaldo).
+   - Texto de la nota, **por defecto**: "Tus datos viven en tu teléfono. Kofi no tiene cuentas ni envía tus datos a internet. Para guardarlos en otro lugar, crea un respaldo." (D-09: el respaldo no tiene contraseña. El designer decide si lo dice ahí o solo en Respaldo).
 
 ### 6.2 Riesgos técnicos
 

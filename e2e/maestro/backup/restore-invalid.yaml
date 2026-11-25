@@ -15,7 +15,7 @@ tags:
       - tapOn: 'Downloads|Descargas'
 - tapOn: 'no-es-un-respaldo.txt'
 - extendedWaitUntil:
-    visible: 'Este archivo no es un respaldo de cuantovendi'
+    visible: 'Este archivo no es un respaldo de Kofi'
     timeout: 20000
 - assertVisible: 'Elige el archivo que creaste con "Crear respaldo".*'
 - assertVisible: 'Elegir otro archivo'

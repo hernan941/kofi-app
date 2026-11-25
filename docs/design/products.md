@@ -182,7 +182,7 @@ La tarjeta pasa a ser:
 
 #### Teclado y botón fijo
 
-- El botón "Guardar" queda **sobre el teclado** cuando está abierto (en iOS con `KeyboardAvoidingView` y `behavior="padding"`; en Android con el `adjustResize` por defecto) y siempre respeta el área segura de abajo.
+- El botón "Guardar" queda **sobre el teclado** cuando está abierto (con `FormLayout`, ver `docs/design/tab-bar-and-keyboard.md`) y siempre respeta el área segura de abajo.
 - Los campos de monto usan el teclado numérico (ya lo hace `MoneyField`).
 
 ### 3.6 Editar producto (`/products/[id]/edit`, `EditProductScreen`)

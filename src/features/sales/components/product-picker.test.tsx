@@ -170,6 +170,31 @@ describe('ProductPickerSheet', () => {
     expect(rows.length).toBeLessThan(50);
   });
 
+  it('lets the list shrink before the search field: the list and its container both shrink', async () => {
+    await renderWithProviders(
+      <ProductPickerSheet
+        isOpen
+        products={catalogOf300}
+        showThumbnails={false}
+        onPick={jest.fn()}
+        onClose={jest.fn()}
+      />,
+    );
+
+    const classNames: string[] = [];
+    let node = screen.getAllByRole('button', { name: /^Producto \d+/ })[0]?.parent ?? null;
+    while (node !== null) {
+      const { className } = node.props as { className?: unknown };
+      if (typeof className === 'string') classNames.push(className);
+      node = node.parent;
+    }
+
+    const list = classNames.find((className) => className.includes('max-h-96'));
+    const container = classNames.find((className) => className.includes('gap-3'));
+    expect(list).toContain('shrink');
+    expect(container).toContain('shrink');
+  });
+
   it('finds a product that is not rendered yet by searching in the sheet', async () => {
     await renderWithProviders(
       <ProductPickerSheet

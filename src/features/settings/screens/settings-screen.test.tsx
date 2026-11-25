@@ -164,13 +164,13 @@ describe('SettingsScreen', () => {
   it('shows the name and the version of the app', async () => {
     await renderScreen();
 
-    expect(screen.getByLabelText('cuantovendi, Versión 1.0.0-test')).toBeOnTheScreen();
+    expect(screen.getByLabelText('Kofi, Versión 1.0.0-test')).toBeOnTheScreen();
   });
 
   it('shows only the name when the version is unknown', async () => {
     await renderScreen({}, createTestDependencies({ appVersion: 'unknown' }));
 
-    expect(screen.getByLabelText('cuantovendi')).toBeOnTheScreen();
+    expect(screen.getByLabelText('Kofi')).toBeOnTheScreen();
     expect(screen.queryByText(/^Versión/)).not.toBeOnTheScreen();
     expect(screen.queryByText(/unknown/)).not.toBeOnTheScreen();
   });
