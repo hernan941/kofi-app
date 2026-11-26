@@ -15,6 +15,9 @@
           "NSAllowsArbitraryLoads": false,
           "NSAllowsLocalNetworking": true
         }
+      },
+      "runtimeVersion": {
+        "policy": "sdkVersion"
       }
     },
     "android": {
@@ -79,6 +82,21 @@
       "typedRoutes": true,
       "reactCompiler": true
     },
-    "platforms": ["ios", "android"]
+    "platforms": ["ios", "android"],
+    "extra": {
+      "router": {
+        "asyncRoutes": {
+          "web": true
+        }
+      },
+      "eas": {
+        "projectId": "220f3dc5-0383-480f-a675-540981070c9c"
+      }
+    },
+    "owner": "herurw",
+    "updates": {
+      "enabled": false,
+      "url": "https://u.expo.dev/220f3dc5-0383-480f-a675-540981070c9c"
+    }
   }
 }

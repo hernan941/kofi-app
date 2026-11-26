@@ -25,6 +25,7 @@
     "expo-sqlite": "~58.0.17",
     "expo-status-bar": "~58.0.5",
     "expo-system-ui": "~58.0.7",
+    "expo-updates": "~58.0.22",
     "heroui-native": "^1.0.11",
     "phosphor-react-native": "^3.0.6",
     "react": "19.3.0",
@@ -85,10 +86,35 @@
     "e2e:android": "maestro test e2e/maestro",
     "db:generate": "drizzle-kit generate",
     "licenses:generate": "node tools/licenses/generate-licenses.js",
-    "licenses:check": "node tools/licenses/generate-licenses.js --check"
+    "licenses:check": "node tools/licenses/generate-licenses.js --check",
+    "publish:ios-go": "node tools/publish/publish-ios-go.js"
   },
   "private": true,
   "engines": {
     "node": ">=22"
+  },
+  "expo": {
+    "autolinking": {
+      "android": {
+        "exclude": [
+          "expo-updates",
+          "expo-manifests",
+          "expo-eas-client",
+          "expo-structured-headers",
+          "expo-updates-interface",
+          "expo-json-utils"
+        ]
+      },
+      "ios": {
+        "exclude": [
+          "expo-updates",
+          "expo-manifests",
+          "expo-eas-client",
+          "expo-structured-headers",
+          "expo-updates-interface",
+          "expo-json-utils"
+        ]
+      }
+    }
   }
 }

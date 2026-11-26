@@ -62,6 +62,18 @@ npm run lint
 npm test
 ```
 
+## Kofi on an iPhone (Expo Go)
+
+Kofi can run on an iPhone without signing the app or building it on a Mac, using Expo Go from the App Store and EAS Update on the free Expo plan (ADR-022). Only the JavaScript bundle and its assets are uploaded; the data never leaves the phone.
+
+Requirements: an Expo account, Expo Go for SDK 58 signed in with that account, and `npx eas-cli@27.11.0 login` plus `npx eas-cli@27.11.0 init` already done in this repository.
+
+1. Commit your changes. The script only publishes a clean tree and never commits.
+2. Run `npm run publish:ios-go`. It runs the checks, publishes to the `ios-go` branch and prints a fixed link and a QR URL. If there are new migrations, export a backup on the iPhone first and add `-- --with-migration`.
+3. Open the link in Expo Go, or scan the QR, and save the link.
+
+Kofi's data lives inside Expo Go. If Expo Go is deleted, the data is lost, so export backups regularly and keep them outside Expo Go (for example in Files).
+
 Technical decisions are recorded in [docs/architecture](docs/architecture/README.md), and the product vision is in [docs/product.md](docs/product.md). Both are in Spanish.
 
 The screenshots use sample data.

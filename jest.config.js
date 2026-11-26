@@ -67,6 +67,7 @@ module.exports = {
         '<rootDir>/tools/licenses/**/*.test.[jt]s?(x)',
         '<rootDir>/tools/perf/**/*.test.[jt]s?(x)',
         '<rootDir>/tools/photos/**/*.test.[jt]s?(x)',
+        '<rootDir>/tools/publish/**/*.test.[jt]s?(x)',
       ],
     },
     {

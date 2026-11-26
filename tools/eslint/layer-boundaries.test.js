@@ -295,6 +295,18 @@ const VIOLATIONS = [
     rule: IMPORTS_RULE,
   },
   {
+    name: 'expo-updates imported (not linked in any native build, ADR-022)',
+    path: 'src/shared/lib/updates-expo-updates.ts',
+    code: "import * as Updates from 'expo-updates';\n\nexport const value = Updates;\n",
+    rule: IMPORTS_RULE,
+  },
+  {
+    name: 'a subpath of expo-updates imported (ADR-022)',
+    path: 'src/core/providers/updates-subpath.ts',
+    code: "import { reloadAsync } from 'expo-updates/build/Updates';\n\nexport const value = reloadAsync;\n",
+    rule: IMPORTS_RULE,
+  },
+  {
     name: 'expo-web-browser imported',
     path: 'src/shared/lib/net-web-browser.ts',
     code: "import * as WebBrowser from 'expo-web-browser';\n\nexport const value = WebBrowser;\n",
@@ -399,6 +411,12 @@ const VIOLATIONS = [
 ];
 
 const ALLOWED = [
+  {
+    name: 'a publishing tool importing expo-updates',
+    path: 'tools/publish/uses-expo-updates.ts',
+    code: "import * as Updates from 'expo-updates';\n\nexport const value = Updates;\n",
+    rules: [IMPORTS_RULE],
+  },
   {
     name: 'the styled safe area view importing SafeAreaView',
     path: 'src/shared/ui/styled-safe-area-view.tsx',
@@ -543,7 +561,7 @@ function writeSandbox() {
         baseUrl: '.',
         paths: { '@/*': ['./src/*'] },
       },
-      include: ['src/**/*'],
+      include: ['src/**/*', 'tools/**/*'],
     }),
     'eslint.config.js': `const base = require(${JSON.stringify(path.join(REPO_ROOT, 'eslint.config.js'))});\nmodule.exports = [...base, { languageOptions: { parserOptions: { tsconfigRootDir: __dirname } } }];\n`,
     ...STUBS,
@@ -565,7 +583,7 @@ function writeSandbox() {
 function lintSandbox() {
   const result = spawnSync(
     path.join(REPO_ROOT, 'node_modules', '.bin', 'eslint'),
-    ['--format', 'json', '--no-warn-ignored', 'src'],
+    ['--format', 'json', '--no-warn-ignored', 'src', 'tools'],
     { cwd: SANDBOX, encoding: 'utf8', maxBuffer: 20 * 1024 * 1024 },
   );
   const report = JSON.parse(result.stdout);
@@ -587,6 +605,10 @@ describe('layer boundaries and local rules', () => {
 
   test.each(VIOLATIONS)('reports $name', ({ path: file, rule }) => {
     expect(reported.get(file)).toContain(rule);
+  });
+
+  it('lints the files of tools/ in the sandbox', () => {
+    expect(reported.has('tools/publish/uses-expo-updates.ts')).toBe(true);
   });
 
   test.each(ALLOWED)('accepts $name', ({ path: file, rules }) => {

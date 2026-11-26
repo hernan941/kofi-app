@@ -24,12 +24,13 @@ Cada decisión técnica se registra como un ADR corto: contexto, opciones, decis
 | [ADR-019](adr-019-uniwind-componentes-de-terceros.md) | Componentes de terceros con `className` envueltos con `withUniwind`; siempre `StyledSafeAreaView`, con import directo de `SafeAreaView` prohibido por lint | Aceptado |
 | [ADR-020](adr-020-apis-de-js-en-hermes.md) | Solo APIs de JS disponibles en Hermes: sin `toSorted`, `toReversed`, `toSpliced` ni `with` (mutable sobre una copia), prohibidos por lint; APIs más nuevas que ES2022 se verifican en el emulador antes de usarlas | Aceptado |
 | [ADR-021](adr-021-nombre-kofi-e-identificadores.md) | Nombre del producto Kofi (mayúscula inicial), archivos `kofi-respaldo-*` y `kofi-emergencia-*` con compatibilidad con los `cuantovendi-*`, e identificadores internos que no cambian | Aceptado |
+| [ADR-022](adr-022-kofi-en-iphone-con-expo-go-y-eas-update.md) | Excepción acotada a la v1 local: el bundle de iOS se publica con EAS Update (plan gratuito, branch `ios-go`) para abrir Kofi en Expo Go desde un link fijo del dueño; los datos quedan en el teléfono; `expo-updates` excluido del autolinking y `updates.enabled: false`, así que los builds de Android no cambian | Aceptado |
 
 ## Pendientes (futuro, fuera de la v1)
-La v1 no se publica y no usa servicios externos: todo es local. Estos ADRs quedan como consideraciones para cuando haya un release:
+La v1 no se publica y no usa servicios externos: todo es local, con la única excepción de [ADR-022](adr-022-kofi-en-iphone-con-expo-go-y-eas-update.md) (solo el bundle de JS, vía EAS Update, para Expo Go en el iPhone del usuario). Estos ADRs quedan como consideraciones para cuando haya un release:
 
 | ADR | Tema | Estado |
 |---|---|---|
-| (nuevo, sin número) | EAS Build y Submit, perfiles de `eas.json`, identificadores definitivos, firma de release, política de EAS Update y rollback (con las migraciones solo en builds nativos, ADR-006) y E2E de iOS. Los puntos de partida están en la sección "Futuro" de [ADR-016](adr-016-plataformas-y-builds-locales.md), que en la v1 solo decide web, builds locales, dependencias y `minSdkVersion` | Pendiente |
+| (nuevo, sin número) | EAS Build y Submit, perfiles de `eas.json`, identificadores definitivos, firma de release, política de EAS Update y rollback para builds nativos (con las migraciones solo en builds nativos, ADR-006) y E2E de iOS. La publicación a Expo Go de [ADR-022](adr-022-kofi-en-iphone-con-expo-go-y-eas-update.md) no cubre nada de esto. Los puntos de partida están en la sección "Futuro" de [ADR-016](adr-016-plataformas-y-builds-locales.md), que en la v1 solo decide web, builds locales, dependencias y `minSdkVersion` | Pendiente |
 | ADR-017 | Crash reporting externo y destino del `logger` en producción (en la v1 el logger solo escribe en consola en desarrollo, ADR-005), con revisión de privacidad | Pendiente |
 | (nuevo, sin número) | Avisos de licencias de las bibliotecas nativas que no vienen de npm (Gradle, CocoaPods y lo que trae `react-native` en sus binarios), fuera del alcance de [ADR-018](adr-018-licencias-de-terceros.md) en la v1 | Pendiente |

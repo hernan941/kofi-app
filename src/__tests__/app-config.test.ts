@@ -82,3 +82,66 @@ describe('package.json native build scripts', () => {
     expect(scripts['e2e:build']).toContain('EXPO_PUBLIC_E2E=1 expo run:android --variant release');
   });
 });
+
+describe('EAS Update for Expo Go on iOS (ADR-022)', () => {
+  const { expo: config } = appJson as unknown as {
+    expo: {
+      owner?: string;
+      runtimeVersion?: unknown;
+      updates?: { enabled?: boolean; url?: string };
+      ios: { runtimeVersion?: unknown };
+      android: { runtimeVersion?: unknown };
+      extra: { eas: { projectId: string } };
+    };
+  };
+  const pkg = packageJson as unknown as {
+    dependencies: Record<string, string>;
+    scripts: Record<string, string>;
+    expo: { autolinking: Record<'android' | 'ios', { exclude: string[] }> };
+  };
+  const EXCLUDED_MODULES = [
+    'expo-updates',
+    'expo-manifests',
+    'expo-eas-client',
+    'expo-structured-headers',
+    'expo-updates-interface',
+    'expo-json-utils',
+  ];
+  const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
+
+  it('keeps updates disabled for native builds', () => {
+    expect(config.updates?.enabled).toBe(false);
+  });
+
+  it('points the updates url to the EAS project', () => {
+    expect(config.extra.eas.projectId).toMatch(UUID);
+    expect(config.updates?.url).toBe(`https://u.expo.dev/${config.extra.eas.projectId}`);
+  });
+
+  it('defines the runtime version only for iOS, following the SDK', () => {
+    expect(config.ios.runtimeVersion).toEqual({ policy: 'sdkVersion' });
+    expect(config.runtimeVersion).toBeUndefined();
+    expect(config.android.runtimeVersion).toBeUndefined();
+  });
+
+  it('has an owner', () => {
+    expect(config.owner).toBeTruthy();
+  });
+
+  it('installs expo-updates as a dependency', () => {
+    expect(pkg.dependencies['expo-updates']).toBeDefined();
+  });
+
+  it.each(['android', 'ios'] as const)(
+    'excludes expo-updates and its native modules from %s autolinking',
+    (platform) => {
+      expect(pkg.expo.autolinking[platform].exclude).toEqual(
+        expect.arrayContaining(EXCLUDED_MODULES),
+      );
+    },
+  );
+
+  it('publishes to Expo Go with the publish script', () => {
+    expect(pkg.scripts['publish:ios-go']).toBe('node tools/publish/publish-ios-go.js');
+  });
+});

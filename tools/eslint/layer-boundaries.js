@@ -34,6 +34,7 @@ const PURE_DOMAIN_PACKAGES = [
 const PERSISTENCE_PACKAGES = ['drizzle-orm', 'drizzle-orm/**', 'expo-sqlite', '**/data/drizzle-*'];
 const NETWORK_MESSAGE =
   'La app no envía datos a internet (D-23): la nota de privacidad de Ajustes dejaría de ser cierta.';
+const EXPO_UPDATES_MESSAGE = 'No está enlazado en ningún build nativo (ADR-022).';
 const NETWORK_PATTERNS = [
   {
     group: [
@@ -51,6 +52,9 @@ const NETWORK_PATTERNS = [
     importNames: ['UploadTask', 'DownloadTask'],
     message: NETWORK_MESSAGE,
   },
+];
+const EXPO_UPDATES_PATTERNS = [
+  { group: ['expo-updates', 'expo-updates/**'], message: EXPO_UPDATES_MESSAGE },
 ];
 const UNSTYLED_COMPONENT_MESSAGE =
   'Usa StyledSafeAreaView de @/shared/ui (ADR-019): Uniwind ignora className en SafeAreaView sin withUniwind.';
@@ -191,6 +195,7 @@ function restrictedImports({
     ...deepImports,
     { group: packages },
     ...NETWORK_PATTERNS,
+    ...EXPO_UPDATES_PATTERNS,
     ...(allowSafeAreaView ? [] : UNSTYLED_COMPONENT_PATTERNS),
     ...(allowIcons
       ? []

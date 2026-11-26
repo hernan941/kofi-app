@@ -37,6 +37,8 @@ const overrides = {
     'react-dom':
       'Peer dependency of expo-router that does not enter the native bundle (ADR-016 removed the web platform).',
     tailwindcss: 'Uniwind uses it only while compiling the styles.',
+    'expo-updates':
+      'Only used by `eas update` when publishing to Expo Go; it is excluded from autolinking and no source file imports it (ADR-022).',
   },
   displayNames: {
     'heroui-native': 'HeroUI Native',

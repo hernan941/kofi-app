@@ -4,7 +4,7 @@ App móvil con Expo (React Native) + TypeScript. Las decisiones técnicas están
 
 ## Reglas
 
-- **Git**: nunca hacer commit ni push salvo que el usuario lo pida explícitamente. Los commits y PRs van **sin coautor ni líneas de atribución**. Los subagentes no tocan el estado de git. Nunca se commitean archivos `.env` ni secretos (solo `.env.example`); revisar `git status` antes de cada commit.
+- **Git**: nunca crear ramas, hacer commit ni push salvo que el usuario lo pida explícitamente; los commits pedidos van en la rama actual, sin crear otra. Los commits y PRs van **sin coautor ni líneas de atribución**. Los subagentes no tocan el estado de git. Nunca se commitean archivos `.env` ni secretos (solo `.env.example`); revisar `git status` antes de cada commit.
 - **Decisiones**: el tiempo de desarrollo no es un criterio. Se decide por calidad, mantenibilidad, corrección, seguridad y UX.
 - **ADRs**: toda decisión técnica nueva se registra como ADR en `docs/architecture/` y se agrega al índice. Este archivo se mantiene mínimo: solo reglas de trabajo y punteros.
 - **TDD** obligatorio; los tests E2E/pesados se hacen al cierre de cada feature (ver ADR-002).
